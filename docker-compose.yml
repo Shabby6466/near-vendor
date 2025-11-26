@@ -1,0 +1,51 @@
+version: "2"
+services:
+
+  redis:
+    image: 'bitnami/redis:latest'
+    volumes:
+      - redis:/var/lib/redis/data/
+    container_name: 'nearvendor-redis'
+    restart: 'always'
+    env_file:
+      - _database.env
+    ports:
+      - '6379:6379'
+    networks:
+      - nearvendor-backend
+
+  postgres:
+    image: 'postgis/postgis'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data/
+    container_name: 'nearvendor-db'
+    restart: 'always'
+    env_file:
+      - _database.env
+    ports:
+      - '5432:5432'
+    networks:
+      - nearvendor-backend
+
+  nearvendor-backend:
+    build:
+      context: .
+    image: nearvendor-backend:latest
+    container_name: nearvendor-backend
+    depends_on:
+      - postgres
+
+    volumes:
+      - ./src:/app/src
+      - .env:/app/.env
+    ports:
+      - '3836:3836'
+    networks:
+      - nearvendor-backend
+
+networks:
+  nearvendor-backend:
+volumes:
+  postgres-data:
+  redis:
+
