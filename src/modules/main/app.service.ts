@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { NodeEnv } from '@utils/enum';
 import { WinstonModuleOptions } from 'nest-winston';
+import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { DataSourceOptions } from 'typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import * as winston from 'winston';
@@ -12,7 +13,7 @@ export class AppService {
     // void this.adminAuthService.createSuperAdmin();
   }
 
-  static typeormConfig(): DataSourceOptions {
+  static typeormConfig(): TypeOrmModuleOptions {
     return {
       type: 'postgres',
       host: process.env.DB_HOST,
@@ -20,7 +21,8 @@ export class AppService {
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
-      entities: [__dirname + './../**/**.entity{.ts,.js}'],
+      entities: [__dirname + '/../../**/*.entity{.ts,.js}'],
+      autoLoadEntities: true,
       synchronize: process.env.DB_SYNC === 'true',
       extra: {
         // based on  https://node-postgres.com/api/pool
@@ -32,7 +34,7 @@ export class AppService {
       namingStrategy: new SnakeNamingStrategy(),
       subscribers: [],
     };
-   
+
   }
 
   /**
