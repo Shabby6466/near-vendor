@@ -11,6 +11,23 @@ export const generateRandomIndex = (): number => {
   return Math.floor(Math.random() * 50);
 };
 
+export class CustomHttpException extends HttpException {
+  constructor(
+    responseCode: ResponseCode,
+    responseMessage: ResponseMessage,
+    status: number = 400,
+  ) {
+    super(
+      {
+        statusCode: responseCode,
+        message: responseMessage,
+      },
+      status,
+    );
+  }
+}
+
+
 export class Exception {
   constructor(responseCode?: ResponseCode, responseMessage?: ResponseMessage) {
     throw new HttpException(

@@ -41,6 +41,7 @@
     "aws-sdk": "^2.1502.0",
     "axios": "^1.6.8",
     "bcrypt": "^5.1.1",
+    "bcryptjs": "^3.0.3",
     "bull": "^4.16.0",
     "bwip-js": "^4.3.0",
     "cache-manager": "^5.3.1",

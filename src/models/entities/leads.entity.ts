@@ -1,7 +1,6 @@
 import { BaseEntity } from "@modules/common/entity/base.entity";
 import { Entity, Column, OneToOne, OneToMany, JoinColumn } from "typeorm";
-import { Buyers } from "./buyers.entity";
-import { Seller } from "./sellers.entity";
+import { User } from "./users.entity";
 import { Item } from "./items.entity";
 import { Shops } from "./shops.entity";
 
@@ -15,13 +14,13 @@ export class Lead extends BaseEntity {
     @Column({ type: 'varchar', length: 100 })
     saleValue: string;
 
-    @OneToOne(() => Buyers, (buyer) => buyer.lead)
+    @OneToOne(() => User, (user) => user.leadAsBuyer)
     @JoinColumn()
-    buyer: Buyers;
+    buyer: User;
 
-    @OneToOne(() => Seller, (seller) => seller.lead)
+    @OneToOne(() => User, (user) => user.leadAsSeller)
     @JoinColumn()
-    seller: Seller;
+    seller: User;
 
     @OneToMany(() => Item, (item) => item.lead)
     @JoinColumn()

@@ -1,6 +1,6 @@
 import { BaseEntity } from "@modules/common/entity/base.entity";
 import { Entity, Column, OneToOne, OneToMany, ManyToOne, JoinColumn } from "typeorm";
-import { Seller } from "./sellers.entity";
+import { User } from "./users.entity";
 import { Lead } from "./leads.entity";
 
 
@@ -19,9 +19,9 @@ export class Shops extends BaseEntity {
     @Column({ type: 'decimal', precision: 10, scale: 6, nullable: false })
     shopLatitude: number;
 
-    @ManyToOne(() => Seller, (seller) => seller.shops)
+    @ManyToOne(() => User, (user) => user.shops)
     @JoinColumn()
-    sellers: Seller;
+    user: User;
 
     @OneToOne(() => Lead, (lead) => lead.shop)
     lead: Lead;

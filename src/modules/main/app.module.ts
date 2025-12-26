@@ -19,9 +19,10 @@ import { RateLimiter } from "bull";
 import { WinstonModule } from "nest-winston";
 import { AppService } from "./app.service";
 import { ProcessorModule } from "@modules/processor/processor.module";
-import { BuyerModule } from "@modules/buyer/buyer.module";
-import { SellerModule } from "@modules/seller/seller.module";
 import { ShopModule } from "@modules/shop/shop.module";
+import { ItemModule } from "@modules/items/item.module";
+import { LeadModule } from "@modules/leads/lead.module";
+import { UsersModule } from "@modules/users/users.module";
 export const adminModulesImports: ModuleMetadata["imports"] = [
 ];
 
@@ -54,9 +55,10 @@ export const imports: ModuleMetadata["imports"] = [
   SeedModule,
   MediaModule,
   ProcessorModule,
-  BuyerModule,
-  SellerModule,
+  UsersModule,
   ShopModule,
+  ItemModule,
+  LeadModule,
 ];
 
 @Module({

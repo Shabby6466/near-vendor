@@ -10,6 +10,16 @@ export enum ResponseMessage {
   BUYER_NOT_FOUND = 'Buyer not found',
   GENERIC_ERROR = 'Generic Error',
   SELLER_NOT_FOUND = 'Seller Not found',
+  SHOP_NOT_FOUND = 'Shop Not found',
+  FORBIDDEN_ACCESS = 'Forbidden Access',
+  INVALID_CREDENTIALS = 'Invalid Credentials',
+  AUTH_HEADER_MISSING = 'Auth Header Missing',
+  AUTH_HEADER_MALFORMED = 'Auth Header Malformed',
+  INSUFFICIENT_ROLE = 'Insufficient Role',
+  USER_INACTIVE = 'User Inactive',
+  USER_SUSPENDED = 'User Suspended',
+  PHONE_NUMBER_ALREADY_EXISTS = 'Phone number already exists',
+  INVALID_ROLE = 'Invalid Role',
 }
 
 export enum ResponseCode {
@@ -28,6 +38,26 @@ export enum ResponseCode {
   BUYER_NOT_FOUND = 407,
   GENERIC_ERROR = 505,
   SELLER_NOT_FOUND = 408,
+  SHOP_NOT_FOUND = 409,
+  FORBIDDEN_ACCESS = 505,
+  INVALID_CREDENTIALS = 401,
+  AUTH_HEADER_MISSING = 401,
+  AUTH_HEADER_MALFORMED = 401,
+  INSUFFICIENT_ROLE = 403,
+  USER_INACTIVE = 401,
+  INVALID_TOKEN = 401,
+  USER_SUSPENDED = 401,
+  USER_NOT_FOUND = 401,
+
+
+  PHONE_NUMBER_ALREADY_EXISTS = 406,
+  INVALID_ROLE = 402,
+}
+
+export enum UserStatus {
+  ACTIVE = "ACTIVE",
+  INACTIVE = "INACTIVE",
+  SUSPENDED = "SUSPENDED",
 }
 
 export enum JobExpression {
@@ -110,3 +140,7 @@ export enum Duration {
   FIVE = "5",
 }
 
+export enum UserRoles {
+  BUYER = "BUYER",
+  SELLER = "SELLER"
+}
