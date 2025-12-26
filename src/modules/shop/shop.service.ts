@@ -4,6 +4,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Injectable } from "@nestjs/common";
 import { CreateShopDto } from "./dto/shop.dto";
 import { ShopNotFoundException } from "./shop.exception";
+import { CreateShopResponse } from "./shop.response";
 
 @Injectable()
 export class ShopService {
@@ -12,14 +13,15 @@ export class ShopService {
         private readonly shopRepo: Repository<Shops>
     ) { }
 
-    async createShop(dto: CreateShopDto) {
+    async createShop(dto: CreateShopDto, user: any): Promise<CreateShopResponse> {
         const shop = new Shops();
         shop.shopName = dto.shopName;
         shop.shopImageUrl = dto.shopImageUrl;
         shop.shopLatitude = dto.latitude;
         shop.shopLongitude = dto.longitude;
+        shop.user = user;
         await this.shopRepo.save(shop);
-        return shop;
+        return new CreateShopResponse();
     }
 
     async getShopById(id: string) {
