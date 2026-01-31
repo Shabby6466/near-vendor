@@ -20,6 +20,8 @@ export enum ResponseMessage {
   USER_SUSPENDED = 'User Suspended',
   PHONE_NUMBER_ALREADY_EXISTS = 'Phone number already exists',
   INVALID_ROLE = 'Invalid Role',
+  INVALID_DATE = "Invalid date",
+  INVALID_ZIP_CODE = "Invalid zip code",
 }
 
 export enum ResponseCode {
