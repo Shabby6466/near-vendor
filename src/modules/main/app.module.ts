@@ -25,11 +25,20 @@ import { LeadModule } from "@modules/leads/lead.module";
 import { UsersModule } from "@modules/users/users.module";
 import { InventoryModule } from "@modules/inventory/inventory.module";
 import { SearchModule } from "@modules/search/search.module";
+import { VendorApplicationsModule } from "@modules/vendor-applications/vendor-applications.module";
+import { AdminModule } from "@modules/admin/admin.module";
+import { ThrottlerModule } from "@nestjs/throttler";
 export const adminModulesImports: ModuleMetadata["imports"] = [
 ];
 
 export const imports: ModuleMetadata["imports"] = [
   ConfigModule.forRoot({ envFilePath: [AppService.envConfiguration()], ignoreEnvFile: false }),
+  ThrottlerModule.forRoot([
+    {
+      ttl: 60_000,
+      limit: 120,
+    },
+  ]),
   TypeOrmModule.forRoot(AppService.typeormConfig()),
   WinstonModule.forRootAsync({
     useFactory: () => AppService.createWinstonTransports(),
@@ -63,6 +72,8 @@ export const imports: ModuleMetadata["imports"] = [
   LeadModule,
   InventoryModule,
   SearchModule,
+  VendorApplicationsModule,
+  AdminModule,
 ];
 
 @Module({

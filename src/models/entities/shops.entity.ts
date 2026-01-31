@@ -13,6 +13,15 @@ export class Shops extends BaseEntity {
     @Column({ type: 'varchar', length: 100 })
     shopImageUrl: string;
 
+    @Column({ type: 'varchar', length: 20, nullable: true })
+    whatsappNumber: string;
+
+    @Column({ type: 'varchar', length: 200, nullable: true })
+    shopAddress: string;
+
+    @Column({ type: 'boolean', default: true })
+    isActive: boolean;
+
     @Column({ type: 'decimal', precision: 10, scale: 6, nullable: false })
     shopLongitude: number;
 

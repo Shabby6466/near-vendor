@@ -144,5 +144,7 @@ export enum Duration {
 
 export enum UserRoles {
   BUYER = "BUYER",
-  SELLER = "SELLER"
+  SELLER = "SELLER",
+  VENDOR = "VENDOR",
+  SUPERADMIN = "SUPERADMIN",
 }
