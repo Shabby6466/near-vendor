@@ -11,7 +11,8 @@ cluster.setupMaster({
 });
 
 
-for (let i = 0; i < 2; i++) {
+const workers = Number(process.env.WORKERS || 1);
+for (let i = 0; i < workers; i++) {
   cluster.fork({ FORK: i });
 }
 cluster.on('exit', (worker, code, signal) => {
