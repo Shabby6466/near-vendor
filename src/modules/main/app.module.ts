@@ -23,6 +23,8 @@ import { ShopModule } from "@modules/shop/shop.module";
 import { ItemModule } from "@modules/items/item.module";
 import { LeadModule } from "@modules/leads/lead.module";
 import { UsersModule } from "@modules/users/users.module";
+import { InventoryModule } from "@modules/inventory/inventory.module";
+import { SearchModule } from "@modules/search/search.module";
 export const adminModulesImports: ModuleMetadata["imports"] = [
 ];
 
@@ -59,6 +61,8 @@ export const imports: ModuleMetadata["imports"] = [
   ShopModule,
   ItemModule,
   LeadModule,
+  InventoryModule,
+  SearchModule,
 ];
 
 @Module({
