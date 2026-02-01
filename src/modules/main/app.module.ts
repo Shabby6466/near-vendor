@@ -28,6 +28,7 @@ import { SearchModule } from "@modules/search/search.module";
 import { VendorApplicationsModule } from "@modules/vendor-applications/vendor-applications.module";
 import { AdminModule } from "@modules/admin/admin.module";
 import { ThrottlerModule } from "@nestjs/throttler";
+import { BootstrapModule } from "@modules/bootstrap/bootstrap.module";
 export const adminModulesImports: ModuleMetadata["imports"] = [
 ];
 
@@ -74,6 +75,7 @@ export const imports: ModuleMetadata["imports"] = [
   SearchModule,
   VendorApplicationsModule,
   AdminModule,
+  BootstrapModule,
 ];
 
 @Module({
