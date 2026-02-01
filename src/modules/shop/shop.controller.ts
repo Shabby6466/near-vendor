@@ -9,6 +9,8 @@ import { JwtAuthGuard } from "@modules/auth/jwt-guard";
 import { RolesGuard } from "@modules/auth/roles.guard";
 import { Request } from "express";
 
+type AuthedRequest = Request & { user?: any };
+
 @ApiTags("Shops")
 @Controller("shop")
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -20,7 +22,7 @@ export class ShopController {
     @ApiOperation({ summary: "Create shop" })
     @ApiOkResponse({ description: "Create a new shop" })
     @Roles(UserRoles.SELLER)
-    async createShop(@Body() dto: CreateShopDto, @Req() req: Request) {
+    async createShop(@Body() dto: CreateShopDto, @Req() req: AuthedRequest) {
         return this.service.createShop(dto, req.user);
     }
 
