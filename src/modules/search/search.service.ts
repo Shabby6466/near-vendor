@@ -86,29 +86,7 @@ export class SearchService {
     });
   }
 
-  /**
-   * Fallback suggestions when no exact match found.
-   * Returns closest in-stock items nearby (ignores query).
-   */
-  async alternatives(params: { userLat: number; userLon: number; limit: number }) {
-    let qb = this.repo
-      .createQueryBuilder("i")
-      .leftJoinAndSelect("i.shop", "s")
-      .where("i.isActive = true")
-      .andWhere("i.stock > 0")
-      .andWhere("s.isActive = true");
-
-    qb = qb.addSelect(
-      "ST_DistanceSphere(ST_MakePoint(s.shopLongitude, s.shopLatitude), ST_MakePoint(:userLon, :userLat))",
-      "distance_m"
-    );
-
-    qb = qb.setParameters({ userLat: params.userLat, userLon: params.userLon });
-
-    qb = qb.orderBy("distance_m", "ASC").limit(params.limit);
-
-    const rows = await qb.getRawAndEntities();
-
+  private mapRows(rows: { entities: InventoryItem[]; raw: any[] }) {
     return rows.entities.map((item, idx) => {
       const raw = rows.raw[idx];
       return {
@@ -131,6 +109,79 @@ export class SearchService {
         distanceMeters: raw?.distance_m ? Number(raw.distance_m) : null,
       };
     });
+  }
+
+  /**
+   * Fallback suggestions when no exact match found.
+   * If a query is provided, return "related" nearby items (token matches).
+   * Never returns the whole DB: always limited.
+   */
+  async alternatives(params: { queryText: string; userLat: number; userLon: number; limit: number }) {
+    const q = (params.queryText || "").trim();
+    const tokens = tokenize(q);
+
+    // If query is empty/too short, don't spam with everything.
+    if (tokens.length === 0) return [];
+
+    let qb = this.repo
+      .createQueryBuilder("i")
+      .leftJoinAndSelect("i.shop", "s")
+      .where("i.isActive = true")
+      .andWhere("i.stock > 0")
+      .andWhere("s.isActive = true");
+
+    // Broad matching: any token in name/description/tags
+    qb = qb.andWhere(
+      "(" +
+        tokens
+          .map((_, idx) => `(i.name ILIKE :t${idx} OR i.description ILIKE :t${idx} OR i.tags ILIKE :t${idx})`)
+          .join(" OR ") +
+        ")",
+      Object.fromEntries(tokens.map((t, idx) => [`t${idx}`, `%${t}%`]))
+    );
+
+    // Simple relevance score: count token matches
+    const scoreExpr = tokens
+      .map((_, idx) => `CASE WHEN (i.name ILIKE :t${idx} OR i.description ILIKE :t${idx} OR i.tags ILIKE :t${idx}) THEN 1 ELSE 0 END`)
+      .join(" + ");
+
+    qb = qb.addSelect(`(${scoreExpr})`, "score");
+
+    qb = qb.addSelect(
+      "ST_DistanceSphere(ST_MakePoint(s.shopLongitude, s.shopLatitude), ST_MakePoint(:userLon, :userLat))",
+      "distance_m"
+    );
+
+    qb = qb.setParameters({ userLat: params.userLat, userLon: params.userLon });
+
+    qb = qb.orderBy("score", "DESC").addOrderBy("distance_m", "ASC").limit(params.limit);
+
+    const rows = await qb.getRawAndEntities();
+    return this.mapRows(rows);
+  }
+
+  /**
+   * Generic nearby suggestions (ignores query) used only when explicitly requested.
+   */
+  async nearby(params: { userLat: number; userLon: number; limit: number }) {
+    let qb = this.repo
+      .createQueryBuilder("i")
+      .leftJoinAndSelect("i.shop", "s")
+      .where("i.isActive = true")
+      .andWhere("i.stock > 0")
+      .andWhere("s.isActive = true");
+
+    qb = qb.addSelect(
+      "ST_DistanceSphere(ST_MakePoint(s.shopLongitude, s.shopLatitude), ST_MakePoint(:userLon, :userLat))",
+      "distance_m"
+    );
+
+    qb = qb.setParameters({ userLat: params.userLat, userLon: params.userLon });
+
+    qb = qb.orderBy("distance_m", "ASC").limit(params.limit);
+
+    const rows = await qb.getRawAndEntities();
+    return this.mapRows(rows);
   }
 }
 

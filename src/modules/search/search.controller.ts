@@ -29,10 +29,12 @@ export class SearchController {
       limit: dto.limit ?? 20,
     });
 
-    // If no exact match, show nearby alternatives so buyer doesn't hit a dead end.
+    // If no exact match, show related alternatives (token matches).
+    // Never dump the whole DB when query is empty.
     const alternatives = results.length
       ? []
       : await this.service.alternatives({
+          queryText,
           userLat: dto.userLat,
           userLon: dto.userLon,
           limit: Math.min(dto.limit ?? 20, 12),
@@ -75,6 +77,7 @@ export class SearchController {
     const alternatives = results.length
       ? []
       : await this.service.alternatives({
+          queryText: description,
           userLat: dto.userLat,
           userLon: dto.userLon,
           limit: Math.min(dto.limit ?? 20, 12),
