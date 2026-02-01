@@ -29,11 +29,29 @@ export class BootstrapService implements OnModuleInit {
       try {
         const existing = await this.users.findOne({ where: { phoneNumber: phone } });
         if (existing) {
+          // Always enforce SUPERADMIN role for this phone.
+          let changed = false;
           if (existing.role !== UserRoles.SUPERADMIN) {
             existing.role = UserRoles.SUPERADMIN;
-            existing.isActive = true;
+            changed = true;
+          }
+          if ((existing as any).isActive === false) {
+            (existing as any).isActive = true;
+            changed = true;
+          }
+
+          // Optional: allow forcing password reset via env flag.
+          // Set SUPERADMIN_FORCE_PASSWORD=true to overwrite password on boot.
+          const force = String(process.env.SUPERADMIN_FORCE_PASSWORD || "").toLowerCase() === "true";
+          if (force && password) {
+            existing.password = await bcrypt.hash(password, 10);
+            (existing as any).mustChangePassword = false;
+            changed = true;
+          }
+
+          if (changed) {
             await this.users.save(existing);
-            this.logger.log(`Promoted existing user ${phone} to SUPERADMIN`);
+            this.logger.log(`Ensured SUPERADMIN for ${phone}${force ? " (password forced)" : ""}`);
           } else {
             this.logger.log(`SUPERADMIN already present for ${phone}`);
           }
