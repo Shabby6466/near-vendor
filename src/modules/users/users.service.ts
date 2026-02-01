@@ -2,7 +2,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "models/entities/users.entity";
 import { Repository } from "typeorm";
 import { CreateUserDto, LoginDto } from "./dto/users.dto";
-import * as bcrypt from "bcrypt";
+import * as bcrypt from "bcryptjs";
 import { InvalidRoleException, PhoneNumberAlreadyExistsException, UserNotFoundException } from "./users.exception";
 import { AuthService } from "@modules/auth/auth.service";
 import { InvalidCredentialsException } from "@modules/auth/auth.exception";

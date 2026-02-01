@@ -5,7 +5,7 @@ import { VendorApplication, VendorApplicationStatus } from "models/entities/vend
 import { User } from "models/entities/users.entity";
 import { Shops } from "models/entities/shops.entity";
 import { UserRoles } from "@utils/enum";
-import * as bcrypt from "bcrypt";
+import * as bcrypt from "bcryptjs";
 import { InventoryItem } from "models/entities/inventory-item.entity";
 
 function generatePassword(length = 10) {
