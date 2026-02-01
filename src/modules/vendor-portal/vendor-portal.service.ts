@@ -90,21 +90,84 @@ export class VendorPortalService {
     const rows = this.parseCsv(csv);
 
     const created: InventoryItem[] = [];
+    const failed: Array<{ row: any; reason: string }> = [];
+
     for (const r of rows) {
-      if (!r.name) continue;
-      const item = this.itemsRepo.create({
-        name: String(r.name).trim(),
-        description: r.description || null,
-        price: r.price ? Number(r.price) : null,
-        stock: r.stock ? Number(r.stock) : 0,
-        tags: r.tags || null,
-        isActive: true,
-        shop,
-      } as any);
-      const saved = (await this.itemsRepo.save(item as any)) as any as InventoryItem;
-      created.push(saved);
+      try {
+        if (!r.name) {
+          failed.push({ row: r, reason: "Missing name" });
+          continue;
+        }
+
+        const price = r.price ? Number(r.price) : null;
+        if (r.price && !Number.isFinite(price)) {
+          failed.push({ row: r, reason: "Invalid price" });
+          continue;
+        }
+
+        const stock = r.stock ? Number(r.stock) : 0;
+        if (r.stock && !Number.isFinite(stock)) {
+          failed.push({ row: r, reason: "Invalid stock" });
+          continue;
+        }
+
+        const item = this.itemsRepo.create({
+          name: String(r.name).trim(),
+          description: r.description || null,
+          price,
+          stock,
+          tags: r.tags || null,
+          isActive: true,
+          shop,
+        } as any);
+
+        const saved = (await this.itemsRepo.save(item as any)) as any as InventoryItem;
+        created.push(saved);
+      } catch (e: any) {
+        failed.push({ row: r, reason: e?.message || "Failed" });
+      }
     }
 
-    return { success: true, createdCount: created.length, data: created };
+    return {
+      success: true,
+      createdCount: created.length,
+      failedCount: failed.length,
+      failed,
+      data: created,
+    };
+  }
+
+  async uploadImage(user: any, file: Express.Multer.File) {
+    // If AWS env is configured, use S3Service via dynamic import.
+    const hasAws =
+      !!process.env.AWS_BUCKET_NAME &&
+      !!process.env.AWS_REGION &&
+      !!process.env.AWS_ACCESS_KEY &&
+      !!process.env.AWS_SECRET_KEY;
+
+    if (hasAws) {
+      // Lazy import to avoid instantiating if not used.
+      const { S3Service } = await import("@utils/s3/s3.service");
+      const s3 = new S3Service();
+      const uploaded: any = await s3.upload(file);
+      return { success: true, imageUrl: uploaded?.Location || null };
+    }
+
+    // Local fallback: store in /app/uploads and serve via /uploads/<filename>
+    const fs = await import("fs");
+    const path = await import("path");
+
+    const uploadsDir = path.join(process.cwd(), "uploads");
+    await fs.promises.mkdir(uploadsDir, { recursive: true });
+
+    const safe = String(file.originalname || "file")
+      .replace(/[^a-zA-Z0-9._-]/g, "_")
+      .slice(-80);
+    const filename = `${Date.now()}_${Math.random().toString(16).slice(2)}_${safe}`;
+    const outPath = path.join(uploadsDir, filename);
+
+    await fs.promises.writeFile(outPath, file.buffer);
+
+    return { success: true, imageUrl: `/uploads/${filename}` };
   }
 }

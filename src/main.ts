@@ -9,6 +9,7 @@ import { TrimStringsPipe } from '@modules/common/transformer/trim-strings.pipe';
 import { adminModulesImports, AppModule, imports } from '@modules/main/app.module';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import express from 'express';
+import path from 'path';
 import { DocumentBuilder, SwaggerDocumentOptions, SwaggerModule } from '@nestjs/swagger';
 import { LoggerService } from '@utils/logger/logger.service';
 import compression from 'compression';
@@ -21,6 +22,9 @@ const bootstrap = async () => {
   app.use(compression());
   app.use(express.json({ limit: '50mb' }));
   app.use(express.urlencoded({ limit: '50mb', extended: true }));
+
+  // Serve locally uploaded files (image uploads for vendor inventory MVP)
+  app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
   app.useLogger(logger);
   app.useGlobalInterceptors(new DecimalInterceptor());
 

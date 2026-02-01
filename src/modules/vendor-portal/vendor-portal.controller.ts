@@ -12,6 +12,7 @@ import {
 } from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { FileInterceptor } from "@nestjs/platform-express";
+import { S3Service } from "@utils/s3/s3.service";
 import { JwtAuthGuard } from "@modules/auth/jwt-guard";
 import { RolesGuard } from "@modules/auth/roles.guard";
 import { Roles } from "@modules/auth/roles.decorator";
@@ -56,4 +57,17 @@ export class VendorPortalController {
   uploadCsv(@Req() req: any, @UploadedFile() file: Express.Multer.File) {
     return this.service.uploadCsv(req.user, file);
   }
+
+  @Post("inventory/items/upload-image")
+  @ApiOperation({ summary: "Vendor: upload an image (returns imageUrl)" })
+  @UseInterceptors(
+    FileInterceptor("file", {
+      fileFilter: S3Service.imageFilter,
+      limits: { fileSize: 2 * 1024 * 1024 },
+    })
+  )
+  uploadImage(@Req() req: any, @UploadedFile() file: Express.Multer.File) {
+    return this.service.uploadImage(req.user, file);
+  }
 }
+
