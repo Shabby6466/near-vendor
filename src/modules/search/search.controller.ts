@@ -29,6 +29,15 @@ export class SearchController {
       limit: dto.limit ?? 20,
     });
 
-    return { success: true, results };
+    // If no exact match, show nearby alternatives so buyer doesn't hit a dead end.
+    const alternatives = results.length
+      ? []
+      : await this.service.alternatives({
+          userLat: dto.userLat,
+          userLon: dto.userLon,
+          limit: Math.min(dto.limit ?? 20, 12),
+        });
+
+    return { success: true, results, alternatives };
   }
 }

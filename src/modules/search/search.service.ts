@@ -32,7 +32,8 @@ export class SearchService {
       .createQueryBuilder("i")
       .leftJoinAndSelect("i.shop", "s")
       .where("i.isActive = true")
-      .andWhere("i.stock > 0");
+      .andWhere("i.stock > 0")
+      .andWhere("s.isActive = true");
 
     if (q.length > 0) {
       // prefer full query OR token matches
@@ -76,9 +77,60 @@ export class SearchService {
           shopImageUrl: (item.shop as any).shopImageUrl,
           shopLatitude: (item.shop as any).shopLatitude,
           shopLongitude: (item.shop as any).shopLongitude,
+          shopAddress: (item.shop as any).shopAddress ?? null,
+          whatsappNumber: (item.shop as any).whatsappNumber ?? null,
+          isActive: (item.shop as any).isActive ?? true,
+        },
+        distanceMeters: raw?.distance_m ? Number(raw.distance_m) : null,
+      };
+    });
+  }
+
+  /**
+   * Fallback suggestions when no exact match found.
+   * Returns closest in-stock items nearby (ignores query).
+   */
+  async alternatives(params: { userLat: number; userLon: number; limit: number }) {
+    let qb = this.repo
+      .createQueryBuilder("i")
+      .leftJoinAndSelect("i.shop", "s")
+      .where("i.isActive = true")
+      .andWhere("i.stock > 0")
+      .andWhere("s.isActive = true");
+
+    qb = qb.addSelect(
+      "ST_DistanceSphere(ST_MakePoint(s.shopLongitude, s.shopLatitude), ST_MakePoint(:userLon, :userLat))",
+      "distance_m"
+    );
+
+    qb = qb.setParameters({ userLat: params.userLat, userLon: params.userLon });
+
+    qb = qb.orderBy("distance_m", "ASC").limit(params.limit);
+
+    const rows = await qb.getRawAndEntities();
+
+    return rows.entities.map((item, idx) => {
+      const raw = rows.raw[idx];
+      return {
+        itemId: item.id,
+        name: item.name,
+        description: item.description,
+        imageUrl: item.imageUrl,
+        price: item.price,
+        stock: item.stock,
+        shop: {
+          id: item.shop.id,
+          shopName: (item.shop as any).shopName,
+          shopImageUrl: (item.shop as any).shopImageUrl,
+          shopLatitude: (item.shop as any).shopLatitude,
+          shopLongitude: (item.shop as any).shopLongitude,
+          shopAddress: (item.shop as any).shopAddress ?? null,
+          whatsappNumber: (item.shop as any).whatsappNumber ?? null,
+          isActive: (item.shop as any).isActive ?? true,
         },
         distanceMeters: raw?.distance_m ? Number(raw.distance_m) : null,
       };
     });
   }
 }
+
