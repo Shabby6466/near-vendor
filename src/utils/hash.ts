@@ -1,12 +1,12 @@
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from "bcryptjs";
 
 export class Hash {
   static async make(plainText: string) {
-    const salt = await bcrypt.genSalt();
-    return bcrypt.hashSync(plainText, salt);
+    const salt = await bcrypt.genSalt(10);
+    return bcrypt.hash(plainText, salt);
   }
 
   static async compare(plainText: string, hash: string) {
-    return await bcrypt.compare(plainText, hash);
+    return bcrypt.compare(plainText, hash);
   }
 }
