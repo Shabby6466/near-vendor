@@ -30,6 +30,7 @@ import { AdminModule } from "@modules/admin/admin.module";
 import { ThrottlerModule } from "@nestjs/throttler";
 import { BootstrapModule } from "@modules/bootstrap/bootstrap.module";
 import { VendorPortalModule } from "@modules/vendor-portal/vendor-portal.module";
+import { PortalAuthModule } from "@modules/auth/portal-auth.module";
 
 export const adminModulesImports: ModuleMetadata["imports"] = [
 ];
@@ -78,6 +79,7 @@ export const imports: ModuleMetadata["imports"] = [
   VendorApplicationsModule,
   AdminModule,
   VendorPortalModule,
+  PortalAuthModule,
   BootstrapModule,
 ];
 
