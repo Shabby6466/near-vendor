@@ -138,6 +138,20 @@ export class VendorPortalService {
   }
 
   async uploadImage(user: any, file: Express.Multer.File) {
+    // Prefer Cloudinary if configured
+    const hasCloudinary =
+      !!process.env.CLOUDINARY_CLOUD_NAME &&
+      !!process.env.CLOUDINARY_API_KEY &&
+      !!process.env.CLOUDINARY_API_SECRET;
+
+    if (hasCloudinary) {
+      const { CloudinaryService } = await import("@utils/cloudinary/cloudinary.service");
+      const cloud = new CloudinaryService();
+      const uploaded = await cloud.uploadImage(file, { folder: process.env.CLOUDINARY_FOLDER ?? "nearvendor/inventory" });
+      if (uploaded?.success) return { success: true, imageUrl: uploaded.imageUrl };
+      // fall through if upload fails
+    }
+
     // If AWS env is configured, use S3Service via dynamic import.
     const hasAws =
       !!process.env.AWS_BUCKET_NAME &&

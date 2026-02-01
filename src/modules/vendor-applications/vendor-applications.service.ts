@@ -14,6 +14,20 @@ export class VendorApplicationsService {
   async uploadShopImage(file: Express.Multer.File) {
     if (!file) return { success: false, error: "No file uploaded" };
 
+    // Prefer Cloudinary if configured
+    const hasCloudinary =
+      !!process.env.CLOUDINARY_CLOUD_NAME &&
+      !!process.env.CLOUDINARY_API_KEY &&
+      !!process.env.CLOUDINARY_API_SECRET;
+
+    if (hasCloudinary) {
+      const { CloudinaryService } = await import("@utils/cloudinary/cloudinary.service");
+      const cloud = new CloudinaryService();
+      const uploaded = await cloud.uploadImage(file, { folder: process.env.CLOUDINARY_FOLDER ?? "nearvendor/shops" });
+      if (uploaded?.success) return { success: true, imageUrl: uploaded.imageUrl };
+      // fall through if upload fails
+    }
+
     const hasAws =
       !!process.env.AWS_BUCKET_NAME &&
       !!process.env.AWS_REGION &&
