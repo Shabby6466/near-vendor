@@ -120,6 +120,28 @@ export class AdminService {
     return { success: true };
   }
 
+  async resetVendorPasswordByPhone(phoneNumber: string) {
+    const user = await this.users.findOne({ where: { phoneNumber } });
+    if (!user) throw new NotFoundException("User not found");
+    if (user.role !== UserRoles.VENDOR) {
+      throw new BadRequestException("User is not a vendor");
+    }
+
+    const passwordPlain = generatePassword();
+    user.password = await bcrypt.hash(passwordPlain, 10);
+    user.mustChangePassword = true;
+    user.isActive = true;
+    await this.users.save(user);
+
+    return {
+      success: true,
+      phoneNumber,
+      tempPassword: passwordPlain,
+      mustChangePassword: true,
+      message: "Password reset. Share tempPassword with vendor via WhatsApp. Vendor must change password after first login.",
+    };
+  }
+
   async setShopActive(shopId: string, active: boolean) {
     const shop = await this.shops.findOne({ where: { id: shopId } });
     if (!shop) throw new NotFoundException("Shop not found");

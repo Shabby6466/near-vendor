@@ -61,4 +61,11 @@ export class AdminController {
   enableItem(@Param("id") id: string) {
     return this.service.setInventoryItemActive(id, true);
   }
+
+  @Post("vendors/reset-password")
+  @ApiOperation({ summary: "Reset vendor password by phone number (returns tempPassword)" })
+  resetVendorPassword(@Body() body: { phoneNumber: string }) {
+    return this.service.resetVendorPasswordByPhone(body?.phoneNumber);
+  }
 }
+
