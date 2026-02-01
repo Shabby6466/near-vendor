@@ -11,6 +11,39 @@ export class VendorApplicationsService {
     private readonly repo: Repository<VendorApplication>
   ) {}
 
+  async uploadShopImage(file: Express.Multer.File) {
+    if (!file) return { success: false, error: "No file uploaded" };
+
+    const hasAws =
+      !!process.env.AWS_BUCKET_NAME &&
+      !!process.env.AWS_REGION &&
+      !!process.env.AWS_ACCESS_KEY &&
+      !!process.env.AWS_SECRET_KEY;
+
+    if (hasAws) {
+      const { S3Service } = await import("@utils/s3/s3.service");
+      const s3 = new S3Service();
+      const uploaded: any = await s3.upload(file);
+      return { success: true, imageUrl: uploaded?.Location || null };
+    }
+
+    const fs = await import("fs");
+    const path = await import("path");
+
+    const uploadsDir = path.join(process.cwd(), "uploads");
+    await fs.promises.mkdir(uploadsDir, { recursive: true });
+
+    const safe = String(file.originalname || "file")
+      .replace(/[^a-zA-Z0-9._-]/g, "_")
+      .slice(-80);
+    const filename = `${Date.now()}_${Math.random().toString(16).slice(2)}_${safe}`;
+    const outPath = path.join(uploadsDir, filename);
+
+    await fs.promises.writeFile(outPath, file.buffer);
+
+    return { success: true, imageUrl: `/uploads/${filename}` };
+  }
+
   async apply(dto: ApplyVendorDto) {
     const app = this.repo.create({
       fullName: dto.fullName,
