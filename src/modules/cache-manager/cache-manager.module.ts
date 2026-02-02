@@ -14,6 +14,7 @@ import { QueueName } from './commons/cache-manager.enums';
           host: process.env.REDIS_HOST,
           port: process.env.REDIS_PORT,
           password: process.env.REDIS_PASSWORD,
+          db: parseInt(process.env.REDIS_DB || '0', 10),
         };
       },
     }),
@@ -24,4 +25,4 @@ import { QueueName } from './commons/cache-manager.enums';
   providers: [CacheManagerService],
   exports: [CacheManagerService],
 })
-export class CacheManagerModule {}
+export class CacheManagerModule { }
