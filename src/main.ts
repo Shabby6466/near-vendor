@@ -30,7 +30,7 @@ const bootstrap = async () => {
 
   app.useGlobalPipes(new TrimStringsPipe(), new ValidationPipe({ whitelist: true, transform: true }));
   app.useGlobalFilters(new HttpExceptionFilter(logger));
-  app.setGlobalPrefix('v1/api');
+  app.setGlobalPrefix('api');
 
   app.disable('x-powered-by');
   app.enableCors({ origin: '*' });
