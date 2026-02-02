@@ -10,6 +10,10 @@ export class NearbyDto {
   @IsNumber()
   userLon: number;
 
+  @ApiProperty({ required: false })
+  @IsOptional()
+  queryText?: string;
+
   @ApiProperty({ required: false, default: 20, maximum: 100 })
   @IsOptional()
   @IsNumber()

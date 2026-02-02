@@ -8,16 +8,16 @@ import { NearbyDto } from "./dto/nearby.dto";
 export class SearchController {
   constructor(
     private readonly service: SearchService,
-  ) {}
+  ) { }
 
   @Post()
   @ApiOperation({ summary: "Search inventory (keyword + FTS search)" })
   async search(@Body() body: NearbyDto) {
     const results = await this.service.search({
-      queryText: body.queryText,
+      queryText: body.queryText || "",
       userLat: body.userLat,
       userLon: body.userLon,
-      limit: 60,
+      limit: body.limit || 60,
     });
     return { success: true, results };
   }
@@ -26,10 +26,10 @@ export class SearchController {
   @ApiOperation({ summary: "Search inventory (AI semantic search)" })
   async semanticSearch(@Body() body: NearbyDto) {
     const results = await this.service.semanticSearch({
-      queryText: body.queryText,
+      queryText: body.queryText || "",
       userLat: body.userLat,
       userLon: body.userLon,
-      limit: 60,
+      limit: body.limit || 60,
     });
     return { success: true, results };
   }
@@ -40,7 +40,7 @@ export class SearchController {
     const results = await this.service.nearby({
       userLat: body.userLat,
       userLon: body.userLon,
-      limit: 60,
+      limit: body.limit || 60,
     });
     return { success: true, results };
   }

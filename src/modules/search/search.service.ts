@@ -12,7 +12,7 @@ export class SearchService {
   constructor(
     @InjectRepository(InventoryItem) private readonly repo: Repository<InventoryItem>,
     private readonly embeddingService: EmbeddingService,
-  ) {}
+  ) { }
 
   /**
    * Hybrid Search (Phase 2):
@@ -41,7 +41,7 @@ export class SearchService {
     if (ftsQuery) {
       qb.andWhere("i.document_vector @@ websearch_to_tsquery('english', :ftsQuery)", { ftsQuery });
     }
-    
+
     const distanceExpr = "ST_Distance(s.location, ST_GeogFromGeoJSON(:userLocation))";
     qb.addSelect(distanceExpr, "distance_m");
     const textRankExpr = "ts_rank(i.document_vector, websearch_to_tsquery('english', :ftsQuery))";
@@ -78,14 +78,43 @@ export class SearchService {
     qb.orderBy("i.description_vector <=> :queryVector", "ASC");
     qb.setParameters({ queryVector: `[${queryVector.join(",")}]` });
     qb.limit(limit);
-    
+
     const rows = await qb.getRawAndEntities();
     return this.mapRows(rows);
   }
 
   private mapRows(rows: { entities: InventoryItem[]; raw: any[] }) {
-    // ... (rest of the mapRows function is the same)
+    return rows.entities.map((entity, index) => {
+      const raw = rows.raw[index];
+      return {
+        ...entity,
+        distance_m: raw.distance_m ? parseFloat(raw.distance_m) : null,
+        text_rank: raw.text_rank ? parseFloat(raw.text_rank) : null,
+        hybrid_score: raw.hybrid_score ? parseFloat(raw.hybrid_score) : null,
+      };
+    });
   }
 
-  // ... (nearby, shopInventory, etc. are the same)
+  async nearby(params: { userLat: number; userLon: number; limit: number }) {
+    const { userLat, userLon, limit } = params;
+    const userLocation = { type: "Point", coordinates: [userLon, userLat] };
+
+    const qb = this.repo
+      .createQueryBuilder("i")
+      .leftJoinAndSelect("i.shop", "s")
+      .where("i.isActive = true")
+      .andWhere("i.stock > 0")
+      .andWhere("s.isActive = true")
+      .andWhere("ST_DWithin(s.location, ST_GeogFromGeoJSON(:userLocation), :radius)", {
+        userLocation: JSON.stringify(userLocation),
+        radius: SEARCH_RADIUS_METERS,
+      });
+
+    qb.addSelect("ST_Distance(s.location, ST_GeogFromGeoJSON(:userLocation))", "distance_m");
+    qb.orderBy("distance_m", "ASC");
+    qb.limit(limit);
+
+    const rows = await qb.getRawAndEntities();
+    return this.mapRows(rows);
+  }
 }

@@ -1,10 +1,10 @@
 import { Injectable, OnModuleInit, Logger } from '@nestjs/common';
-import { pipeline, Pipeline, FeatureExtractionPipeline } from '@xenova/transformers';
+import type { FeatureExtractionPipeline } from '@xenova/transformers';
 
 @Injectable()
 export class EmbeddingService implements OnModuleInit {
   private readonly logger = new Logger(EmbeddingService.name);
-  
+
   private textGenerator: FeatureExtractionPipeline;
   private imageGenerator: FeatureExtractionPipeline;
 
@@ -19,11 +19,14 @@ export class EmbeddingService implements OnModuleInit {
   }
 
   async onModuleInit() {
-    // This function will now load both models in parallel
     this.logger.log('Initializing embedding models...');
+
+    // Use dynamic import via eval to prevent TS from transpiling it to require()
+    const { pipeline } = await (eval('import("@xenova/transformers")') as Promise<typeof import('@xenova/transformers')>);
+
     [this.textGenerator, this.imageGenerator] = await Promise.all([
-        pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2') as Promise<FeatureExtractionPipeline>,
-        pipeline('feature-extraction', 'Xenova/clip-vit-base-patch32') as Promise<FeatureExtractionPipeline>,
+      pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2') as Promise<FeatureExtractionPipeline>,
+      pipeline('feature-extraction', 'Xenova/clip-vit-base-patch32') as Promise<FeatureExtractionPipeline>,
     ]);
     this.logger.log('Embedding models initialized successfully.');
   }
