@@ -183,5 +183,55 @@ export class SearchService {
     const rows = await qb.getRawAndEntities();
     return this.mapRows(rows);
   }
+
+  /**
+   * Public shop inventory view.
+   * If userLat/userLon are provided, items include distanceMeters (to shop).
+   */
+  async shopInventory(params: { shopId: string; userLat: number | null; userLon: number | null; limit: number }) {
+    let qb = this.repo
+      .createQueryBuilder("i")
+      .leftJoinAndSelect("i.shop", "s")
+      .where("i.isActive = true")
+      .andWhere("i.stock > 0")
+      .andWhere("s.isActive = true")
+      .andWhere("s.id = :shopId", { shopId: params.shopId });
+
+    // If we have location, order by distance (constant per shop) but keep stable.
+    if (params.userLat != null && params.userLon != null) {
+      qb = qb.addSelect(
+        "ST_DistanceSphere(ST_MakePoint(s.shopLongitude, s.shopLatitude), ST_MakePoint(:userLon, :userLat))",
+        "distance_m"
+      );
+      qb = qb.setParameters({ userLat: params.userLat, userLon: params.userLon });
+      qb = qb.orderBy("distance_m", "ASC");
+    } else {
+      qb = qb.orderBy("i.name", "ASC");
+    }
+
+    qb = qb.limit(params.limit);
+
+    const rows = await qb.getRawAndEntities();
+    const items = this.mapRows(rows);
+
+    const first = rows.entities[0];
+    const shop = first
+      ? {
+          id: first.shop.id,
+          shopName: (first.shop as any).shopName,
+          shopImageUrl: (first.shop as any).shopImageUrl,
+          shopLatitude: (first.shop as any).shopLatitude,
+          shopLongitude: (first.shop as any).shopLongitude,
+          shopAddress: (first.shop as any).shopAddress ?? null,
+          whatsappNumber: (first.shop as any).whatsappNumber ?? null,
+          isActive: (first.shop as any).isActive ?? true,
+        }
+      : null;
+
+    const distanceMeters = rows.raw?.[0]?.distance_m ? Number(rows.raw[0].distance_m) : null;
+
+    return { shop, distanceMeters, items };
+  }
 }
+
 
