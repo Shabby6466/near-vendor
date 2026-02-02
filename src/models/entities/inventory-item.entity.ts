@@ -27,6 +27,10 @@ export class InventoryItem extends BaseEntity {
   @Column({ type: "text", nullable: true })
   tags?: string;
 
+  @Index()
+  @Column({ type: 'tsvector', select: false, nullable: true })
+  document_vector: string;
+
   @ManyToOne(() => Shops, { eager: true, onDelete: "CASCADE" })
   @JoinColumn()
   shop: Shops;

@@ -1,5 +1,5 @@
 import { BaseEntity } from "@modules/common/entity/base.entity";
-import { Entity, Column, OneToOne, OneToMany, ManyToOne, JoinColumn } from "typeorm";
+import { Entity, Column, OneToOne, OneToMany, ManyToOne, JoinColumn, Index } from "typeorm";
 import { User } from "./users.entity";
 import { Lead } from "./leads.entity";
 
@@ -27,6 +27,15 @@ export class Shops extends BaseEntity {
 
     @Column({ type: 'decimal', precision: 10, scale: 6, nullable: false })
     shopLatitude: number;
+
+    @Index({ spatial: true })
+    @Column({
+        type: 'geography',
+        spatialFeatureType: 'Point',
+        srid: 4326,
+        nullable: true,
+    })
+    location: string;
 
     @ManyToOne(() => User, (user) => user.shops)
     @JoinColumn()
