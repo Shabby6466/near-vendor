@@ -1,7 +1,7 @@
 import { HttpException } from '@nestjs/common';
-import { ResponseCode, ResponseMessage } from '../enum';
+import { ResponseCode, ResponseMessage } from '@utils/enum';
 import { ApiQueryFilters } from '../../models/models';
-import { PaginationMeta } from '../../modules/common/responses';
+import { PaginationMeta } from '@modules/common/responses';
 export declare const generateOTP: () => number;
 export declare const generateRandomIndex: () => number;
 export declare class CustomHttpException extends HttpException {

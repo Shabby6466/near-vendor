@@ -16,7 +16,7 @@ exports.ItemService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
-const items_entity_1 = require("../../models/entities/items.entity");
+const items_entity_1 = require("models/entities/items.entity");
 let ItemService = class ItemService {
     constructor(itemRepo) {
         this.itemRepo = itemRepo;

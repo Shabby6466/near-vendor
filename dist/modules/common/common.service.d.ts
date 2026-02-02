@@ -1,4 +1,4 @@
-import { TimeSpan } from "../../utils/enum";
+import { TimeSpan } from "@utils/enum";
 export declare class CommonService {
     constructor();
     calculateDateRange(timeSpan: TimeSpan): {

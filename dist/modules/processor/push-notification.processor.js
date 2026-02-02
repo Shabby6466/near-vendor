@@ -11,8 +11,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PushNotificationProcessor = void 0;
 const bull_1 = require("@nestjs/bull");
-const logger_service_1 = require("../../utils/logger/logger.service");
-const processor_enum_1 = require("../processor/common/processor.enum");
+const logger_service_1 = require("@utils/logger/logger.service");
+const processor_enum_1 = require("@modules/processor/common/processor.enum");
 let PushNotificationProcessor = class PushNotificationProcessor {
     constructor(loggerService) {
         this.loggerService = loggerService;

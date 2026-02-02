@@ -9,8 +9,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.VendorPortalModule = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
-const shops_entity_1 = require("../../models/entities/shops.entity");
-const inventory_item_entity_1 = require("../../models/entities/inventory-item.entity");
+const shops_entity_1 = require("models/entities/shops.entity");
+const inventory_item_entity_1 = require("models/entities/inventory-item.entity");
 const vendor_portal_controller_1 = require("./vendor-portal.controller");
 const vendor_portal_service_1 = require("./vendor-portal.service");
 let VendorPortalModule = class VendorPortalModule {

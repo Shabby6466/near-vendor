@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CreateInventoryItemDto = void 0;
+exports.UpdateInventoryItemDto = exports.CreateInventoryItemDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 class CreateInventoryItemDto {
@@ -29,7 +29,7 @@ __decorate([
 ], CreateInventoryItemDto.prototype, "description", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ example: "https://.../image.jpg", required: false }),
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsUrl)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreateInventoryItemDto.prototype, "imageUrl", void 0);
@@ -62,4 +62,7 @@ __decorate([
     (0, class_validator_1.IsUUID)(),
     __metadata("design:type", String)
 ], CreateInventoryItemDto.prototype, "shopId", void 0);
+class UpdateInventoryItemDto extends (0, swagger_1.PartialType)(CreateInventoryItemDto) {
+}
+exports.UpdateInventoryItemDto = UpdateInventoryItemDto;
 //# sourceMappingURL=create-inventory-item.dto.js.map

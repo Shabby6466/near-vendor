@@ -1,4 +1,4 @@
-import { CustomHttpException } from "../../utils/helper";
+import { CustomHttpException } from "@utils/helper";
 export declare class InvalidCredentialsException extends CustomHttpException {
     statusCode: number;
     message: string;

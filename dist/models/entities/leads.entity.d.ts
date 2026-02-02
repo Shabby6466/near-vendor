@@ -1,4 +1,4 @@
-import { BaseEntity } from "../../modules/common/entity/base.entity";
+import { BaseEntity } from "@modules/common/entity/base.entity";
 import { User } from "./users.entity";
 import { Item } from "./items.entity";
 import { Shops } from "./shops.entity";

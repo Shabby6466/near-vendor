@@ -1,5 +1,5 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsBoolean, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, Min } from "class-validator";
+import { ApiProperty, PartialType } from "@nestjs/swagger";
+import { IsBoolean, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, IsUrl, Min } from "class-validator";
 
 export class CreateInventoryItemDto {
   @ApiProperty({ example: "Jordans - Special Edition" })
@@ -13,7 +13,7 @@ export class CreateInventoryItemDto {
   description?: string;
 
   @ApiProperty({ example: "https://.../image.jpg", required: false })
-  @IsString()
+  @IsUrl()
   @IsOptional()
   imageUrl?: string;
 
@@ -41,3 +41,5 @@ export class CreateInventoryItemDto {
   @IsUUID()
   shopId: string;
 }
+
+export class UpdateInventoryItemDto extends PartialType(CreateInventoryItemDto) {}

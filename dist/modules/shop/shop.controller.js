@@ -27,10 +27,10 @@ const swagger_1 = require("@nestjs/swagger");
 const shop_service_1 = require("./shop.service");
 const shop_dto_1 = require("./dto/shop.dto");
 const swagger_2 = require("@nestjs/swagger");
-const enum_1 = require("../../utils/enum");
-const roles_decorator_1 = require("../auth/roles.decorator");
-const jwt_guard_1 = require("../auth/jwt-guard");
-const roles_guard_1 = require("../auth/roles.guard");
+const enum_1 = require("@utils/enum");
+const roles_decorator_1 = require("@modules/auth/roles.decorator");
+const jwt_guard_1 = require("@modules/auth/jwt-guard");
+const roles_guard_1 = require("@modules/auth/roles.guard");
 let ShopController = class ShopController {
     constructor(service) {
         this.service = service;

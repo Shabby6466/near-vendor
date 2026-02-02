@@ -11,8 +11,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.InvalidPortalRoleException = void 0;
 const swagger_1 = require("@nestjs/swagger");
-const enum_1 = require("../../utils/enum");
-const helper_1 = require("../../utils/helper");
+const enum_1 = require("@utils/enum");
+const helper_1 = require("@utils/helper");
 class InvalidPortalRoleException extends helper_1.CustomHttpException {
     constructor() {
         super(enum_1.ResponseCode.INSUFFICIENT_ROLE, enum_1.ResponseMessage.INSUFFICIENT_ROLE, 403);

@@ -48,7 +48,7 @@ exports.VendorApplicationsService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
-const vendor_applications_entity_1 = require("../../models/entities/vendor-applications.entity");
+const vendor_applications_entity_1 = require("models/entities/vendor-applications.entity");
 let VendorApplicationsService = class VendorApplicationsService {
     constructor(repo) {
         this.repo = repo;
@@ -62,7 +62,7 @@ let VendorApplicationsService = class VendorApplicationsService {
                 !!process.env.CLOUDINARY_API_KEY &&
                 !!process.env.CLOUDINARY_API_SECRET;
             if (hasCloudinary) {
-                const { CloudinaryService } = yield Promise.resolve().then(() => __importStar(require("../../utils/cloudinary/cloudinary.service")));
+                const { CloudinaryService } = yield Promise.resolve().then(() => __importStar(require("@utils/cloudinary/cloudinary.service")));
                 const cloud = new CloudinaryService();
                 const uploaded = yield cloud.uploadImage(file, { folder: (_a = process.env.CLOUDINARY_FOLDER) !== null && _a !== void 0 ? _a : "nearvendor/shops" });
                 if (uploaded === null || uploaded === void 0 ? void 0 : uploaded.success)
@@ -73,7 +73,7 @@ let VendorApplicationsService = class VendorApplicationsService {
                 !!process.env.AWS_ACCESS_KEY &&
                 !!process.env.AWS_SECRET_KEY;
             if (hasAws) {
-                const { S3Service } = yield Promise.resolve().then(() => __importStar(require("../../utils/s3/s3.service")));
+                const { S3Service } = yield Promise.resolve().then(() => __importStar(require("@utils/s3/s3.service")));
                 const s3 = new S3Service();
                 const uploaded = yield s3.upload(file);
                 return { success: true, imageUrl: (uploaded === null || uploaded === void 0 ? void 0 : uploaded.Location) || null };

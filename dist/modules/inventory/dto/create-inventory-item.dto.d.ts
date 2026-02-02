@@ -8,3 +8,7 @@ export declare class CreateInventoryItemDto {
     tags?: string;
     shopId: string;
 }
+declare const UpdateInventoryItemDto_base: import("@nestjs/common").Type<Partial<CreateInventoryItemDto>>;
+export declare class UpdateInventoryItemDto extends UpdateInventoryItemDto_base {
+}
+export {};

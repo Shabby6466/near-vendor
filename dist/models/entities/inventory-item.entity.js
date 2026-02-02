@@ -10,7 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.InventoryItem = void 0;
-const base_entity_1 = require("../../modules/common/entity/base.entity");
+const base_entity_1 = require("@modules/common/entity/base.entity");
 const typeorm_1 = require("typeorm");
 const shops_entity_1 = require("./shops.entity");
 let InventoryItem = class InventoryItem extends base_entity_1.BaseEntity {
@@ -45,6 +45,19 @@ __decorate([
     (0, typeorm_1.Column)({ type: "text", nullable: true }),
     __metadata("design:type", String)
 ], InventoryItem.prototype, "tags", void 0);
+__decorate([
+    (0, typeorm_1.Index)(),
+    (0, typeorm_1.Column)({ type: 'tsvector', select: false, nullable: true }),
+    __metadata("design:type", String)
+], InventoryItem.prototype, "document_vector", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'text', nullable: true }),
+    __metadata("design:type", String)
+], InventoryItem.prototype, "description_vector", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'text', nullable: true }),
+    __metadata("design:type", String)
+], InventoryItem.prototype, "image_vector", void 0);
 __decorate([
     (0, typeorm_1.ManyToOne)(() => shops_entity_1.Shops, { eager: true, onDelete: "CASCADE" }),
     (0, typeorm_1.JoinColumn)(),

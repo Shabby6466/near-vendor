@@ -24,7 +24,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CacheManagerService = void 0;
 const common_1 = require("@nestjs/common");
 const cache_manager_enums_1 = require("./commons/cache-manager.enums");
-const helper_1 = require("../../utils/helper");
+const helper_1 = require("@utils/helper");
 const cache_manager_1 = require("@nestjs/cache-manager");
 const bull_1 = require("@nestjs/bull");
 let CacheManagerService = class CacheManagerService {

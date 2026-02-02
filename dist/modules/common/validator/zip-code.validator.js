@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ValidZipCode = void 0;
-const enum_1 = require("../../../utils/enum");
+const enum_1 = require("@utils/enum");
 const class_validator_1 = require("class-validator");
 const ValidZipCode = (validationOptions) => {
     return (object, propertyName) => {

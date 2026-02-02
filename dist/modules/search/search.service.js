@@ -25,177 +25,73 @@ exports.SearchService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
-const inventory_item_entity_1 = require("../../models/entities/inventory-item.entity");
-function tokenize(q) {
-    return q
-        .toLowerCase()
-        .replace(/[^a-z0-9\s]/g, " ")
-        .split(/\s+/)
-        .map((s) => s.trim())
-        .filter((s) => s.length >= 2)
-        .slice(0, 10);
-}
+const inventory_item_entity_1 = require("models/entities/inventory-item.entity");
+const embedding_service_1 = require("@modules/embedding.service");
+const SEARCH_RADIUS_METERS = 25000;
 let SearchService = class SearchService {
-    constructor(repo) {
+    constructor(repo, embeddingService) {
         this.repo = repo;
+        this.embeddingService = embeddingService;
     }
     search(params) {
         return __awaiter(this, void 0, void 0, function* () {
-            const tokens = tokenize(params.queryText);
-            const q = params.queryText.trim();
-            let qb = this.repo
-                .createQueryBuilder("i")
-                .leftJoinAndSelect("i.shop", "s")
-                .where("i.isActive = true")
-                .andWhere("i.stock > 0")
-                .andWhere("s.isActive = true");
-            if (q.length > 0) {
-                qb = qb.andWhere("(i.name ILIKE :q OR i.description ILIKE :q OR i.tags ILIKE :q OR (" +
-                    tokens
-                        .map((_, idx) => `(i.name ILIKE :t${idx} OR i.description ILIKE :t${idx} OR i.tags ILIKE :t${idx})`)
-                        .join(" OR ") +
-                    "))", Object.assign({ q: `%${q}%` }, Object.fromEntries(tokens.map((t, idx) => [`t${idx}`, `%${t}%`]))));
-            }
-            qb = qb.addSelect("ST_DistanceSphere(ST_MakePoint(s.shopLongitude, s.shopLatitude), ST_MakePoint(:userLon, :userLat))", "distance_m");
-            qb = qb.setParameters({ userLat: params.userLat, userLon: params.userLon });
-            qb = qb.orderBy("distance_m", "ASC").limit(params.limit);
-            const rows = yield qb.getRawAndEntities();
-            return rows.entities.map((item, idx) => {
-                var _a, _b, _c;
-                const raw = rows.raw[idx];
-                return {
-                    itemId: item.id,
-                    name: item.name,
-                    description: item.description,
-                    imageUrl: item.imageUrl,
-                    price: item.price,
-                    stock: item.stock,
-                    shop: {
-                        id: item.shop.id,
-                        shopName: item.shop.shopName,
-                        shopImageUrl: item.shop.shopImageUrl,
-                        shopLatitude: item.shop.shopLatitude,
-                        shopLongitude: item.shop.shopLongitude,
-                        shopAddress: (_a = item.shop.shopAddress) !== null && _a !== void 0 ? _a : null,
-                        whatsappNumber: (_b = item.shop.whatsappNumber) !== null && _b !== void 0 ? _b : null,
-                        isActive: (_c = item.shop.isActive) !== null && _c !== void 0 ? _c : true,
-                    },
-                    distanceMeters: (raw === null || raw === void 0 ? void 0 : raw.distance_m) ? Number(raw.distance_m) : null,
-                };
-            });
-        });
-    }
-    mapRows(rows) {
-        return rows.entities.map((item, idx) => {
-            var _a, _b, _c;
-            const raw = rows.raw[idx];
-            return {
-                itemId: item.id,
-                name: item.name,
-                description: item.description,
-                imageUrl: item.imageUrl,
-                price: item.price,
-                stock: item.stock,
-                shop: {
-                    id: item.shop.id,
-                    shopName: item.shop.shopName,
-                    shopImageUrl: item.shop.shopImageUrl,
-                    shopLatitude: item.shop.shopLatitude,
-                    shopLongitude: item.shop.shopLongitude,
-                    shopAddress: (_a = item.shop.shopAddress) !== null && _a !== void 0 ? _a : null,
-                    whatsappNumber: (_b = item.shop.whatsappNumber) !== null && _b !== void 0 ? _b : null,
-                    isActive: (_c = item.shop.isActive) !== null && _c !== void 0 ? _c : true,
-                },
-                distanceMeters: (raw === null || raw === void 0 ? void 0 : raw.distance_m) ? Number(raw.distance_m) : null,
+            const userLocation = {
+                type: "Point",
+                coordinates: [params.userLon, params.userLat],
             };
-        });
-    }
-    alternatives(params) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const q = (params.queryText || "").trim();
-            const tokens = tokenize(q);
-            if (tokens.length === 0)
-                return [];
-            let qb = this.repo
-                .createQueryBuilder("i")
-                .leftJoinAndSelect("i.shop", "s")
-                .where("i.isActive = true")
-                .andWhere("i.stock > 0")
-                .andWhere("s.isActive = true");
-            qb = qb.andWhere("(" +
-                tokens
-                    .map((_, idx) => `(i.name ILIKE :t${idx} OR i.description ILIKE :t${idx} OR i.tags ILIKE :t${idx})`)
-                    .join(" OR ") +
-                ")", Object.fromEntries(tokens.map((t, idx) => [`t${idx}`, `%${t}%`])));
-            const scoreExpr = tokens
-                .map((_, idx) => `CASE WHEN (i.name ILIKE :t${idx} OR i.description ILIKE :t${idx} OR i.tags ILIKE :t${idx}) THEN 1 ELSE 0 END`)
-                .join(" + ");
-            qb = qb.addSelect(`(${scoreExpr})`, "score");
-            qb = qb.addSelect("ST_DistanceSphere(ST_MakePoint(s.shopLongitude, s.shopLatitude), ST_MakePoint(:userLon, :userLat))", "distance_m");
-            qb = qb.setParameters({ userLat: params.userLat, userLon: params.userLon });
-            qb = qb.orderBy("score", "DESC").addOrderBy("distance_m", "ASC").limit(params.limit);
-            const rows = yield qb.getRawAndEntities();
-            return this.mapRows(rows);
-        });
-    }
-    nearby(params) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let qb = this.repo
-                .createQueryBuilder("i")
-                .leftJoinAndSelect("i.shop", "s")
-                .where("i.isActive = true")
-                .andWhere("i.stock > 0")
-                .andWhere("s.isActive = true");
-            qb = qb.addSelect("ST_DistanceSphere(ST_MakePoint(s.shopLongitude, s.shopLatitude), ST_MakePoint(:userLon, :userLat))", "distance_m");
-            qb = qb.setParameters({ userLat: params.userLat, userLon: params.userLon });
-            qb = qb.orderBy("distance_m", "ASC").limit(params.limit);
-            const rows = yield qb.getRawAndEntities();
-            return this.mapRows(rows);
-        });
-    }
-    shopInventory(params) {
-        var _a, _b, _c, _d, _e;
-        return __awaiter(this, void 0, void 0, function* () {
+            const ftsQuery = params.queryText.trim().replace(/\s+/g, ' & ');
             let qb = this.repo
                 .createQueryBuilder("i")
                 .leftJoinAndSelect("i.shop", "s")
                 .where("i.isActive = true")
                 .andWhere("i.stock > 0")
                 .andWhere("s.isActive = true")
-                .andWhere("s.id = :shopId", { shopId: params.shopId });
-            if (params.userLat != null && params.userLon != null) {
-                qb = qb.addSelect("ST_DistanceSphere(ST_MakePoint(s.shopLongitude, s.shopLatitude), ST_MakePoint(:userLon, :userLat))", "distance_m");
-                qb = qb.setParameters({ userLat: params.userLat, userLon: params.userLon });
-                qb = qb.orderBy("distance_m", "ASC");
+                .andWhere("ST_DWithin(s.location, ST_GeogFromGeoJSON(:userLocation), :radius)", {
+                userLocation: JSON.stringify(userLocation),
+                radius: SEARCH_RADIUS_METERS,
+            });
+            if (ftsQuery) {
+                qb.andWhere("i.document_vector @@ websearch_to_tsquery('english', :ftsQuery)", { ftsQuery });
             }
-            else {
-                qb = qb.orderBy("i.name", "ASC");
-            }
-            qb = qb.limit(params.limit);
+            const distanceExpr = "ST_Distance(s.location, ST_GeogFromGeoJSON(:userLocation))";
+            qb.addSelect(distanceExpr, "distance_m");
+            const textRankExpr = "ts_rank(i.document_vector, websearch_to_tsquery('english', :ftsQuery))";
+            qb.addSelect(textRankExpr, "text_rank");
+            const hybridScoreExpr = `${textRankExpr} * EXP(-0.0001 * ${distanceExpr})`;
+            qb.addSelect(hybridScoreExpr, "hybrid_score");
+            qb.orderBy("hybrid_score", "DESC").limit(params.limit);
             const rows = yield qb.getRawAndEntities();
-            const items = this.mapRows(rows);
-            const first = rows.entities[0];
-            const shop = first
-                ? {
-                    id: first.shop.id,
-                    shopName: first.shop.shopName,
-                    shopImageUrl: first.shop.shopImageUrl,
-                    shopLatitude: first.shop.shopLatitude,
-                    shopLongitude: first.shop.shopLongitude,
-                    shopAddress: (_a = first.shop.shopAddress) !== null && _a !== void 0 ? _a : null,
-                    whatsappNumber: (_b = first.shop.whatsappNumber) !== null && _b !== void 0 ? _b : null,
-                    isActive: (_c = first.shop.isActive) !== null && _c !== void 0 ? _c : true,
-                }
-                : null;
-            const distanceMeters = ((_e = (_d = rows.raw) === null || _d === void 0 ? void 0 : _d[0]) === null || _e === void 0 ? void 0 : _e.distance_m) ? Number(rows.raw[0].distance_m) : null;
-            return { shop, distanceMeters, items };
+            return this.mapRows(rows);
         });
+    }
+    semanticSearch(params) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { queryText, userLat, userLon, limit } = params;
+            const queryVector = yield this.embeddingService.generateTextEmbedding(queryText);
+            const userLocation = { type: "Point", coordinates: [userLon, userLat] };
+            const qb = this.repo
+                .createQueryBuilder("i")
+                .leftJoinAndSelect("i.shop", "s")
+                .where("ST_DWithin(s.location, ST_GeogFromGeoJSON(:userLocation), :radius)", {
+                userLocation: JSON.stringify(userLocation),
+                radius: SEARCH_RADIUS_METERS,
+            });
+            qb.addSelect("ST_Distance(s.location, ST_GeogFromGeoJSON(:userLocation))", "distance_m");
+            qb.orderBy("i.description_vector <=> :queryVector", "ASC");
+            qb.setParameters({ queryVector: `[${queryVector.join(",")}]` });
+            qb.limit(limit);
+            const rows = yield qb.getRawAndEntities();
+            return this.mapRows(rows);
+        });
+    }
+    mapRows(rows) {
     }
 };
 exports.SearchService = SearchService;
 exports.SearchService = SearchService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(inventory_item_entity_1.InventoryItem)),
-    __metadata("design:paramtypes", [typeorm_2.Repository])
+    __metadata("design:paramtypes", [typeorm_2.Repository,
+        embedding_service_1.EmbeddingService])
 ], SearchService);
 //# sourceMappingURL=search.service.js.map

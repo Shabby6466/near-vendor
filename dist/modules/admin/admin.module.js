@@ -11,10 +11,10 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const admin_controller_1 = require("./admin.controller");
 const admin_service_1 = require("./admin.service");
-const vendor_applications_entity_1 = require("../../models/entities/vendor-applications.entity");
-const users_entity_1 = require("../../models/entities/users.entity");
-const shops_entity_1 = require("../../models/entities/shops.entity");
-const inventory_item_entity_1 = require("../../models/entities/inventory-item.entity");
+const vendor_applications_entity_1 = require("models/entities/vendor-applications.entity");
+const users_entity_1 = require("models/entities/users.entity");
+const shops_entity_1 = require("models/entities/shops.entity");
+const inventory_item_entity_1 = require("models/entities/inventory-item.entity");
 let AdminModule = class AdminModule {
 };
 exports.AdminModule = AdminModule;

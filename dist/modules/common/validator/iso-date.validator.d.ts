@@ -1,4 +1,4 @@
-import { ResponseMessage } from '../../../utils/enum';
+import { ResponseMessage } from '@utils/enum';
 import { ValidationOptions, ValidatorConstraintInterface } from 'class-validator';
 export declare class IsIso8601DateStringConstraint implements ValidatorConstraintInterface {
     validate(value: any): boolean;

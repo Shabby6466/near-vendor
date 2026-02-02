@@ -1,8 +1,8 @@
 import { Repository } from "typeorm";
-import { VendorApplication } from "../../models/entities/vendor-applications.entity";
-import { User } from "../../models/entities/users.entity";
-import { Shops } from "../../models/entities/shops.entity";
-import { InventoryItem } from "../../models/entities/inventory-item.entity";
+import { VendorApplication } from "models/entities/vendor-applications.entity";
+import { User } from "models/entities/users.entity";
+import { Shops } from "models/entities/shops.entity";
+import { InventoryItem } from "models/entities/inventory-item.entity";
 export declare class AdminService {
     private readonly apps;
     private readonly users;

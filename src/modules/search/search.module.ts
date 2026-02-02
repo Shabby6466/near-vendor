@@ -5,9 +5,10 @@ import { SearchController } from "./search.controller";
 import { SearchService } from "./search.service";
 import { GeminiVisionService } from "./gemini-vision.service";
 import { ImageCacheService } from "./image-cache.service";
+import { EmbeddingModule } from "@modules/embedding.module";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([InventoryItem])],
+  imports: [TypeOrmModule.forFeature([InventoryItem]), EmbeddingModule],
   controllers: [SearchController],
   providers: [SearchService, GeminiVisionService, ImageCacheService],
 })

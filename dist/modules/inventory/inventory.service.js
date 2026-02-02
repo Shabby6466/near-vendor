@@ -25,12 +25,15 @@ exports.InventoryService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
-const inventory_item_entity_1 = require("../../models/entities/inventory-item.entity");
-const shops_entity_1 = require("../../models/entities/shops.entity");
+const inventory_item_entity_1 = require("models/entities/inventory-item.entity");
+const shops_entity_1 = require("models/entities/shops.entity");
+const bull_1 = require("@nestjs/bull");
+const embedding_processor_1 = require("@modules/embedding.processor");
 let InventoryService = class InventoryService {
-    constructor(repo, shopRepo) {
+    constructor(repo, shopRepo, embeddingQueue) {
         this.repo = repo;
         this.shopRepo = shopRepo;
+        this.embeddingQueue = embeddingQueue;
     }
     create(dto) {
         var _a;
@@ -48,7 +51,20 @@ let InventoryService = class InventoryService {
                 tags: dto.tags,
                 shop,
             });
-            return this.repo.save(item);
+            const savedItem = yield this.repo.save(item);
+            yield this.embeddingQueue.add(embedding_processor_1.GENERATE_EMBEDDING_JOB, { itemId: savedItem.id });
+            return savedItem;
+        });
+    }
+    update(id, dto) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const item = yield this.repo.findOne({ where: { id } });
+            if (!item)
+                throw new common_1.NotFoundException("Inventory item not found");
+            Object.assign(item, dto);
+            const savedItem = yield this.repo.save(item);
+            yield this.embeddingQueue.add(embedding_processor_1.GENERATE_EMBEDDING_JOB, { itemId: savedItem.id });
+            return savedItem;
         });
     }
     listByShop(shopId) {
@@ -62,7 +78,8 @@ exports.InventoryService = InventoryService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(inventory_item_entity_1.InventoryItem)),
     __param(1, (0, typeorm_1.InjectRepository)(shops_entity_1.Shops)),
+    __param(2, (0, bull_1.InjectQueue)(embedding_processor_1.EMBEDDING_QUEUE)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
-        typeorm_2.Repository])
+        typeorm_2.Repository, Object])
 ], InventoryService);
 //# sourceMappingURL=inventory.service.js.map

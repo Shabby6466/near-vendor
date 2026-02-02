@@ -10,7 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Category = void 0;
-const base_entity_1 = require("../../modules/common/entity/base.entity");
+const base_entity_1 = require("@modules/common/entity/base.entity");
 const typeorm_1 = require("typeorm");
 const items_entity_1 = require("./items.entity");
 let Category = class Category extends base_entity_1.BaseEntity {

@@ -9,8 +9,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProcessorModule = void 0;
 const common_1 = require("@nestjs/common");
 const bull_1 = require("@nestjs/bull");
-const processor_enum_1 = require("../processor/common/processor.enum");
-const logger_module_1 = require("../../utils/logger/logger.module");
+const processor_enum_1 = require("@modules/processor/common/processor.enum");
+const logger_module_1 = require("@utils/logger/logger.module");
 const push_notification_processor_1 = require("./push-notification.processor");
 let ProcessorModule = class ProcessorModule {
 };

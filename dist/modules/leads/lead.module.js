@@ -9,7 +9,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.LeadModule = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
-const leads_entity_1 = require("../../models/entities/leads.entity");
+const leads_entity_1 = require("models/entities/leads.entity");
 const lead_controller_1 = require("./lead.controller");
 const lead_service_1 = require("./lead.service");
 let LeadModule = class LeadModule {

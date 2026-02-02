@@ -15,10 +15,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AdminController = void 0;
 const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
-const jwt_guard_1 = require("../auth/jwt-guard");
-const roles_guard_1 = require("../auth/roles.guard");
-const roles_decorator_1 = require("../auth/roles.decorator");
-const enum_1 = require("../../utils/enum");
+const jwt_guard_1 = require("@modules/auth/jwt-guard");
+const roles_guard_1 = require("@modules/auth/roles.guard");
+const roles_decorator_1 = require("@modules/auth/roles.decorator");
+const enum_1 = require("@utils/enum");
 const admin_service_1 = require("./admin.service");
 let AdminController = class AdminController {
     constructor(service) {

@@ -22,7 +22,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ShopService = void 0;
-const shops_entity_1 = require("../../models/entities/shops.entity");
+const shops_entity_1 = require("models/entities/shops.entity");
 const typeorm_1 = require("typeorm");
 const typeorm_2 = require("@nestjs/typeorm");
 const common_1 = require("@nestjs/common");
@@ -32,6 +32,12 @@ let ShopService = class ShopService {
     constructor(shopRepo) {
         this.shopRepo = shopRepo;
     }
+    createPoint(lon, lat) {
+        return {
+            type: "Point",
+            coordinates: [lon, lat],
+        };
+    }
     createShop(dto, user) {
         return __awaiter(this, void 0, void 0, function* () {
             const shop = new shops_entity_1.Shops();
@@ -39,9 +45,26 @@ let ShopService = class ShopService {
             shop.shopImageUrl = dto.shopImageUrl;
             shop.shopLatitude = dto.latitude;
             shop.shopLongitude = dto.longitude;
+            shop.location = this.createPoint(dto.longitude, dto.latitude);
             shop.user = user;
             yield this.shopRepo.save(shop);
             return new shop_response_1.CreateShopResponse();
+        });
+    }
+    updateShop(id, dto) {
+        var _a, _b, _c, _d;
+        return __awaiter(this, void 0, void 0, function* () {
+            const shop = yield this.getShopById(id);
+            shop.shopName = (_a = dto.shopName) !== null && _a !== void 0 ? _a : shop.shopName;
+            shop.shopImageUrl = (_b = dto.shopImageUrl) !== null && _b !== void 0 ? _b : shop.shopImageUrl;
+            shop.shopAddress = (_c = dto.shopAddress) !== null && _c !== void 0 ? _c : shop.shopAddress;
+            shop.whatsappNumber = (_d = dto.whatsappNumber) !== null && _d !== void 0 ? _d : shop.whatsappNumber;
+            if (dto.latitude && dto.longitude) {
+                shop.shopLatitude = dto.latitude;
+                shop.shopLongitude = dto.longitude;
+                shop.location = this.createPoint(dto.longitude, dto.latitude);
+            }
+            return this.shopRepo.save(shop);
         });
     }
     getShopById(id) {

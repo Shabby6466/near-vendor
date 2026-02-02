@@ -49,8 +49,8 @@ exports.BootstrapService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
-const users_entity_1 = require("../../models/entities/users.entity");
-const enum_1 = require("../../utils/enum");
+const users_entity_1 = require("models/entities/users.entity");
+const enum_1 = require("@utils/enum");
 const bcrypt = __importStar(require("bcryptjs"));
 let BootstrapService = BootstrapService_1 = class BootstrapService {
     constructor(users) {

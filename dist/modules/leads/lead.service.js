@@ -25,8 +25,8 @@ exports.LeadService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
-const leads_entity_1 = require("../../models/entities/leads.entity");
-const jwt_guard_1 = require("../auth/jwt-guard");
+const leads_entity_1 = require("models/entities/leads.entity");
+const jwt_guard_1 = require("@modules/auth/jwt-guard");
 const swagger_1 = require("@nestjs/swagger");
 let LeadService = class LeadService {
     constructor(leadRepo) {

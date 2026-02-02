@@ -10,12 +10,12 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.User = void 0;
-const base_entity_1 = require("../../modules/common/entity/base.entity");
+const base_entity_1 = require("@modules/common/entity/base.entity");
 const typeorm_1 = require("typeorm");
 const shops_entity_1 = require("./shops.entity");
 const leads_entity_1 = require("./leads.entity");
 const class_validator_1 = require("class-validator");
-const enum_1 = require("../../utils/enum");
+const enum_1 = require("@utils/enum");
 let User = class User extends base_entity_1.BaseEntity {
 };
 exports.User = User;

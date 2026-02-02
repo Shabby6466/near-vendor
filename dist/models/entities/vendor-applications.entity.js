@@ -10,7 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VendorApplication = exports.VendorApplicationStatus = void 0;
-const base_entity_1 = require("../../modules/common/entity/base.entity");
+const base_entity_1 = require("@modules/common/entity/base.entity");
 const typeorm_1 = require("typeorm");
 const users_entity_1 = require("./users.entity");
 var VendorApplicationStatus;

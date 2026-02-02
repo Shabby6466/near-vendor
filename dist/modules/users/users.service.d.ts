@@ -1,7 +1,7 @@
-import { User } from "../../models/entities/users.entity";
+import { User } from "models/entities/users.entity";
 import { Repository } from "typeorm";
 import { CreateUserDto, LoginDto } from "./dto/users.dto";
-import { AuthService } from "../auth/auth.service";
+import { AuthService } from "@modules/auth/auth.service";
 export declare class UserService {
     private readonly userRepo;
     private readonly authService;

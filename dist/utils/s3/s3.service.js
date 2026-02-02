@@ -45,7 +45,7 @@ exports.S3Service = void 0;
 const common_1 = require("@nestjs/common");
 const aws_sdk_1 = require("aws-sdk");
 const path = __importStar(require("path"));
-const enum_1 = require("../enum");
+const enum_1 = require("@utils/enum");
 const querystring = __importStar(require("querystring"));
 let S3Service = class S3Service {
     constructor() { }

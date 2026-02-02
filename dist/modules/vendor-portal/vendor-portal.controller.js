@@ -16,11 +16,11 @@ exports.VendorPortalController = void 0;
 const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
 const platform_express_1 = require("@nestjs/platform-express");
-const s3_service_1 = require("../../utils/s3/s3.service");
-const jwt_guard_1 = require("../auth/jwt-guard");
-const roles_guard_1 = require("../auth/roles.guard");
-const roles_decorator_1 = require("../auth/roles.decorator");
-const enum_1 = require("../../utils/enum");
+const s3_service_1 = require("@utils/s3/s3.service");
+const jwt_guard_1 = require("@modules/auth/jwt-guard");
+const roles_guard_1 = require("@modules/auth/roles.guard");
+const roles_decorator_1 = require("@modules/auth/roles.decorator");
+const enum_1 = require("@utils/enum");
 const vendor_portal_service_1 = require("./vendor-portal.service");
 let VendorPortalController = class VendorPortalController {
     constructor(service) {

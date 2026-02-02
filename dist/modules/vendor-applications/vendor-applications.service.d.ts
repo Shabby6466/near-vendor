@@ -1,6 +1,6 @@
 /// <reference types="multer" />
 import { Repository } from "typeorm";
-import { VendorApplication, VendorApplicationStatus } from "../../models/entities/vendor-applications.entity";
+import { VendorApplication, VendorApplicationStatus } from "models/entities/vendor-applications.entity";
 import { ApplyVendorDto } from "./dto/apply-vendor.dto";
 export declare class VendorApplicationsService {
     private readonly repo;

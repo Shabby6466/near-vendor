@@ -8,7 +8,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PortalAuthModule = void 0;
 const common_1 = require("@nestjs/common");
-const users_module_1 = require("../users/users.module");
+const users_module_1 = require("@modules/users/users.module");
 const portal_auth_controller_1 = require("./portal-auth.controller");
 let PortalAuthModule = class PortalAuthModule {
 };

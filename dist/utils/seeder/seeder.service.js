@@ -21,7 +21,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SeedService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("typeorm");
-const logger_service_1 = require("../logger/logger.service");
+const logger_service_1 = require("@utils/logger/logger.service");
 let SeedService = class SeedService {
     constructor(logger, dataSource) {
         this.logger = logger;

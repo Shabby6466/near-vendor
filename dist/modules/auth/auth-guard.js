@@ -13,9 +13,9 @@ exports.AuthGuard = void 0;
 const common_1 = require("@nestjs/common");
 const jsonwebtoken_1 = require("jsonwebtoken");
 const core_1 = require("@nestjs/core");
-const jwt_1 = require("../../utils/jwt");
-const enum_1 = require("../../utils/enum");
-const role_decorator_1 = require("../common/decorator/role.decorator");
+const jwt_1 = require("@utils/jwt");
+const enum_1 = require("@utils/enum");
+const role_decorator_1 = require("@modules/common/decorator/role.decorator");
 let AuthGuard = class AuthGuard {
     constructor(reflector) {
         this.reflector = reflector;

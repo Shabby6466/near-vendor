@@ -11,8 +11,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.InvalidTokenException = exports.UserSuspendedException = exports.UserInactiveException = exports.InsufficientRoleException = exports.AuthHeaderMalformedException = exports.AuthHeaderMissingException = exports.InvalidCredentialsException = void 0;
 const swagger_1 = require("@nestjs/swagger");
-const enum_1 = require("../../utils/enum");
-const helper_1 = require("../../utils/helper");
+const enum_1 = require("@utils/enum");
+const helper_1 = require("@utils/helper");
 class InvalidCredentialsException extends helper_1.CustomHttpException {
     constructor() {
         super(enum_1.ResponseCode.INVALID_CREDENTIALS, enum_1.ResponseMessage.INVALID_CREDENTIALS, 401);

@@ -46,7 +46,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CommonService = void 0;
 const common_1 = require("@nestjs/common");
-const enum_1 = require("../../utils/enum");
+const enum_1 = require("@utils/enum");
 const QRCode = __importStar(require("qrcode"));
 const jimp_1 = __importDefault(require("jimp"));
 const path_1 = require("path");

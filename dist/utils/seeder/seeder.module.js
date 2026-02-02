@@ -9,7 +9,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SeedModule = void 0;
 const common_1 = require("@nestjs/common");
 const seeder_service_1 = require("./seeder.service");
-const logger_service_1 = require("../logger/logger.service");
+const logger_service_1 = require("@utils/logger/logger.service");
 let SeedModule = class SeedModule {
 };
 exports.SeedModule = SeedModule;

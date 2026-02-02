@@ -1,7 +1,7 @@
 /// <reference types="multer" />
 import { Repository } from "typeorm";
-import { Shops } from "../../models/entities/shops.entity";
-import { InventoryItem } from "../../models/entities/inventory-item.entity";
+import { Shops } from "models/entities/shops.entity";
+import { InventoryItem } from "models/entities/inventory-item.entity";
 export declare class VendorPortalService {
     private readonly shopsRepo;
     private readonly itemsRepo;

@@ -24,9 +24,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PortalAuthController = void 0;
 const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
-const users_dto_1 = require("../users/dto/users.dto");
-const users_service_1 = require("../users/users.service");
-const enum_1 = require("../../utils/enum");
+const users_dto_1 = require("@modules/users/dto/users.dto");
+const users_service_1 = require("@modules/users/users.service");
+const enum_1 = require("@utils/enum");
 const role_login_exception_1 = require("./role-login.exception");
 let PortalAuthController = class PortalAuthController {
     constructor(users) {

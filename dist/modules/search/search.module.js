@@ -9,17 +9,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SearchModule = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
-const inventory_item_entity_1 = require("../../models/entities/inventory-item.entity");
+const inventory_item_entity_1 = require("models/entities/inventory-item.entity");
 const search_controller_1 = require("./search.controller");
 const search_service_1 = require("./search.service");
 const gemini_vision_service_1 = require("./gemini-vision.service");
 const image_cache_service_1 = require("./image-cache.service");
+const embedding_module_1 = require("@modules/embedding.module");
 let SearchModule = class SearchModule {
 };
 exports.SearchModule = SearchModule;
 exports.SearchModule = SearchModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([inventory_item_entity_1.InventoryItem])],
+        imports: [typeorm_1.TypeOrmModule.forFeature([inventory_item_entity_1.InventoryItem]), embedding_module_1.EmbeddingModule],
         controllers: [search_controller_1.SearchController],
         providers: [search_service_1.SearchService, gemini_vision_service_1.GeminiVisionService, image_cache_service_1.ImageCacheService],
     })

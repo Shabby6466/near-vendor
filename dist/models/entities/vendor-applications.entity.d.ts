@@ -1,4 +1,4 @@
-import { BaseEntity } from "../../modules/common/entity/base.entity";
+import { BaseEntity } from "@modules/common/entity/base.entity";
 import { User } from "./users.entity";
 export declare enum VendorApplicationStatus {
     PENDING = "PENDING",

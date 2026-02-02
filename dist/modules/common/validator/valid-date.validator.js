@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ValidDate = void 0;
-const enum_1 = require("../../../utils/enum");
+const enum_1 = require("@utils/enum");
 const class_validator_1 = require("class-validator");
 const ValidDate = (options, validationOptions) => {
     return (object, propertyName) => {

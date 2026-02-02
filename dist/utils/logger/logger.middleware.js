@@ -11,7 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LoggerMiddleware = void 0;
 const common_1 = require("@nestjs/common");
-const logger_service_1 = require("../logger/logger.service");
+const logger_service_1 = require("@utils/logger/logger.service");
 const uuid_1 = require("uuid");
 let LoggerMiddleware = class LoggerMiddleware {
     constructor(loggerService) {

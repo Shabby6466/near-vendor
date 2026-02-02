@@ -46,13 +46,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserService = void 0;
 const typeorm_1 = require("@nestjs/typeorm");
-const users_entity_1 = require("../../models/entities/users.entity");
+const users_entity_1 = require("models/entities/users.entity");
 const typeorm_2 = require("typeorm");
 const bcrypt = __importStar(require("bcryptjs"));
 const users_exception_1 = require("./users.exception");
-const auth_service_1 = require("../auth/auth.service");
-const auth_exception_1 = require("../auth/auth.exception");
-const enum_1 = require("../../utils/enum");
+const auth_service_1 = require("@modules/auth/auth.service");
+const auth_exception_1 = require("@modules/auth/auth.exception");
+const enum_1 = require("@utils/enum");
 const common_1 = require("@nestjs/common");
 let UserService = class UserService {
     constructor(userRepo, authService) {

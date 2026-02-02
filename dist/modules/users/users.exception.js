@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.InvalidRoleException = exports.PhoneNumberAlreadyExistsException = exports.UserNotFoundException = exports.PhoneNumberNotFoundException = void 0;
-const enum_1 = require("../../utils/enum");
-const helper_1 = require("../../utils/helper");
+const enum_1 = require("@utils/enum");
+const helper_1 = require("@utils/helper");
 class PhoneNumberNotFoundException extends helper_1.Exception {
     constructor() {
         super(enum_1.ResponseCode.BUYER_PHONE_NUMBER_NOT_FOUND, enum_1.ResponseMessage.BUYER_PHONE_NUMBER_NOT_FOUND);

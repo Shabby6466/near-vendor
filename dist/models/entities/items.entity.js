@@ -10,7 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Item = void 0;
-const base_entity_1 = require("../../modules/common/entity/base.entity");
+const base_entity_1 = require("@modules/common/entity/base.entity");
 const typeorm_1 = require("typeorm");
 const leads_entity_1 = require("./leads.entity");
 const categories_entity_1 = require("./categories.entity");

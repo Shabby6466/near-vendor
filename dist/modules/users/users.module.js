@@ -10,12 +10,12 @@ exports.UsersModule = void 0;
 const common_1 = require("@nestjs/common");
 const users_service_1 = require("./users.service");
 const typeorm_1 = require("@nestjs/typeorm");
-const users_entity_1 = require("../../models/entities/users.entity");
+const users_entity_1 = require("models/entities/users.entity");
 const users_controller_1 = require("./users.controller");
-const auth_service_1 = require("../auth/auth.service");
+const auth_service_1 = require("@modules/auth/auth.service");
 const jwt_1 = require("@nestjs/jwt");
 const passport_1 = require("@nestjs/passport");
-const jwt_strategy_1 = require("../auth/jwt-strategy");
+const jwt_strategy_1 = require("@modules/auth/jwt-strategy");
 let UsersModule = class UsersModule {
 };
 exports.UsersModule = UsersModule;

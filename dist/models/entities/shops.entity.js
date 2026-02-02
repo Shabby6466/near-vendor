@@ -10,7 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Shops = void 0;
-const base_entity_1 = require("../../modules/common/entity/base.entity");
+const base_entity_1 = require("@modules/common/entity/base.entity");
 const typeorm_1 = require("typeorm");
 const users_entity_1 = require("./users.entity");
 const leads_entity_1 = require("./leads.entity");
@@ -45,6 +45,16 @@ __decorate([
     (0, typeorm_1.Column)({ type: 'decimal', precision: 10, scale: 6, nullable: false }),
     __metadata("design:type", Number)
 ], Shops.prototype, "shopLatitude", void 0);
+__decorate([
+    (0, typeorm_1.Index)({ spatial: true }),
+    (0, typeorm_1.Column)({
+        type: 'geography',
+        spatialFeatureType: 'Point',
+        srid: 4326,
+        nullable: true,
+    }),
+    __metadata("design:type", String)
+], Shops.prototype, "location", void 0);
 __decorate([
     (0, typeorm_1.ManyToOne)(() => users_entity_1.User, (user) => user.shops),
     (0, typeorm_1.JoinColumn)(),

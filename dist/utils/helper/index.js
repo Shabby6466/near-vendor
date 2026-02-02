@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.withPagination = exports.generateRandomString = exports.Exception = exports.CustomHttpException = exports.generateRandomIndex = exports.generateOTP = void 0;
 const common_1 = require("@nestjs/common");
-const enum_1 = require("../enum");
+const enum_1 = require("@utils/enum");
 const generateOTP = () => {
     return Math.floor(100000 + Math.random() * 900000);
 };

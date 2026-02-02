@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CreateShopDto = void 0;
+exports.UpdateShopDto = exports.CreateShopDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 class CreateShopDto {
@@ -18,21 +18,52 @@ exports.CreateShopDto = CreateShopDto;
 __decorate([
     (0, swagger_1.ApiProperty)({ example: "Shoaib" }),
     (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateShopDto.prototype, "shopName", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ example: "https://imageurl.com" }),
     (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsUrl)(),
     __metadata("design:type", String)
 ], CreateShopDto.prototype, "shopImageUrl", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: "44.4" }),
+    (0, swagger_1.ApiProperty)({ example: 44.4 }),
     (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsNumber)(),
     __metadata("design:type", Number)
 ], CreateShopDto.prototype, "latitude", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: "44.4" }),
+    (0, swagger_1.ApiProperty)({ example: 44.4 }),
     (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsNumber)(),
     __metadata("design:type", Number)
 ], CreateShopDto.prototype, "longitude", void 0);
+class UpdateShopDto extends (0, swagger_1.PartialType)(CreateShopDto) {
+}
+exports.UpdateShopDto = UpdateShopDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: "Shoaib's Store", required: false }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], UpdateShopDto.prototype, "shopName", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: "https://newimage.com", required: false }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsUrl)(),
+    __metadata("design:type", String)
+], UpdateShopDto.prototype, "shopImageUrl", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: "123 Main St", required: false }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], UpdateShopDto.prototype, "shopAddress", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: "+1234567890", required: false }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], UpdateShopDto.prototype, "whatsappNumber", void 0);
 //# sourceMappingURL=shop.dto.js.map

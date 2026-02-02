@@ -1,4 +1,4 @@
-import { BaseEntity } from "../../modules/common/entity/base.entity";
+import { BaseEntity } from "@modules/common/entity/base.entity";
 import { User } from "./users.entity";
 import { Lead } from "./leads.entity";
 export declare class Shops extends BaseEntity {
@@ -9,6 +9,7 @@ export declare class Shops extends BaseEntity {
     isActive: boolean;
     shopLongitude: number;
     shopLatitude: number;
+    location: string;
     user: User;
     lead: Lead;
 }

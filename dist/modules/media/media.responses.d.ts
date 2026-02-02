@@ -1,4 +1,4 @@
-import { ResponseMessage } from '../../utils/enum';
+import { ResponseMessage } from '@utils/enum';
 import { Response } from '../../response/response';
 declare class SuccessData {
     url: string | string[];

@@ -9,7 +9,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MediaModule = void 0;
 const common_1 = require("@nestjs/common");
 const media_controller_1 = require("./media.controller");
-const s3_service_1 = require("../../utils/s3/s3.service");
+const s3_service_1 = require("@utils/s3/s3.service");
 const media_service_1 = require("./media.service");
 let MediaModule = class MediaModule {
 };
