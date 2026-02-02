@@ -20,6 +20,9 @@ export enum ResponseMessage {
   USER_SUSPENDED = 'User Suspended',
   PHONE_NUMBER_ALREADY_EXISTS = 'Phone number already exists',
   INVALID_ROLE = 'Invalid Role',
+  INVALID_DATE = "Invalid date",
+  INVALID_ZIP_CODE = "Invalid zip code",
+  INVALID_COORDINATES = "Invalid coordinates",
 }
 
 export enum ResponseCode {
@@ -142,5 +145,7 @@ export enum Duration {
 
 export enum UserRoles {
   BUYER = "BUYER",
-  SELLER = "SELLER"
+  SELLER = "SELLER",
+  VENDOR = "VENDOR",
+  SUPERADMIN = "SUPERADMIN",
 }

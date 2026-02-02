@@ -23,11 +23,27 @@ import { ShopModule } from "@modules/shop/shop.module";
 import { ItemModule } from "@modules/items/item.module";
 import { LeadModule } from "@modules/leads/lead.module";
 import { UsersModule } from "@modules/users/users.module";
+import { InventoryModule } from "@modules/inventory/inventory.module";
+import { SearchModule } from "@modules/search/search.module";
+import { VendorApplicationsModule } from "@modules/vendor-applications/vendor-applications.module";
+import { AdminModule } from "@modules/admin/admin.module";
+import { ThrottlerModule } from "@nestjs/throttler";
+import { BootstrapModule } from "@modules/bootstrap/bootstrap.module";
+import { VendorPortalModule } from "@modules/vendor-portal/vendor-portal.module";
+import { PortalAuthModule } from "@modules/auth/portal-auth.module";
+import { EmbeddingModule } from "@modules/embedding.module";
+
 export const adminModulesImports: ModuleMetadata["imports"] = [
 ];
 
 export const imports: ModuleMetadata["imports"] = [
   ConfigModule.forRoot({ envFilePath: [AppService.envConfiguration()], ignoreEnvFile: false }),
+  ThrottlerModule.forRoot([
+    {
+      ttl: 60_000,
+      limit: 120,
+    },
+  ]),
   TypeOrmModule.forRoot(AppService.typeormConfig()),
   WinstonModule.forRootAsync({
     useFactory: () => AppService.createWinstonTransports(),
@@ -59,6 +75,14 @@ export const imports: ModuleMetadata["imports"] = [
   ShopModule,
   ItemModule,
   LeadModule,
+  InventoryModule,
+  SearchModule,
+  VendorApplicationsModule,
+  AdminModule,
+  VendorPortalModule,
+  PortalAuthModule,
+  BootstrapModule,
+  EmbeddingModule,
 ];
 
 @Module({

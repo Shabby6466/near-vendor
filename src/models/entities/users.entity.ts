@@ -22,6 +22,14 @@ export class User extends BaseEntity {
     @Column({ type: 'enum', enum: UserRoles, default: UserRoles.BUYER })
     role: UserRoles;
 
+    // Superadmin can force this to require vendors to change password on first login
+    @Column({ type: 'boolean', default: false })
+    mustChangePassword: boolean;
+
+    // Soft switches for moderation/verification
+    @Column({ type: 'boolean', default: true })
+    isActive: boolean;
+
     @Column({ type: 'decimal', precision: 10, scale: 6, nullable: true })
     lastKnownLongitude: number;
 

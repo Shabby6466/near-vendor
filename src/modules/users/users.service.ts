@@ -2,12 +2,15 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "models/entities/users.entity";
 import { Repository } from "typeorm";
 import { CreateUserDto, LoginDto } from "./dto/users.dto";
-import * as bcrypt from "bcrypt";
+import * as bcrypt from "bcryptjs";
 import { InvalidRoleException, PhoneNumberAlreadyExistsException, UserNotFoundException } from "./users.exception";
 import { AuthService } from "@modules/auth/auth.service";
 import { InvalidCredentialsException } from "@modules/auth/auth.exception";
 import { UserRoles } from "@utils/enum";
 
+import { Injectable } from "@nestjs/common";
+
+@Injectable()
 export class UserService {
     constructor(
         @InjectRepository(User)
@@ -40,7 +43,8 @@ export class UserService {
         delete user.password;
         return {
             user,
-            token: tokenData.accessToken
+            token: tokenData.accessToken,
+            mustChangePassword: (user as any).mustChangePassword || false,
         };
     }
 
@@ -48,6 +52,9 @@ export class UserService {
         const user = await this.userRepo.findOne({ where: { phoneNumber: dto.phoneNumber } });
         if (!user) {
             throw new UserNotFoundException();
+        }
+        if ((user as any).isActive === false) {
+            throw new InvalidCredentialsException();
         }
         const isPasswordMatched = await bcrypt.compare(dto.password, user.password);
         if (!isPasswordMatched) {
@@ -57,7 +64,20 @@ export class UserService {
         delete user.password;
         return {
             user,
-            token: tokenData.accessToken
+            token: tokenData.accessToken,
+            mustChangePassword: (user as any).mustChangePassword || false,
         };
+    }
+
+    async changePassword(user: any, newPassword: string) {
+        const u = await this.userRepo.findOne({ where: { id: user.id } });
+        if (!u) throw new UserNotFoundException();
+
+        u.password = await bcrypt.hash(newPassword, 10);
+        (u as any).mustChangePassword = false;
+        await this.userRepo.save(u);
+
+        delete (u as any).password;
+        return { success: true, user: u };
     }
 }
