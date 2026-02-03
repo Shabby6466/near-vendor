@@ -18,17 +18,30 @@ export class UserService {
         private readonly authService: AuthService,
     ) { }
 
+    private normalizePhone(phone: string): string {
+        if (!phone) return "";
+        // Remove all non-numeric characters
+        let normalized = phone.replace(/\D/g, "");
+        // If it starts with 00, replace with + (logic: leading 00 is often used for +)
+        if (phone.startsWith("00")) normalized = normalized.substring(2);
+        // Standardize leading 0 (e.g. for local numbers, add country code if missing - assuming UZ +998 for now given the context)
+        // If it's 9 digits, assume it's local UZ and add 998
+        if (normalized.length === 9) normalized = "998" + normalized;
+        return normalized;
+    }
+
     async createUser(dto: CreateUserDto) {
         console.log(dto);
         const user = new User();
         user.fullName = dto.fullName;
-        if (dto.phoneNumber) {
-            const existingUser = await this.userRepo.findOne({ where: { phoneNumber: dto.phoneNumber } });
+        const normalizedPhone = this.normalizePhone(dto.phoneNumber);
+        if (normalizedPhone) {
+            const existingUser = await this.userRepo.findOne({ where: { phoneNumber: normalizedPhone } });
             if (existingUser) {
                 throw new PhoneNumberAlreadyExistsException();
             }
         }
-        user.phoneNumber = dto.phoneNumber;
+        user.phoneNumber = normalizedPhone;
         const hashedPassword = await bcrypt.hash(dto.password, 10);
         user.password = hashedPassword;
         user.lastKnownLatitude = dto.latitude;
@@ -49,7 +62,8 @@ export class UserService {
     }
 
     async login(dto: LoginDto) {
-        const user = await this.userRepo.findOne({ where: { phoneNumber: dto.phoneNumber } });
+        const normalizedPhone = this.normalizePhone(dto.phoneNumber);
+        const user = await this.userRepo.findOne({ where: { phoneNumber: normalizedPhone } });
         if (!user) {
             throw new UserNotFoundException();
         }

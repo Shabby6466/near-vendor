@@ -9,7 +9,15 @@ import * as bcrypt from "bcryptjs";
 export class BootstrapService implements OnModuleInit {
   private readonly logger = new Logger(BootstrapService.name);
 
-  constructor(@InjectRepository(User) private readonly users: Repository<User>) {}
+  constructor(@InjectRepository(User) private readonly users: Repository<User>) { }
+
+  private normalizePhone(phone: string): string {
+    if (!phone) return "";
+    let normalized = phone.replace(/\D/g, "");
+    if (phone.startsWith("00")) normalized = normalized.substring(2);
+    if (normalized.length === 9) normalized = "998" + normalized;
+    return normalized;
+  }
 
   async onModuleInit() {
     // Run in background with retries so we don't crash startup if DB schema isn't ready yet.
@@ -27,7 +35,8 @@ export class BootstrapService implements OnModuleInit {
 
     for (let attempt = 1; attempt <= 10; attempt++) {
       try {
-        const existing = await this.users.findOne({ where: { phoneNumber: phone } });
+        const normalizedPhone = this.normalizePhone(phone);
+        const existing = await this.users.findOne({ where: { phoneNumber: normalizedPhone } });
         if (existing) {
           // Always enforce SUPERADMIN role for this phone.
           let changed = false;
@@ -61,7 +70,7 @@ export class BootstrapService implements OnModuleInit {
         const hashedPassword = await bcrypt.hash(password, 10);
         const user = this.users.create({
           fullName: "Super Admin",
-          phoneNumber: phone,
+          phoneNumber: normalizedPhone,
           password: hashedPassword,
           role: UserRoles.SUPERADMIN,
           mustChangePassword: false,
