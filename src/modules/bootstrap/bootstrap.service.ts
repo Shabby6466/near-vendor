@@ -1,4 +1,5 @@
 import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
+import { DataSource } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { User } from "models/entities/users.entity";
@@ -9,7 +10,10 @@ import * as bcrypt from "bcryptjs";
 export class BootstrapService implements OnModuleInit {
   private readonly logger = new Logger(BootstrapService.name);
 
-  constructor(@InjectRepository(User) private readonly users: Repository<User>) { }
+  constructor(
+    private readonly dataSource: DataSource,
+    @InjectRepository(User) private readonly users: Repository<User>
+  ) { }
 
   private normalizePhone(phone: string): string {
     if (!phone) return "";
@@ -20,8 +24,19 @@ export class BootstrapService implements OnModuleInit {
   }
 
   async onModuleInit() {
-    // Run in background with retries so we don't crash startup if DB schema isn't ready yet.
+    // 1. Ensure PostGIS is enabled first
+    await this.ensurePostgis();
+    // 2. Run superadmin bootstrap in background
     void this.ensureSuperAdminWithRetry();
+  }
+
+  private async ensurePostgis() {
+    try {
+      await this.dataSource.query("CREATE EXTENSION IF NOT EXISTS postgis;");
+      this.logger.log("Ensured PostGIS extension is enabled");
+    } catch (err) {
+      this.logger.error("Failed to enable PostGIS extension", err as any);
+    }
   }
 
   private async ensureSuperAdminWithRetry() {

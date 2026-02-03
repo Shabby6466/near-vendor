@@ -1,4 +1,5 @@
-import { Body, Controller, Post } from "@nestjs/common";
+import { Body, Controller, Post, UploadedFile, UseInterceptors } from "@nestjs/common";
+import { FileInterceptor } from "@nestjs/platform-express";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { SearchService } from "./search.service";
 import { NearbyDto } from "./dto/nearby.dto";
@@ -43,5 +44,23 @@ export class SearchController {
       limit: body.limit || 60,
     });
     return { success: true, results };
+  }
+
+  @Post("/image")
+  @UseInterceptors(FileInterceptor("file"))
+  @ApiOperation({ summary: "Search inventory using an image (AI vision)" })
+  async searchImage(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() body: any
+  ) {
+    const results = await this.service.searchImage({
+      file: file.buffer,
+      mimeType: file.mimetype,
+      userLat: parseFloat(body.userLat),
+      userLon: parseFloat(body.userLon),
+      limit: body.limit ? parseInt(body.limit, 10) : 20,
+      queryText: body.queryText,
+    });
+    return { success: true, ...results };
   }
 }

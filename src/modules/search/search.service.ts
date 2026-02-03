@@ -3,6 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { InventoryItem } from "models/entities/inventory-item.entity";
 import { EmbeddingService } from "@modules/embedding.service";
+import { GeminiVisionService } from "./gemini-vision.service";
 
 // Define a reasonable search radius in meters (e.g., 25km)
 const SEARCH_RADIUS_METERS = 25000;
@@ -12,6 +13,7 @@ export class SearchService {
   constructor(
     @InjectRepository(InventoryItem) private readonly repo: Repository<InventoryItem>,
     private readonly embeddingService: EmbeddingService,
+    private readonly visionService: GeminiVisionService,
   ) { }
 
   /**
@@ -116,5 +118,23 @@ export class SearchService {
 
     const rows = await qb.getRawAndEntities();
     return this.mapRows(rows);
+  }
+
+  async searchImage(params: { file: Buffer; mimeType: string; userLat: number; userLon: number; limit: number; queryText?: string }) {
+    // 1. Describe the image
+    const description = await this.visionService.describeImage(params.file, params.mimeType, params.queryText);
+
+    // 2. Perform semantic search using the description
+    const results = await this.semanticSearch({
+      queryText: description,
+      userLat: params.userLat,
+      userLon: params.userLon,
+      limit: params.limit,
+    });
+
+    return {
+      results,
+      normalizedQuery: description
+    };
   }
 }
