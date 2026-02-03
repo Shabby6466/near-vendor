@@ -35,7 +35,7 @@ export class SearchService {
       .where("i.isActive = true")
       .andWhere("i.stock > 0")
       .andWhere("s.isActive = true")
-      .andWhere("public.ST_DWithin(s.location, public.ST_GeogFromGeoJSON(:userLocation::text), :radius)", {
+      .andWhere("ST_DWithin(s.location, ST_GeomFromGeoJSON(:userLocation)::geography, :radius)", {
         userLocation: JSON.stringify(userLocation),
         radius: SEARCH_RADIUS_METERS,
       });
@@ -44,7 +44,7 @@ export class SearchService {
       qb.andWhere("i.document_vector @@ websearch_to_tsquery('english', :ftsQuery)", { ftsQuery });
     }
 
-    const distanceExpr = "public.ST_Distance(s.location, public.ST_GeogFromGeoJSON(:userLocation::text))";
+    const distanceExpr = "ST_Distance(s.location, ST_GeomFromGeoJSON(:userLocation)::geography)";
     qb.addSelect(distanceExpr, "distance_m");
     const textRankExpr = "ts_rank(i.document_vector, websearch_to_tsquery('english', :ftsQuery))";
     qb.addSelect(textRankExpr, "text_rank");
@@ -70,13 +70,13 @@ export class SearchService {
     const qb = this.repo
       .createQueryBuilder("i")
       .leftJoinAndSelect("i.shop", "s")
-      .where("public.ST_DWithin(s.location, public.ST_GeogFromGeoJSON(:userLocation::text), :radius)", {
+      .where("ST_DWithin(s.location, ST_GeomFromGeoJSON(:userLocation)::geography, :radius)", {
         userLocation: JSON.stringify(userLocation),
         radius: SEARCH_RADIUS_METERS,
       });
 
     // Add distance calculation and order by vector similarity (cosine distance)
-    qb.addSelect("public.ST_Distance(s.location, public.ST_GeogFromGeoJSON(:userLocation::text))", "distance_m");
+    qb.addSelect("ST_Distance(s.location, ST_GeomFromGeoJSON(:userLocation)::geography)", "distance_m");
     qb.orderBy("i.description_vector <=> :queryVector", "ASC");
     qb.setParameters({ queryVector: `[${queryVector.join(",")}]` });
     qb.limit(limit);
@@ -107,12 +107,12 @@ export class SearchService {
       .where("i.isActive = true")
       .andWhere("i.stock > 0")
       .andWhere("s.isActive = true")
-      .andWhere("public.ST_DWithin(s.location, public.ST_GeogFromGeoJSON(:userLocation::text), :radius)", {
+      .andWhere("ST_DWithin(s.location, ST_GeomFromGeoJSON(:userLocation)::geography, :radius)", {
         userLocation: JSON.stringify(userLocation),
         radius: SEARCH_RADIUS_METERS,
       });
 
-    qb.addSelect("public.ST_Distance(s.location, public.ST_GeogFromGeoJSON(:userLocation::text))", "distance_m");
+    qb.addSelect("ST_Distance(s.location, ST_GeomFromGeoJSON(:userLocation)::geography)", "distance_m");
     qb.orderBy("distance_m", "ASC");
     qb.limit(limit);
 
