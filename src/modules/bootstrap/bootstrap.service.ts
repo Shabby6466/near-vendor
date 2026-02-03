@@ -33,9 +33,10 @@ export class BootstrapService implements OnModuleInit {
   private async ensurePostgis() {
     try {
       await this.dataSource.query("CREATE EXTENSION IF NOT EXISTS postgis;");
-      this.logger.log("Ensured PostGIS extension is enabled");
+      await this.dataSource.query("SET search_path TO \"$user\", public, topology;");
+      this.logger.log("Ensured PostGIS extension is enabled and search_path is set");
     } catch (err) {
-      this.logger.error("Failed to enable PostGIS extension", err as any);
+      this.logger.error("Failed to enable PostGIS extension or set search_path", err as any);
     }
   }
 
