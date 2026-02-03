@@ -22,13 +22,13 @@ export class AuthService {
         subject?: string,
     ) {
         return {
-            expiresIn: expiryTime ? expiryTime : process.env.JWT_EXPIRATION_TIME,
+            expiresIn: expiryTime ? expiryTime : process.env.JWT_EXPIRES_IN,
             accessToken: this.jwtService.sign(
                 { uuid: user?.id },
                 {
-                    secret: process.env.JWT_SECRET_KEY,
+                    secret: process.env.JWT_SECRET,
                     subject: subject ? subject : '',
-                    expiresIn: expiryTime ? expiryTime : process.env.JWT_EXPIRATION_TIME,
+                    expiresIn: expiryTime ? expiryTime : process.env.JWT_EXPIRES_IN,
                 },
             ),
             user,

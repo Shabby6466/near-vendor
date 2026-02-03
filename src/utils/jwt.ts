@@ -8,7 +8,7 @@ export class AuthToken {
    * Generate a jwt authentication token
    */
   static generate(payload: JwtPayload | Buffer, options?: SignOptions) {
-    return sign(payload, process.env.JWT_SECRET_KEY, {
+    return sign(payload, process.env.JWT_SECRET, {
       jwtid: randomUUID(),
       algorithm: 'HS256',
       ...options,
@@ -23,6 +23,6 @@ export class AuthToken {
       throw new UnauthorizedException('Unathenticated', {
         cause: new Error('Authentication Required'),
       });
-    return verify(token, process.env.JWT_SECRET_KEY);
+    return verify(token, process.env.JWT_SECRET);
   }
 }

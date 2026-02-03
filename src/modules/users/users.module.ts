@@ -17,7 +17,7 @@ import { JwtStrategy } from "@modules/auth/jwt-strategy";
                 imports: [],
                 useFactory: () => {
                     return {
-                        secret: process.env.JWT_SECRET_KEY,
+                        secret: process.env.JWT_SECRET,
                         signOptions: {
                             ...(process.env.JWT_EXPIRES_IN
                                 ? {
