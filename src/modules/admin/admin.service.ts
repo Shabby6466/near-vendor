@@ -22,7 +22,7 @@ export class AdminService {
     @InjectRepository(User) private readonly users: Repository<User>,
     @InjectRepository(Shops) private readonly shops: Repository<Shops>,
     @InjectRepository(InventoryItem) private readonly inventory: Repository<InventoryItem>,
-  ) {}
+  ) { }
 
   async listVendorApps(status?: string) {
     const where: any = {};
@@ -83,7 +83,11 @@ export class AdminService {
       whatsappNumber: app.whatsappNumber,
       isActive: true,
       user: vendorUser,
-    } as DeepPartial<Shops>);
+      location: {
+        type: "Point",
+        coordinates: [Number(app.shopLongitude), Number(app.shopLatitude)],
+      } as any,
+    } as any as DeepPartial<Shops>);
 
     await this.shops.save(shop);
 

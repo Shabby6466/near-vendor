@@ -26,8 +26,28 @@ export class BootstrapService implements OnModuleInit {
   async onModuleInit() {
     // 1. Ensure PostGIS is enabled first
     await this.ensurePostgis();
-    // 2. Run superadmin bootstrap in background
+    // 2. Fix any missing location data in production
+    await this.repairShopLocations();
+    // 3. Run superadmin bootstrap in background
     void this.ensureSuperAdminWithRetry();
+  }
+
+  private async repairShopLocations() {
+    try {
+      // Fixes existing shops where location geography is NULL but lat/long are available
+      const result = await this.dataSource.query(`
+        UPDATE shops 
+        SET location = ST_SetSRID(ST_MakePoint(shop_longitude, shop_latitude), 4326)::geography
+        WHERE location IS NULL 
+          AND shop_longitude IS NOT NULL 
+          AND shop_latitude IS NOT NULL;
+      `);
+      if (result[1] > 0) {
+        this.logger.log(`Repaired ${result[1]} shop locations in database`);
+      }
+    } catch (err) {
+      this.logger.error("Failed to repair shop locations", err as any);
+    }
   }
 
   private async ensurePostgis() {

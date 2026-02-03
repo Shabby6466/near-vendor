@@ -3,8 +3,8 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { InventoryItem } from "models/entities/inventory-item.entity";
 
-// Define a reasonable search radius in meters (e.g., 25km)
-const SEARCH_RADIUS_METERS = 25000;
+// Increased radius to 100km for better testing results
+const SEARCH_RADIUS_METERS = 100000;
 
 @Injectable()
 export class SearchService {
@@ -13,52 +13,17 @@ export class SearchService {
   ) { }
 
   /**
-   * Search inventory (Keyword + Distance):
-   * - Filters by location using ST_DWithin.
-   * - Uses Full-Text Search (FTS) for matching names/descriptions.
+   * Search inventory (Simple Indexed Search):
+   * - Filters by location within 100km.
+   * - Uses ILIKE for flexible matching of names/descriptions.
    */
   async search(params: { queryText: string; userLat: number; userLon: number; limit: number }) {
+    const { queryText, userLat, userLon, limit } = params;
+
     const userLocation = {
       type: "Point",
-      coordinates: [params.userLon, params.userLat],
+      coordinates: [userLon, userLat],
     };
-    const ftsQuery = params.queryText.trim().replace(/\s+/g, ' & ');
-
-    let qb = this.repo
-      .createQueryBuilder("i")
-      .leftJoinAndSelect("i.shop", "s")
-      .where("i.isActive = true")
-      .andWhere("i.stock > 0")
-      .andWhere("s.isActive = true")
-      .andWhere("ST_DWithin(s.location, ST_GeomFromGeoJSON(:userLocation)::geography, :radius)", {
-        userLocation: JSON.stringify(userLocation),
-        radius: SEARCH_RADIUS_METERS,
-      });
-
-    if (ftsQuery) {
-      qb.andWhere("i.document_vector @@ websearch_to_tsquery('english', :ftsQuery)", { ftsQuery });
-    }
-
-    const distanceExpr = "ST_Distance(s.location, ST_GeomFromGeoJSON(:userLocation)::geography)";
-    qb.addSelect(distanceExpr, "distance_m");
-
-    if (ftsQuery) {
-      const textRankExpr = "ts_rank(i.document_vector, websearch_to_tsquery('english', :ftsQuery))";
-      qb.addSelect(textRankExpr, "text_rank");
-      qb.orderBy("text_rank", "DESC");
-    } else {
-      qb.orderBy(distanceExpr, "ASC");
-    }
-
-    qb.limit(params.limit);
-
-    const rows = await qb.getRawAndEntities();
-    return this.mapRows(rows);
-  }
-
-  async nearby(params: { userLat: number; userLon: number; limit: number }) {
-    const { userLat, userLon, limit } = params;
-    const userLocation = { type: "Point", coordinates: [userLon, userLat] };
 
     const qb = this.repo
       .createQueryBuilder("i")
@@ -71,12 +36,25 @@ export class SearchService {
         radius: SEARCH_RADIUS_METERS,
       });
 
-    qb.addSelect("ST_Distance(s.location, ST_GeomFromGeoJSON(:userLocation)::geography)", "distance_m");
-    qb.orderBy("distance_m", "ASC");
-    qb.limit(limit);
+    if (queryText && queryText.trim()) {
+      const searchTerm = `%${queryText.trim().toLowerCase()}%`;
+      qb.andWhere("(LOWER(i.name) LIKE :searchTerm OR LOWER(i.description) LIKE :searchTerm)", {
+        searchTerm
+      });
+    }
+
+    const distanceExpr = "ST_Distance(s.location, ST_GeomFromGeoJSON(:userLocation)::geography)";
+    qb.addSelect(distanceExpr, "distance_m");
+    qb.orderBy("distance_m", "ASC"); // Always show closest results first
+
+    qb.limit(limit || 60);
 
     const rows = await qb.getRawAndEntities();
     return this.mapRows(rows);
+  }
+
+  async nearby(params: { userLat: number; userLon: number; limit: number }) {
+    return this.search({ ...params, queryText: "" });
   }
 
   private mapRows(rows: { entities: InventoryItem[]; raw: any[] }) {
@@ -85,7 +63,6 @@ export class SearchService {
       return {
         ...entity,
         distance_m: raw.distance_m ? parseFloat(raw.distance_m) : null,
-        text_rank: raw.text_rank ? parseFloat(raw.text_rank) : null,
       };
     });
   }
