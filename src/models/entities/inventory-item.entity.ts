@@ -30,12 +30,6 @@ export class InventoryItem extends BaseEntity {
   @Index()
   @Column({ type: 'tsvector', select: false, nullable: true })
   document_vector: string;
-  
-  @Column({ type: 'text', nullable: true }) // Stored as text, converted by pgvector
-  description_vector: string;
-
-  @Column({ type: 'text', nullable: true }) // Stored as text, converted by pgvector
-  image_vector: string;
 
   @ManyToOne(() => Shops, { eager: true, onDelete: "CASCADE" })
   @JoinColumn()

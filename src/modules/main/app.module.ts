@@ -31,7 +31,6 @@ import { ThrottlerModule } from "@nestjs/throttler";
 import { BootstrapModule } from "@modules/bootstrap/bootstrap.module";
 import { VendorPortalModule } from "@modules/vendor-portal/vendor-portal.module";
 import { PortalAuthModule } from "@modules/auth/portal-auth.module";
-import { EmbeddingModule } from "@modules/embedding.module";
 
 export const adminModulesImports: ModuleMetadata["imports"] = [
 ];
@@ -82,7 +81,6 @@ export const imports: ModuleMetadata["imports"] = [
   VendorPortalModule,
   PortalAuthModule,
   BootstrapModule,
-  EmbeddingModule,
 ];
 
 @Module({

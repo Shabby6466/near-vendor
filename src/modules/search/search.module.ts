@@ -3,13 +3,10 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { InventoryItem } from "models/entities/inventory-item.entity";
 import { SearchController } from "./search.controller";
 import { SearchService } from "./search.service";
-import { GeminiVisionService } from "./gemini-vision.service";
-import { ImageCacheService } from "./image-cache.service";
-import { EmbeddingModule } from "@modules/embedding.module";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([InventoryItem]), EmbeddingModule],
+  imports: [TypeOrmModule.forFeature([InventoryItem])],
   controllers: [SearchController],
-  providers: [SearchService, GeminiVisionService, ImageCacheService],
+  providers: [SearchService],
 })
-export class SearchModule {}
+export class SearchModule { }
