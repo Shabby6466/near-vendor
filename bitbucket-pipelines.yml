@@ -33,3 +33,31 @@ pipelines:
           services:
             - postgres
             - redis
+  branches:
+    main:
+      - step:
+          name: Build and Test
+          size: 2x
+          caches:
+            - node
+          services:
+            - postgres
+            - redis
+          script:
+            - export NODE_OPTIONS=--max_old_space_size=5096
+            - npm install
+            - npm test
+      - step:
+          name: Deploy to Production
+          deployment: production
+          script:
+            - pipe: atlassian/ssh-run:0.4.1
+              variables:
+                SSH_USER: $SSH_USER
+                SERVER: $SSH_HOST
+                SSH_KEY: $SSH_PRIVATE_KEY
+                COMMAND: |
+                  cd ~/projects/near-vendor/backend/deploy
+                  git pull origin main
+                  ./deploy.sh build
+                  ./deploy.sh start
