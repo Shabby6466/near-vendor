@@ -77,7 +77,7 @@ const adminSwaggerDoc = (app: INestApplication, modules) => {
     .addServer('https://dev-api.nearvendor.com', 'Dev')
     .addServer('https://nearvendor-backend-testing.rnssol.com', 'Testing')
     .addServer('https://nearvendor-staging-api.rnssol.com', 'Staging')
-    .addServer('https://api.nearvendor.com', 'Live')
+    .addServer('https://api.nearvendor.pro', 'Live')
     .addBearerAuth()
     .build();
 
