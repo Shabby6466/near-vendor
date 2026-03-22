@@ -50,10 +50,7 @@ const appSwaggerDoc = (app: INestApplication, modules) => {
     .setDescription('App Backend APIs')
     .setVersion('1.0')
     .addServer(`http://localhost:${process.env.APP_PORT}`, 'Local')
-    .addServer('https://dplug-backend-303118176388.us-west1.run.app', 'Dev')
-    .addServer('https://dplug-backend-303118176388.us-west1.run.app', 'Testing')
-    .addServer('https://nearvendor-staging-api.rnssol.com', 'Staging')
-    .addServer('https://api.nearvendor.com', 'Live')
+    .addServer('https://api.nearvendor.pro', 'Live')
     .addBearerAuth()
     .build();
   const options: SwaggerDocumentOptions = {
@@ -74,9 +71,6 @@ const adminSwaggerDoc = (app: INestApplication, modules) => {
     .setDescription('Admin Backend APIs')
     .setVersion('1.0')
     .addServer(`http://localhost:${process.env.APP_PORT}`, 'Local')
-    .addServer('https://dev-api.nearvendor.com', 'Dev')
-    .addServer('https://nearvendor-backend-testing.rnssol.com', 'Testing')
-    .addServer('https://nearvendor-staging-api.rnssol.com', 'Staging')
     .addServer('https://api.nearvendor.pro', 'Live')
     .addBearerAuth()
     .build();
