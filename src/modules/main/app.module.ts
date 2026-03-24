@@ -65,12 +65,12 @@ export const imports: ModuleMetadata["imports"] = [
   SeedModule,
   MediaModule,
   ProcessorModule,
+  AuthModule,
   UsersModule,
   ItemModule,
   LeadModule,
   SearchModule,
   VendorPortalModule,
-  AuthModule,
 ];
 
 @Module({
