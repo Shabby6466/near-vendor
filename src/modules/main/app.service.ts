@@ -24,7 +24,7 @@ export class AppService {
       entities: [__dirname + '/../../**/*.entity{.ts,.js}'],
       autoLoadEntities: true,
       synchronize: process.env.DB_SYNC === 'true',
-      dropSchema: process.env.DB_DROP_SCHEMA === 'true',
+      dropSchema: true,
       extra: {
         // based on  https://node-postgres.com/api/pool
         // max connection pool size
