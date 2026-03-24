@@ -3,8 +3,6 @@ import { User } from "models/entities/users.entity";
 import { Repository } from "typeorm";
 import * as bcrypt from "bcryptjs";
 import { UserNotFoundException } from "./users.exception";
-import { AuthService } from "@modules/auth/auth.service";
-import { OtpService } from "@modules/auth/otp.service";
 
 
 import { Injectable } from "@nestjs/common";

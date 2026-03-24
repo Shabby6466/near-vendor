@@ -21,8 +21,7 @@
     "ts-typeorm": "ts-node -r tsconfig-paths/register ./node_modules/.bin/typeorm",
     "migration:create": "typeorm migration:create -d src/migrations",
     "migration:run": "yarn ts-typeorm migration:run",
-    "migration:revert": "yarn ts-typeorm migration:revert",
-    "backfill:embeddings": "ts-node -r tsconfig-paths/register src/backfill.ts"
+    "migration:revert": "yarn ts-typeorm migration:revert"
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^1.6.1",
