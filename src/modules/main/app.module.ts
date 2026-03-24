@@ -38,22 +38,26 @@ export const imports: ModuleMetadata["imports"] = [
       limit: 120,
     },
   ]),
-  TypeOrmModule.forRoot(AppService.typeormConfig()),
+  TypeOrmModule.forRootAsync({
+    useFactory: () => AppService.typeormConfig(),
+  }),
   WinstonModule.forRootAsync({
     useFactory: () => AppService.createWinstonTransports(),
   }),
-  BullModule.forRoot({
-    redis: {
-      host: process.env.REDIS_HOST,
-      port: Number(process.env.REDIS_PORT),
-      password: process.env.REDIS_PASSWORD,
-      db: parseInt(process.env.REDIS_DB || process.env.BULL_REDIS_DB || '0', 10),
-    },
-    limiter: {
-      max: 1000,
-      duration: 5000,
-      bounceBack: false,
-    } as RateLimiter,
+  BullModule.forRootAsync({
+    useFactory: () => ({
+      redis: {
+        host: process.env.REDIS_HOST,
+        port: Number(process.env.REDIS_PORT),
+        password: process.env.REDIS_PASSWORD,
+        db: parseInt(process.env.REDIS_DB || process.env.BULL_REDIS_DB || '0', 10),
+      },
+      limiter: {
+        max: 1000,
+        duration: 5000,
+        bounceBack: false,
+      } as RateLimiter,
+    }),
   }),
   LoggerModule,
   CommonModule,
