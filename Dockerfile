@@ -12,18 +12,20 @@ RUN npm i -g tsc-alias
 
 # Build
 COPY . .
+RUN ls -la /app
 RUN npm run prestart:prod
+RUN ls -la /app/dist
 
 
 FROM node:22-bookworm-slim AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 
-# Copy from builder stage using relative paths (relative to WORKDIR /app in builder)
-COPY --from=builder node_modules ./node_modules
-COPY --from=builder dist ./dist
-COPY --from=builder worker.js ./worker.js
-COPY --from=builder package.json ./package.json
+# Copy from builder stage using absolute paths
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/worker.js ./worker.js
+COPY --from=builder /app/package.json ./package.json
 
 EXPOSE 3836
 
