@@ -19,18 +19,13 @@ import { RateLimiter } from "bull";
 import { WinstonModule } from "nest-winston";
 import { AppService } from "./app.service";
 import { ProcessorModule } from "@modules/processor/processor.module";
-import { ShopModule } from "@modules/shop/shop.module";
 import { ItemModule } from "@modules/items/item.module";
 import { LeadModule } from "@modules/leads/lead.module";
 import { UsersModule } from "@modules/users/users.module";
-import { InventoryModule } from "@modules/inventory/inventory.module";
 import { SearchModule } from "@modules/search/search.module";
-import { VendorApplicationsModule } from "@modules/vendor-applications/vendor-applications.module";
-import { AdminModule } from "@modules/admin/admin.module";
 import { ThrottlerModule } from "@nestjs/throttler";
-import { BootstrapModule } from "@modules/bootstrap/bootstrap.module";
 import { VendorPortalModule } from "@modules/vendor-portal/vendor-portal.module";
-import { PortalAuthModule } from "@modules/auth/portal-auth.module";
+import { AuthModule } from "@modules/auth/auth.module";
 
 export const adminModulesImports: ModuleMetadata["imports"] = [
 ];
@@ -71,16 +66,11 @@ export const imports: ModuleMetadata["imports"] = [
   MediaModule,
   ProcessorModule,
   UsersModule,
-  ShopModule,
   ItemModule,
   LeadModule,
-  InventoryModule,
   SearchModule,
-  VendorApplicationsModule,
-  AdminModule,
   VendorPortalModule,
-  PortalAuthModule,
-  BootstrapModule,
+  AuthModule,
 ];
 
 @Module({

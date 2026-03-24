@@ -14,10 +14,10 @@ export class VendorApplication extends BaseEntity {
   fullName: string;
 
   @Column({ type: "varchar", length: 20 })
-  phoneNumber: string;
+  email: string;
 
   @Column({ type: "varchar", length: 20 })
-  whatsappNumber: string;
+  phoneNumber: string;
 
   @Column({ type: "varchar", length: 80 })
   shopName: string;

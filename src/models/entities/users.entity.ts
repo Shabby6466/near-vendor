@@ -7,15 +7,15 @@ import { UserRoles } from "@utils/enum";
 
 @Entity({ name: "users" })
 export class User extends BaseEntity {
-    @Column({ type: 'varchar', length: 50 })
+    @Column({ type: 'varchar', length: 100 })
     @IsNotEmpty()
     fullName: string;
 
-    @Column({ type: 'varchar', length: 13, unique: true })
+    @Column({ type: 'varchar', length: 100, unique: true })
     @IsNotEmpty()
-    phoneNumber: string;
+    email: string;
 
-    @Column({ type: 'varchar', length: 100 })
+    @Column({ type: 'varchar', length: 255 })
     @IsNotEmpty()
     password: string;
 
@@ -42,6 +42,6 @@ export class User extends BaseEntity {
     @OneToOne(() => Lead, (lead) => lead.buyer)
     leadAsBuyer: Lead;
 
-    @OneToOne(() => Lead, (lead) => lead.seller)
-    leadAsSeller: Lead;
+    @OneToOne(() => Lead, (lead) => lead.vendor)
+    leadAsVendor: Lead;
 }

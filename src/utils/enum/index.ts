@@ -9,7 +9,7 @@ export enum ResponseMessage {
   BUYER_PHONE_NUMBER_NOT_FOUND = "Buyer phone number not found",
   BUYER_NOT_FOUND = 'Buyer not found',
   GENERIC_ERROR = 'Generic Error',
-  SELLER_NOT_FOUND = 'Seller Not found',
+  VENDOR_NOT_FOUND = 'Vendor Not found',
   SHOP_NOT_FOUND = 'Shop Not found',
   FORBIDDEN_ACCESS = 'Forbidden Access',
   INVALID_CREDENTIALS = 'Invalid Credentials',
@@ -18,11 +18,12 @@ export enum ResponseMessage {
   INSUFFICIENT_ROLE = 'Insufficient Role',
   USER_INACTIVE = 'User Inactive',
   USER_SUSPENDED = 'User Suspended',
-  PHONE_NUMBER_ALREADY_EXISTS = 'Phone number already exists',
+  EMAIL_ALREADY_EXISTS = 'Email already exists',
   INVALID_ROLE = 'Invalid Role',
   INVALID_DATE = "Invalid date",
   INVALID_ZIP_CODE = "Invalid zip code",
   INVALID_COORDINATES = "Invalid coordinates",
+  INVALID_OTP = "Invalid OTP",
 }
 
 export enum ResponseCode {
@@ -40,7 +41,7 @@ export enum ResponseCode {
   INTERNAL_SERVER_ERROR = 500,
   BUYER_NOT_FOUND = 407,
   GENERIC_ERROR = 505,
-  SELLER_NOT_FOUND = 408,
+  VENDOR_NOT_FOUND = 408,
   SHOP_NOT_FOUND = 409,
   FORBIDDEN_ACCESS = 505,
   INVALID_CREDENTIALS = 401,
@@ -53,8 +54,9 @@ export enum ResponseCode {
   USER_NOT_FOUND = 401,
 
 
-  PHONE_NUMBER_ALREADY_EXISTS = 406,
+  EMAIL_ALREADY_EXISTS = 406,
   INVALID_ROLE = 402,
+  INVALID_OTP = 403,
 }
 
 export enum UserStatus {
@@ -145,7 +147,6 @@ export enum Duration {
 
 export enum UserRoles {
   BUYER = "BUYER",
-  SELLER = "SELLER",
   VENDOR = "VENDOR",
   SUPERADMIN = "SUPERADMIN",
 }

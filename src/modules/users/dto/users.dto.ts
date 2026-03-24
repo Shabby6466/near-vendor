@@ -7,9 +7,9 @@ export class CreateUserDto {
     @IsNotEmpty()
     fullName: string;
 
-    @ApiProperty({ example: "03090072339" })
+    @ApiProperty({ example: "[EMAIL_ADDRESS]" })
     @IsNotEmpty()
-    phoneNumber: string;
+    email: string;
 
     @ApiProperty({ example: "password" })
     @IsNotEmpty()
@@ -30,11 +30,21 @@ export class CreateUserDto {
 
 
 export class LoginDto {
-    @ApiProperty({ example: "03090072339" })
+    @ApiProperty({ example: "[EMAIL_ADDRESS]" })
     @IsNotEmpty()
-    phoneNumber: string;
+    email: string;
 
     @ApiProperty({ example: "password" })
     @IsNotEmpty()
     password: string;
+}
+
+export class VerifyOtpDto {
+    @ApiProperty({ example: "[EMAIL_ADDRESS]" })
+    @IsNotEmpty()
+    email: string;
+
+    @ApiProperty({ example: "123456" })
+    @IsNotEmpty()
+    otp: string;
 }

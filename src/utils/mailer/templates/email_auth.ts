@@ -1,5 +1,5 @@
 const html = String.raw;
-export const email_auth = html`
+export const email_auth = (verificationCode: string) => html`
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -29,6 +29,7 @@ export const email_auth = html`
         }
         .content {
             padding: 20px 0;
+            border-bottom: 1px solid #eeeeee;
         }
         .footer {
             padding: 20px 0;
@@ -76,50 +77,26 @@ export const email_auth = html`
 <body>
     <div class="email-container">
         <div class="header">
-            <svg width="180" height="60" viewBox="0 0 300 100">
-                <!-- Blue cross/plus symbol -->
-                <path d="M30,20 L45,5 L60,20 L75,5 L90,20 L75,35 L90,50 L75,65 L60,50 L45,65 L30,50 L45,35 Z" fill="#0077cc"/>
                 
                 <!-- nearvendor text -->
-                <text x="110" y="45" font-family="Arial, sans-serif" font-size="30" font-weight="bold">nearvendor</text>
+                <text x="110" y="45" font-family="Arial, sans-serif" font-size="30" font-weight="bold">Nearvendor</text>
                 
-                <!-- Tagline -->
-                <text x="110" y="65" font-family="Arial, sans-serif" font-size="11">TOKENIZING YOUR EMOTION</text>
             </svg>
         </div>
         
         <div class="content">
-            <h2>Device Authentication</h2>
+            <h2>Email Authentication</h2>
             
             <p>Just one more step to authenticate your identity. Simply tap the 'Authenticate' button below from the device where your app is installed.</p>
             
-            <div class="device-info">
-                <div class="device-row">
-                    <div class="device-label">Location:</div>
-                    <div class="device-value">{{Location}}</div>
-                </div>
-                <div class="device-row">
-                    <div class="device-label">Time:</div>
-                    <div class="device-value">{{GMTTime}} (GMT)</div>
-                </div>
-                <div class="device-row">
-                    <div class="device-label">IP:</div>
-                    <div class="device-value">{{IP}}</div>
-                </div>
-                <div class="device-row">
-                    <div class="device-label">Device:</div>
-                    <div class="device-value">{{Device}}</div>
-                </div>
-            </div>
-            
             <p style="margin: 30px 0; text-align: center;">
-                <a href="{{AuthLink}}" style="color: white;"  class="button" target="_blank">Authenticate</a>
+                <a style="color: white;" class="button" target="_blank">${verificationCode}</a>
             </p>
             
             <p>If you did not attempt to log in, please ignore this email or contact our support team immediately.</p>
             
             <p>Best regards,</p>
-            <p>The nearvendor Team</p>
+            <p>The Nearvendor Team</p>
         </div>
         
          
@@ -127,3 +104,4 @@ export const email_auth = html`
 </body>
 </html>
 `;
+

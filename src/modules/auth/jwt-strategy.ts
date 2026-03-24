@@ -6,12 +6,14 @@ import { Request } from 'express';
 import { AuthService } from './auth.service';
 import { InvalidTokenException, UserInactiveException, UserSuspendedException } from './auth.exception';
 import { UserStatus } from '@utils/enum';
+import { UserService } from '@modules/users/users.service';
 
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     constructor(
         private readonly authService: AuthService,
+        private readonly user: UserService,
 
     ) {
         super({
@@ -28,7 +30,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
             throw new InvalidTokenException();
         }
 
-        const user: any = await this.authService.getUser(uuid as string);
+        const user: any = await this.user.getUser(uuid as string);
         if (!user || !token.length) {
             throw new InvalidTokenException();
         }

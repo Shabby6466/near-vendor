@@ -8,11 +8,25 @@ import { JwtService } from "@nestjs/jwt";
 import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
 import { JwtStrategy } from "@modules/auth/jwt-strategy";
+import { CacheModule } from "@nestjs/cache-manager";
+import { MailModule } from "@utils/mailer/mail.module";
+import { OtpService } from "@modules/auth/otp.service";
+import * as redisStore from "cache-manager-redis-store";
+
 
 @Module(
     {
         imports: [
             TypeOrmModule.forFeature([User]),
+            MailModule,
+            CacheModule.register({
+                store: redisStore,
+                host: process.env.REDIS_HOST,
+                port: process.env.REDIS_PORT,
+                db: parseInt(process.env.REDIS_DB || process.env.BULL_REDIS_DB || '0', 10),
+                password: process.env.REDIS_PASSWORD,
+            }),
+
             JwtModule.registerAsync({
                 imports: [],
                 useFactory: () => {
@@ -31,9 +45,11 @@ import { JwtStrategy } from "@modules/auth/jwt-strategy";
             }),
             PassportModule.register({ defaultStrategy: 'jwt' }),
         ],
-        providers: [UserService, AuthService, JwtStrategy],
+        providers: [UserService, AuthService, JwtStrategy, OtpService],
+
         controllers: [UsersController],
-        exports: [UserService, AuthService, JwtStrategy, PassportModule],
+        exports: [UserService, AuthService, JwtStrategy, PassportModule, OtpService],
+
     }
 )
 export class UsersModule { }

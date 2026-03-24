@@ -48,7 +48,7 @@ export class AdminService {
     const passwordPlain = generatePassword();
     const passwordHash = await bcrypt.hash(passwordPlain, 10);
 
-    const existing = await this.users.findOne({ where: { phoneNumber: app.phoneNumber } });
+    const existing = await this.users.findOne({ where: { email: app.email } });
     let vendorUser: User;
 
     if (existing) {
@@ -80,7 +80,7 @@ export class AdminService {
       shopLatitude: app.shopLatitude as any,
       shopLongitude: app.shopLongitude as any,
       shopAddress: app.shopAddress || "",
-      whatsappNumber: app.whatsappNumber,
+      whatsappNumber: app.phoneNumber,
       isActive: true,
       user: vendorUser,
       location: {
@@ -124,27 +124,27 @@ export class AdminService {
     return { success: true };
   }
 
-  async resetVendorPasswordByPhone(phoneNumber: string) {
-    const user = await this.users.findOne({ where: { phoneNumber } });
-    if (!user) throw new NotFoundException("User not found");
-    if (user.role !== UserRoles.VENDOR) {
-      throw new BadRequestException("User is not a vendor");
-    }
+  // async resetVendorPasswordByPhone(email: string) {
+  //   const user = await this.users.findOne({ where: { email } });
+  //   if (!user) throw new NotFoundException("User not found");
+  //   if (user.role !== UserRoles.VENDOR) {
+  //     throw new BadRequestException("User is not a vendor");
+  //   }
 
-    const passwordPlain = generatePassword();
-    user.password = await bcrypt.hash(passwordPlain, 10);
-    user.mustChangePassword = true;
-    user.isActive = true;
-    await this.users.save(user);
+  //   const passwordPlain = generatePassword();
+  //   user.password = await bcrypt.hash(passwordPlain, 10);
+  //   user.mustChangePassword = true;
+  //   user.isActive = true;
+  //   await this.users.save(user);
 
-    return {
-      success: true,
-      phoneNumber,
-      tempPassword: passwordPlain,
-      mustChangePassword: true,
-      message: "Password reset. Share tempPassword with vendor via WhatsApp. Vendor must change password after first login.",
-    };
-  }
+  //   return {
+  //     success: true,
+  //     phoneNumber,
+  //     tempPassword: passwordPlain,
+  //     mustChangePassword: true,
+  //     message: "Password reset. Share tempPassword with vendor via WhatsApp. Vendor must change password after first login.",
+  //   };
+  // }
 
   async setShopActive(shopId: string, active: boolean) {
     const shop = await this.shops.findOne({ where: { id: shopId } });

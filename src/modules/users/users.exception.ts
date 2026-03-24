@@ -15,12 +15,18 @@ export class UserNotFoundException extends Exception {
 
 export class PhoneNumberAlreadyExistsException extends Exception {
     constructor() {
-        super(ResponseCode.PHONE_NUMBER_ALREADY_EXISTS, ResponseMessage.PHONE_NUMBER_ALREADY_EXISTS);
+        super(ResponseCode.EMAIL_ALREADY_EXISTS, ResponseMessage.EMAIL_ALREADY_EXISTS);
     }
 }
 
 export class InvalidRoleException extends Exception {
     constructor() {
         super(ResponseCode.INVALID_ROLE, ResponseMessage.INVALID_ROLE);
+    }
+}
+
+export class InvalidOtpException extends Exception {
+    constructor() {
+        super(ResponseCode.INVALID_OTP, ResponseMessage.INVALID_OTP);
     }
 }

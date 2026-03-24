@@ -18,9 +18,9 @@ export class Lead extends BaseEntity {
     @JoinColumn()
     buyer: User;
 
-    @OneToOne(() => User, (user) => user.leadAsSeller)
+    @OneToOne(() => User, (user) => user.leadAsVendor)
     @JoinColumn()
-    seller: User;
+    vendor: User;
 
     @OneToMany(() => Item, (item) => item.lead)
     @JoinColumn()
