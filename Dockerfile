@@ -1,7 +1,4 @@
-# Backend Dockerfile (stable, non-alpine)
-# Alpine + native deps (sharp/bcrypt/etc) can cause runtime SIGSEGV. Use Debian slim.
-
-FROM node:22-bookworm-slim AS build
+FROM node:22-bookworm-slim AS builder
 WORKDIR /app
 
 ENV NODE_ENV=production
@@ -22,12 +19,13 @@ FROM node:22-bookworm-slim AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 
-COPY --from=build /app/node_modules ./node_modules
-COPY --from=build /app/dist ./dist
-COPY --from=build /app/worker.js ./worker.js
-COPY --from=build /app/package.json ./package.json
+# Copy from builder stage using relative paths (relative to WORKDIR /app in builder)
+COPY --from=builder node_modules ./node_modules
+COPY --from=builder dist ./dist
+COPY --from=builder worker.js ./worker.js
+COPY --from=builder package.json ./package.json
 
 EXPOSE 3836
 
-# Run compiled NestJS directly (worker.js now just requires dist/main.js)
-CMD ["node", "dist/main.js"]
+# Run via worker.js which requires dist/main.js
+CMD ["node", "worker.js"]
