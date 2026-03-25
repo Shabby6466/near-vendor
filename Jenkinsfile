@@ -67,14 +67,18 @@ pipeline {
                         // Adjust this path to your VPS project location
                         def vpsPath = "/root/projects/terarare/near-vendor"
 
-                        echo "Archiving files (using tar because rsync is missing)..."
-                        sh "tar -czf project.tar.gz --exclude='node_modules' --exclude='.git' ."
+                        echo "Archiving files..."
+                        // We exclude the archive file itself to avoid 'file changed as we read it' error
+                        sh "tar --exclude='project.tar.gz' --exclude='node_modules' --exclude='.git' -czf project.tar.gz ."
 
                         echo "Syncing archive to VPS..."
                         sh "scp -i ${env.SSH_KEY} -o StrictHostKeyChecking=no project.tar.gz ${vpsUser}@${vpsIp}:${vpsPath}/"
 
                         echo "Extracting archive and running deployment script on VPS..."
                         sh "ssh -i ${env.SSH_KEY} -o StrictHostKeyChecking=no ${vpsUser}@${vpsIp} 'cd ${vpsPath} && tar -xzf project.tar.gz && rm project.tar.gz && chmod +x ./deploy/deploy.sh && ./deploy/deploy.sh build && ./deploy/deploy.sh start'"
+                        
+                        // Clean up the local archive after transfer
+                        sh "rm project.tar.gz"
                     }
                 }
             }
