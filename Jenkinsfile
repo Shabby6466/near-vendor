@@ -86,4 +86,29 @@ pipeline {
             }
         }
     }
+
+    post {
+        always {
+            script {
+                // Retrieve the webhook URL from credentials
+                try {
+                    withCredentials([string(credentialsId: 'discord-webhook-url', variable: 'DISCORD_URL')]) {
+                        def color = currentBuild.currentResult == 'SUCCESS' ? 'GREEN' : 'RED'
+                        def status = currentBuild.currentResult ?: 'IN PROGRESS'
+                        
+                        discordSend(
+                            webhookURL: "${DISCORD_URL}",
+                            title: "${env.JOB_NAME} - Build #${env.BUILD_NUMBER}",
+                            link: "${env.BUILD_URL}",
+                            description: "Branch: ${env.BRANCH_NAME}\nStatus: ${status}",
+                            result: "${status}",
+                            thumbnail: "https://jenkins.io/images/logos/jenkins/jenkins.png"
+                        )
+                    }
+                } catch (Exception e) {
+                    echo "Discord notification failed: ${e.message}"
+                }
+            }
+        }
+    }
 }
