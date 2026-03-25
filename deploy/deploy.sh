@@ -10,10 +10,18 @@
 #   ./deploy.sh build   - Rebuild all service images.
 #
 
+# Ensure we are in the directory where the script and docker-compose.yml are located
+cd "$(dirname "$0")"
+
 COMPOSE_FILE="docker-compose.yml"
 
 case "$1" in
     start)
+        # Clear any accidental .env directories created by Docker volume mounts
+        if [ -d ".env" ]; then
+            echo "Removing .env directory created accidentally by Docker..."
+            rm -rf .env
+        fi
         docker compose -f $COMPOSE_FILE up -d
         ;;
     stop)
@@ -33,4 +41,5 @@ case "$1" in
         exit 1
         ;;
 esac
+
 exit 0
