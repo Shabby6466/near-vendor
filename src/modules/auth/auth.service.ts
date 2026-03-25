@@ -8,7 +8,7 @@ import { InvalidOtpException, InvalidRoleException, PhoneNumberAlreadyExistsExce
 import * as bcrypt from 'bcryptjs';
 import { CreateUserDto, LoginDto } from '@modules/users/dto/users.dto';
 import { UserService } from '@modules/users/users.service';
-import { UserRoles } from '@utils/enum';
+import { ResponseCode, ResponseMessage, UserRoles } from '@utils/enum';
 import { OtpService } from './otp.service';
 
 @Injectable()
@@ -55,11 +55,11 @@ export class AuthService {
 
         return {
             success: true,
+            statusCode: ResponseCode.SUCCESS,
             message: "OTP sent to email. Please verify to complete registration.",
             otp
         };
     }
-
     async verifyAndCreateUser(email: string, otp: string) {
         // Verify OTP
         const isOtpValid = await this.otpService.verifyOtp(email, otp);
@@ -91,12 +91,14 @@ export class AuthService {
         const tokenData = await this.createToken(user);
         delete user.password;
         return {
+            success: true,
+            statusCode: ResponseCode.CREATED_SUCCESSFULLY,
+            message: ResponseMessage.SUCCESS,
             user,
             token: tokenData.accessToken,
             mustChangePassword: (user as any).mustChangePassword || false,
         };
     }
-
     async login(dto: LoginDto) {
         const user = await this.userService.findUserByEmail(dto.email)
         if (!user) {
@@ -112,6 +114,9 @@ export class AuthService {
         const tokenData = await this.createToken(user);
         delete user.password;
         return {
+            success: true,
+            statusCode: ResponseCode.SUCCESS,
+            message: ResponseMessage.SUCCESS,
             user,
             token: tokenData.accessToken,
             mustChangePassword: (user as any).mustChangePassword || false,
