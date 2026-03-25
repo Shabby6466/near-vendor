@@ -35,11 +35,11 @@ pipeline {
         disableConcurrentBuilds()
     }
 
-    post {
-        always {
-          discordSend description: 'Jenkins Pipeline Build', footer:  '' , link: env.BUILD_URL, result: currentBuild.currentResult, unstable: false, title: JOB_NAME, webhookURL: 'https://discord.com/api/webhooks/1177227683361472593/6SB7J264CEPqUlXUWvGCxvPt2EhueIYMDOHyocC_r8QSMZfw0QVLcoFdjxxHLbgQVNev'
-        }
-    }
+    // post {
+    //     always {
+    //       discordSend description: 'Jenkins Pipeline Build', footer:  '' , link: env.BUILD_URL, result: currentBuild.currentResult, unstable: false, title: JOB_NAME, webhookURL: 'https://discord.com/api/webhooks/1177227683361472593/6SB7J264CEPqUlXUWvGCxvPt2EhueIYMDOHyocC_r8QSMZfw0QVLcoFdjxxHLbgQVNev'
+    //     }
+    // }
 
     stages {
         stage('Prepare workspace') {
