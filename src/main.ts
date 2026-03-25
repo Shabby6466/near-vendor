@@ -46,7 +46,7 @@ const bootstrap = async () => {
 
 const appSwaggerDoc = (app: INestApplication, modules) => {
   const config = new DocumentBuilder()
-    .setTitle('🌐 NEARVENDOR')
+    .setTitle('🌐  NEARVENDOR')
     .setDescription('NEARVENDOR BACKEND APIs')
     .setVersion('1.0')
     .addServer(`http://localhost:${process.env.APP_PORT}`, 'Local')
