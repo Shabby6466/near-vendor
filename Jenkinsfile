@@ -12,15 +12,14 @@
 //
 // ***********************
 
-
 def CONTAINER_NAME="nearvendor/backend"
 def CONTAINER_TAG="0.0.1"
-def DOCKER_HUB_USER="rnssolutions"
+def DOCKER_HUB_USER="terarare"
 def CURRENT_DIR='backend'
 
 pipeline {
 
-    agent {label params.node}
+    agent any
 
     environment {
         GLOBAL_ENVIRONMENT = 'NO_DEPLOYMENT'
@@ -38,7 +37,6 @@ pipeline {
 
     post {
         always {
-
           discordSend description: 'Jenkins Pipeline Build', footer:  '' , link: env.BUILD_URL, result: currentBuild.currentResult, unstable: false, title: JOB_NAME, webhookURL: 'https://discord.com/api/webhooks/1177227683361472593/6SB7J264CEPqUlXUWvGCxvPt2EhueIYMDOHyocC_r8QSMZfw0QVLcoFdjxxHLbgQVNev'
         }
     }
@@ -81,15 +79,14 @@ pipeline {
                     }
 
                     // Get tag on current branch
-                    TAG = sh(returnStdout: true, script: 'git tag --points-at HEAD')
+                    TAG = sh(returnStdout: true, script: 'git tag --points-at HEAD').trim()
 
-                    echo 'Branch To Build'
-                    echo env.BRANCH_NAME
+                    echo 'Branch To Build: ' + env.BRANCH_NAME
 
                     if (TAG && GLOBAL_ENVIRONMENT == 'staging') {
-                        echo 'Build for production'
+                        echo 'Build for production requested via tag: ' + TAG
 
-                        // Ask user whether master should be builded and deployed to production
+                        // Ask user whether master should be built and deployed to production
                         try {
                             timeout(time: 15, unit: 'MINUTES') {
                                 APPROVED = input(
@@ -125,13 +122,12 @@ pipeline {
 
                     script {
                         if (GLOBAL_ENVIRONMENT == 'NO_DEPLOYMENT') {
-                            echo 'This is not develop nor master branch and should not be build'
+                            echo 'This is not develop nor master branch and should not be built'
                         } else {
-
                             build(GLOBAL_ENVIRONMENT)
 
                             if (GLOBAL_ENVIRONMENT == 'production') {
-                                echo 'Additionally, build staging'
+                                echo 'Additionally, built staging for production release'
                             }
                         }
                     }
@@ -151,7 +147,7 @@ pipeline {
                             deploy(GLOBAL_ENVIRONMENT)
 
                             if (GLOBAL_ENVIRONMENT == 'production') {
-                                echo 'Additionally, deploy staging'
+                                echo 'Additionally, deployed staging for production release'
                             }
                         }
                     }
@@ -162,14 +158,16 @@ pipeline {
 }
 
 def build(ENVIRONMENT) {
-
-  echo 'started building image...'
-  echo 'Build ENV ' + ENVIRONMENT
-  sh './jenkins/scripts/docker-build.sh'
-
+    echo 'started building image...'
+    echo 'Build ENV ' + ENVIRONMENT
+    sh 'chmod +x ./jenkins/scripts/docker-build.sh'
+    sh './jenkins/scripts/docker-build.sh'
 }
+
 def deploy(ENVIRONMENT) {
     echo 'started deploying'
-    sh 'chmod +x ./jenkins/scripts/remote-deploy.sh'
-    sh './jenkins/scripts/remote-deploy.sh'
+    sshagent(credentials: ['vps-ssh-key']) {
+        sh 'chmod +x ./jenkins/scripts/remote-deploy.sh'
+        sh './jenkins/scripts/remote-deploy.sh'
+    }
 }
