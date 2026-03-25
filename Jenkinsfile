@@ -59,26 +59,15 @@ pipeline {
                 echo 'Setup environment'
 
                 script {
-                    def branch = env.BRANCH_NAME ?: env.GIT_BRANCH
-                    if (branch.contains('/')) { branch = branch.split('/')[-1] }
-                    // Determine whether this is a test or a staging / production build
-                    switch (branch) {
-                        case 'development':
-                            GLOBAL_ENVIRONMENT = 'development'
-                            break
-                        case 'testing':
-                            GLOBAL_ENVIRONMENT = 'testing'
-                            break
-                        case 'staging':
-                            GLOBAL_ENVIRONMENT = 'staging'
-                            break
-                        case 'master':
-                        case 'main':
-                            GLOBAL_ENVIRONMENT = 'production'
-                            break
-                        default:
-                            GLOBAL_ENVIRONMENT = 'NO_DEPLOYMENT'
-                            break
+                    def branchName = env.BRANCH_NAME ?: env.GIT_BRANCH ?: 'unknown'
+                    echo "Actual Branch detected: ${branchName}"
+
+                    if (branchName.contains('main') || branchName.contains('master')) {
+                        GLOBAL_ENVIRONMENT = 'production'
+                    } else if (branchName.contains('development')) {
+                        GLOBAL_ENVIRONMENT = 'development'
+                    } else {
+                        GLOBAL_ENVIRONMENT = 'NO_DEPLOYMENT'
                     }
 
                     // Get tag on current branch
@@ -164,13 +153,13 @@ def build(ENVIRONMENT) {
     echo 'started building image...'
     echo 'Build ENV ' + ENVIRONMENT
     sh 'chmod +x ./jenkins/scripts/docker-build.sh'
-    sh './jenkins/scripts/docker-build.sh'
+    sh '../jenkins/scripts/docker-build.sh'
 }
 
 def deploy(ENVIRONMENT) {
     echo 'started deploying'
     sshagent(credentials: ['vps-ssh-key']) {
         sh 'chmod +x ./jenkins/scripts/remote-deploy.sh'
-        sh './jenkins/scripts/remote-deploy.sh'
+        sh '../jenkins/scripts/remote-deploy.sh'
     }
 }
