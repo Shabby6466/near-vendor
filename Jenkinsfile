@@ -72,7 +72,7 @@ pipeline {
                         case 'staging':
                             GLOBAL_ENVIRONMENT = 'staging'
                             break
-                        case 'master':    
+                        case 'master':
                         case 'main':
                             GLOBAL_ENVIRONMENT = 'production'
                             break
