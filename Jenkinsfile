@@ -59,8 +59,10 @@ pipeline {
                 echo 'Setup environment'
 
                 script {
+                    def branch = env.BRANCH_NAME ?: env.GIT_BRANCH
+                    if (branch.contains('/')) { branch = branch.split('/')[-1] }
                     // Determine whether this is a test or a staging / production build
-                    switch (env.BRANCH_NAME) {
+                    switch (branch) {
                         case 'development':
                             GLOBAL_ENVIRONMENT = 'development'
                             break
@@ -70,6 +72,7 @@ pipeline {
                         case 'staging':
                             GLOBAL_ENVIRONMENT = 'staging'
                             break
+                        case 'master':    
                         case 'main':
                             GLOBAL_ENVIRONMENT = 'production'
                             break
