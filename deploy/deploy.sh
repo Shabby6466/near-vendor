@@ -11,27 +11,22 @@
 #
 
 COMPOSE_FILE="docker-compose.yml"
-PROJECT_NAME="nearvendor"
 
 case "$1" in
     start)
-        # Stop and remove any old containers with the conflicting underscore names
-        docker stop nearvendor_db nearvendor_redis nearvendor_backend nearvendor_nginx || true
-        docker rm -f nearvendor_db nearvendor_redis nearvendor_backend nearvendor_nginx || true
-        
-        docker compose -f $COMPOSE_FILE -p $PROJECT_NAME up -d
+        docker compose -f $COMPOSE_FILE up -d
         ;;
     stop)
-        docker compose -f $COMPOSE_FILE -p $PROJECT_NAME stop
+        docker compose -f $COMPOSE_FILE stop
         ;;
     down)
-        docker compose -f $COMPOSE_FILE -p $PROJECT_NAME down
+        docker compose -f $COMPOSE_FILE down
         ;;
     logs-f)
-        docker compose -f $COMPOSE_FILE -p $PROJECT_NAME logs -f
+        docker compose -f $COMPOSE_FILE logs -f
         ;;
     build)
-        docker compose -f $COMPOSE_FILE -p $PROJECT_NAME build
+        docker compose -f $COMPOSE_FILE build
         ;;
     *)
         echo "Usage: $0 {start|stop|down|logs-f|build}"
