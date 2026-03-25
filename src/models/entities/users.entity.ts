@@ -1,9 +1,9 @@
 import { BaseEntity } from "@modules/common/entity/base.entity";
-import { Entity, Column, OneToMany, OneToOne, JoinColumn } from "typeorm";
+import { Entity, Column, OneToMany, OneToOne } from "typeorm";
 import { Shops } from "./shops.entity";
-import { Lead } from "./leads.entity";
 import { IsNotEmpty } from "class-validator";
 import { UserRoles } from "@utils/enum";
+import { Vendors } from "./vendors.entity";
 
 @Entity({ name: "users" })
 export class User extends BaseEntity {
@@ -15,16 +15,21 @@ export class User extends BaseEntity {
     @IsNotEmpty()
     email: string;
 
-    @Column({ type: 'varchar', length: 255 })
+    @Column({ type: 'boolean', default: false })
+    isEmailVerified: boolean;
+
+    @Column({ type: 'varchar', length: 20, nullable: true })
+    phone: string;
+
+    @Column({ type: 'boolean', default: false })
+    isPhoneVerified: boolean;
+
+    @Column({ select: false, type: 'varchar', length: 255 })
     @IsNotEmpty()
     password: string;
 
     @Column({ type: 'enum', enum: UserRoles, default: UserRoles.BUYER })
     role: UserRoles;
-
-    // Superadmin can force this to require vendors to change password on first login
-    @Column({ type: 'boolean', default: false })
-    mustChangePassword: boolean;
 
     // Soft switches for moderation/verification
     @Column({ type: 'boolean', default: true })
@@ -36,12 +41,9 @@ export class User extends BaseEntity {
     @Column({ type: 'decimal', precision: 10, scale: 6, nullable: true })
     lastKnownLatitude: number;
 
-    @OneToMany(() => Shops, (shop) => shop.user)
-    shops: Shops[];
+    @Column({ type: 'timestamp', nullable: true })
+    lastLoginAt: Date;
 
-    @OneToOne(() => Lead, (lead) => lead.buyer)
-    leadAsBuyer: Lead;
-
-    @OneToOne(() => Lead, (lead) => lead.vendor)
-    leadAsVendor: Lead;
+    @OneToOne(() => Vendors, (vendor) => vendor.user)
+    vendorProfile: Vendors;
 }

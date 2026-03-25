@@ -1,6 +1,5 @@
 import { BaseEntity } from "@modules/common/entity/base.entity";
 import { Entity, Column, ManyToOne, OneToOne, JoinColumn } from "typeorm";
-import { Lead } from "./leads.entity";
 import { Category } from "./categories.entity";
 
 
@@ -27,9 +26,6 @@ export class Item extends BaseEntity {
 
     @Column({ type: 'boolean' })
     isAvailable: boolean;
-
-    @ManyToOne(() => Lead, (lead) => lead.item)
-    lead: Lead
 
     @OneToOne(() => Category, (category) => category.item)
     @JoinColumn()

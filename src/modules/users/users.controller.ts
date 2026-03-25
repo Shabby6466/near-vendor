@@ -3,7 +3,7 @@ import { UserService } from "./users.service";
 import { CreateUserDto, LoginDto, VerifyOtpDto } from "./dto/users.dto";
 import { ChangePasswordDto } from "./dto/change-password.dto";
 import { DeleteAccountDto } from "./dto/delete-account.dto";
-import { JwtAuthGuard } from "@modules/auth/jwt-guard";
+import { JwtAuthGuard } from "@modules/auth/auth-utils/jwt-guard";
 import {
     ApiBearerAuth,
     ApiCookieAuth,

@@ -3,7 +3,7 @@ import { ApiOkResponse, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { CreateUserDto, LoginDto, VerifyOtpDto } from "@modules/users/dto/users.dto";
 import { UserService } from "@modules/users/users.service";
 import { UserRoles } from "@utils/enum";
-import { InvalidPortalRoleException } from "./role-login.exception";
+import { InvalidPortalRoleException } from "./auth-utils/role-login.exception";
 import { AuthService } from "./auth.service";
 
 @ApiTags("Auth")

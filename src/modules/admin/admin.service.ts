@@ -55,7 +55,6 @@ export class AdminService {
       vendorUser = existing;
       vendorUser.role = UserRoles.VENDOR;
       vendorUser.password = passwordHash;
-      vendorUser.mustChangePassword = true;
       vendorUser.isActive = true;
       vendorUser.fullName = app.fullName;
     } else {
@@ -64,7 +63,6 @@ export class AdminService {
         phoneNumber: app.phoneNumber,
         password: passwordHash,
         role: UserRoles.VENDOR,
-        mustChangePassword: true,
         isActive: true,
         lastKnownLatitude: app.shopLatitude as any,
         lastKnownLongitude: app.shopLongitude as any,
@@ -103,7 +101,6 @@ export class AdminService {
       vendorUserId: vendorUser.id,
       shopId: shop.id,
       tempPassword: passwordPlain,
-      mustChangePassword: true,
       message: "Approved. Share tempPassword with vendor via WhatsApp. Vendor must change password after first login.",
     };
   }
@@ -133,7 +130,6 @@ export class AdminService {
 
   //   const passwordPlain = generatePassword();
   //   user.password = await bcrypt.hash(passwordPlain, 10);
-  //   user.mustChangePassword = true;
   //   user.isActive = true;
   //   await this.users.save(user);
 
@@ -141,7 +137,6 @@ export class AdminService {
   //     success: true,
   //     phoneNumber,
   //     tempPassword: passwordPlain,
-  //     mustChangePassword: true,
   //     message: "Password reset. Share tempPassword with vendor via WhatsApp. Vendor must change password after first login.",
   //   };
   // }

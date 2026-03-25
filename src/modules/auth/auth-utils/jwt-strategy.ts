@@ -3,7 +3,7 @@ import { JwtPayload } from 'jsonwebtoken';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { Request } from 'express';
-import { AuthService } from './auth.service';
+import { AuthService } from '../auth.service';
 import { InvalidTokenException, UserInactiveException, UserSuspendedException } from './auth.exception';
 import { UserStatus } from '@utils/enum';
 import { UserService } from '@modules/users/users.service';

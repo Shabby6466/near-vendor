@@ -6,3 +6,8 @@ export class ShopNotFoundException extends Exception {
         super(ResponseCode.SHOP_NOT_FOUND, ResponseMessage.SHOP_NOT_FOUND);
     }
 }
+export class VendorNotFoundException extends Exception {
+    constructor() {
+        super(ResponseCode.VENDOR_NOT_FOUND, ResponseMessage.VENDOR_NOT_FOUND);
+    }
+}

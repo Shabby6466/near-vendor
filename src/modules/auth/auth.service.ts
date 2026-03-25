@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from 'models/entities/users.entity';
-import { InvalidCredentialsException } from './auth.exception';
+import { InvalidCredentialsException } from '@modules/auth/auth-utils/auth.exception';
 import { InvalidOtpException, InvalidRoleException, PhoneNumberAlreadyExistsException, UserNotFoundException } from '@modules/users/users.exception';
 import * as bcrypt from 'bcryptjs';
 import { CreateUserDto, LoginDto } from '@modules/users/dto/users.dto';
@@ -96,7 +96,6 @@ export class AuthService {
             message: ResponseMessage.SUCCESS,
             user,
             token: tokenData.accessToken,
-            mustChangePassword: (user as any).mustChangePassword || false,
         };
     }
     async login(dto: LoginDto) {
@@ -119,7 +118,6 @@ export class AuthService {
             message: ResponseMessage.SUCCESS,
             user,
             token: tokenData.accessToken,
-            mustChangePassword: (user as any).mustChangePassword || false,
         };
     }
 

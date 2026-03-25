@@ -20,12 +20,12 @@ import { WinstonModule } from "nest-winston";
 import { AppService } from "./app.service";
 import { ProcessorModule } from "@modules/processor/processor.module";
 import { ItemModule } from "@modules/items/item.module";
-import { LeadModule } from "@modules/leads/lead.module";
 import { UsersModule } from "@modules/users/users.module";
 import { SearchModule } from "@modules/search/search.module";
 import { ThrottlerModule } from "@nestjs/throttler";
-import { VendorPortalModule } from "@modules/vendor-portal/vendor-portal.module";
 import { AuthModule } from "@modules/auth/auth.module";
+import { VendorModule } from "@modules/vendor/vendor.module";
+import { ShopModule } from "@modules/shop/shop.module";
 
 export const adminModulesImports: ModuleMetadata["imports"] = [
 ];
@@ -71,10 +71,10 @@ export const imports: ModuleMetadata["imports"] = [
   ProcessorModule,
   AuthModule,
   UsersModule,
+  VendorModule,
+  ShopModule,
   ItemModule,
-  LeadModule,
   SearchModule,
-  VendorPortalModule,
 ];
 
 @Module({

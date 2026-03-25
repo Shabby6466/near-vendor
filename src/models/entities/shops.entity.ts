@@ -1,22 +1,19 @@
 import { BaseEntity } from "@modules/common/entity/base.entity";
-import { Entity, Column, OneToOne, OneToMany, ManyToOne, JoinColumn, Index } from "typeorm";
-import { User } from "./users.entity";
-import { Lead } from "./leads.entity";
-
-
+import { Entity, Column, ManyToOne, Index } from "typeorm";
+import { Vendors } from "./vendors.entity";
 
 @Entity({ name: "shops" })
 export class Shops extends BaseEntity {
-    @Column({ type: 'varchar', length: 50 })
+    @Column({ type: 'varchar', length: 100 })
     shopName: string;
 
-    @Column({ type: 'varchar', length: 100 })
+    @Column({ type: 'varchar', length: 100, nullable: true })
     shopImageUrl: string;
 
     @Column({ type: 'varchar', length: 20, nullable: true })
     whatsappNumber: string;
 
-    @Column({ type: 'varchar', length: 200, nullable: true })
+    @Column({ type: 'varchar', nullable: true })
     shopAddress: string;
 
     @Column({ type: 'boolean', default: true })
@@ -35,13 +32,12 @@ export class Shops extends BaseEntity {
         srid: 4326,
         nullable: true,
     })
-    location: string;
+    location: any;
 
-    @ManyToOne(() => User, (user) => user.shops)
-    @JoinColumn()
-    user: User;
+    @Column({ type: 'jsonb', nullable: true })
+    operatingHours: any;
 
-    @OneToOne(() => Lead, (lead) => lead.shop)
-    lead: Lead;
+    @ManyToOne(() => Vendors, (vendor) => vendor.shops)
+    vendorProfile: Vendors;
 
 }

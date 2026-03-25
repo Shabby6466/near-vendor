@@ -3,7 +3,7 @@ import { User } from "models/entities/users.entity";
 import { Repository } from "typeorm";
 import * as bcrypt from "bcryptjs";
 import { UserNotFoundException } from "./users.exception";
-import { InvalidCredentialsException } from "@modules/auth/auth.exception";
+import { InvalidCredentialsException } from "@modules/auth/auth-utils/auth.exception";
 
 
 import { Injectable } from "@nestjs/common";
@@ -29,6 +29,7 @@ export class UserService {
     }
 
 
+
     async changePassword(user: any, oldPassword: string, newPassword: string) {
         const u = await this.userRepo.findOne({ where: { id: user.id } });
         if (!u) throw new UserNotFoundException();
@@ -37,7 +38,6 @@ export class UserService {
         if (!isMatch) throw new InvalidCredentialsException();
 
         u.password = await bcrypt.hash(newPassword, 10);
-        (u as any).mustChangePassword = false;
         await this.userRepo.save(u);
 
         delete (u as any).password;

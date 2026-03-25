@@ -7,7 +7,7 @@ import { OtpService } from "./otp.service";
 import { MailModule } from "@utils/mailer/mail.module";
 import { CacheModule } from "@nestjs/cache-manager";
 import { PassportModule } from "@nestjs/passport";
-import { JwtStrategy } from "./jwt-strategy";
+import { JwtStrategy } from "./auth-utils/jwt-strategy";
 import * as redisStore from "cache-manager-redis-store";
 
 
