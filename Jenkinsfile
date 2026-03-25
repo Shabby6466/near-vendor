@@ -15,7 +15,7 @@
 def CONTAINER_NAME="nearvendor/backend"
 def CONTAINER_TAG="0.0.1"
 def DOCKER_HUB_USER="terarare"
-def CURRENT_DIR='backend'
+def CURRENT_DIR='.'
 
 pipeline {
 
@@ -61,12 +61,16 @@ pipeline {
                 echo 'Setup environment'
 
                 script {
-                    def branchName = env.BRANCH_NAME ?: env.GIT_BRANCH ?: 'unknown'
-                    echo "Actual Branch detected: ${branchName}"
+                    def fullBranchName = env.BRANCH_NAME ?: env.GIT_BRANCH ?: 'unknown'
+                    echo "Actual Branch detected: ${fullBranchName}"
 
-                    if (branchName.contains('main') || branchName.contains('master')) {
+                    // Strip 'origin/' if present
+                    def branchName = fullBranchName.replace('origin/', '')
+                    echo "Normalized Branch name: ${branchName}"
+
+                    if (branchName == 'main' || branchName == 'master') {
                         env.GLOBAL_ENVIRONMENT = 'production'
-                    } else if (branchName.contains('development')) {
+                    } else if (branchName == 'development') {
                         env.GLOBAL_ENVIRONMENT = 'development'
                     } else {
                         env.GLOBAL_ENVIRONMENT = 'NO_DEPLOYMENT'
