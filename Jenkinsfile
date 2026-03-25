@@ -61,19 +61,20 @@ pipeline {
                 script {
                     echo "Deploying ${GLOBAL_ENVIRONMENT} to VPS..."
                     
-                    // Fallback to withCredentials if sshagent continues to fail
                     withCredentials([sshUserPrivateKey(credentialsId: 'vps-ssh-key', keyFileVariable: 'SSH_KEY')]) {
                         def vpsIp = "76.13.223.103"
                         def vpsUser = "root"
                         // Adjust this path to your VPS project location
                         def vpsPath = "/root/projects/terarare/near-vendor"
 
-                        echo "Syncing files to VPS..."
-                        // Synchronize current workspace to VPS (excludes node_modules for speed)
-                        sh "rsync -avz --exclude 'node_modules' --exclude '.git' ./ ${vpsUser}@${vpsIp}:${vpsPath}/"
+                        echo "Archiving files (using tar because rsync is missing)..."
+                        sh "tar -czf project.tar.gz --exclude='node_modules' --exclude='.git' ."
 
-                        echo "Running deployment script on VPS..."
-                        sh "ssh -i ${env.SSH_KEY} -o StrictHostKeyChecking=no ${vpsUser}@${vpsIp} 'cd ${vpsPath} && chmod +x ./deploy/deploy.sh && ./deploy/deploy.sh build && ./deploy/deploy.sh start'"
+                        echo "Syncing archive to VPS..."
+                        sh "scp -i ${env.SSH_KEY} -o StrictHostKeyChecking=no project.tar.gz ${vpsUser}@${vpsIp}:${vpsPath}/"
+
+                        echo "Extracting archive and running deployment script on VPS..."
+                        sh "ssh -i ${env.SSH_KEY} -o StrictHostKeyChecking=no ${vpsUser}@${vpsIp} 'cd ${vpsPath} && tar -xzf project.tar.gz && rm project.tar.gz && chmod +x ./deploy/deploy.sh && ./deploy/deploy.sh build && ./deploy/deploy.sh start'"
                     }
                 }
             }
