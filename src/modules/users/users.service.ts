@@ -7,6 +7,7 @@ import { InvalidCredentialsException } from "@modules/auth/auth.exception";
 
 
 import { Injectable } from "@nestjs/common";
+import { ResponseCode } from "@utils/enum";
 
 @Injectable()
 export class UserService {
@@ -40,6 +41,20 @@ export class UserService {
         await this.userRepo.save(u);
 
         delete (u as any).password;
-        return { success: true, user: u };
+        return { success: true, statusCode: ResponseCode.SUCCESS };
+    }
+
+    async deleteAccount(user: any, password: string) {
+        const u = await this.userRepo.findOne({ where: { id: user.id } });
+        if (!u) throw new UserNotFoundException();
+
+        const isMatch = await bcrypt.compare(password, u.password);
+        if (!isMatch) throw new InvalidCredentialsException();
+
+        u.isActive = false;
+        await this.userRepo.save(u);
+        await this.userRepo.softDelete(u.id);
+
+        return { success: true, message: "Account deleted successfully" };
     }
 }
