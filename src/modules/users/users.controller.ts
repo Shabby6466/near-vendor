@@ -22,6 +22,6 @@ export class UsersController {
     @ApiOperation({ summary: "Change password (first login / security)" })
     @ApiOkResponse({ description: "Change password" })
     async changePassword(@Body() dto: ChangePasswordDto, @Req() req: any) {
-        return await this.service.changePassword(req.user, dto.newPassword);
+        return await this.service.changePassword(req.user, dto.oldPassword, dto.newPassword);
     }
 }
