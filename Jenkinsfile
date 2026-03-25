@@ -16,13 +16,13 @@ def CONTAINER_NAME="nearvendor/backend"
 def CONTAINER_TAG="0.0.1"
 def DOCKER_HUB_USER="terarare"
 def CURRENT_DIR='.'
+def GLOBAL_ENVIRONMENT = 'NO_DEPLOYMENT'
 
 pipeline {
 
     agent any
 
     environment {
-        GLOBAL_ENVIRONMENT = 'NO_DEPLOYMENT'
         // Need the staging properties anyway to deploy to staging and production simultaneously when doing a prod release
         ENVIRONMENT_STAGING = 'staging'
     }
@@ -65,24 +65,24 @@ pipeline {
                     echo "Actual Branch detected: ${fullBranchName}"
 
                     // Strip 'origin/' if present
-                    def branchName = fullBranchName.replace('origin/', '')
+                    def branchName = fullBranchName.replace('origin/', '').trim()
                     echo "Normalized Branch name: ${branchName}"
 
-                    if (branchName == 'main' || branchName == 'master') {
-                        env.GLOBAL_ENVIRONMENT = 'production'
-                    } else if (branchName == 'development') {
-                        env.GLOBAL_ENVIRONMENT = 'development'
+                    if (branchName.contains('main') || branchName.contains('master')) {
+                        GLOBAL_ENVIRONMENT = 'production'
+                    } else if (branchName.contains('development')) {
+                        GLOBAL_ENVIRONMENT = 'development'
                     } else {
-                        env.GLOBAL_ENVIRONMENT = 'NO_DEPLOYMENT'
+                        GLOBAL_ENVIRONMENT = 'NO_DEPLOYMENT'
                     }
 
                     // Get tag on current branch
                     def TAG = sh(returnStdout: true, script: 'git tag --points-at HEAD').trim()
 
                     echo 'Branch To Build: ' + branchName
-                    echo 'Environment Set To: ' + env.GLOBAL_ENVIRONMENT
+                    echo 'Environment Set To: ' + GLOBAL_ENVIRONMENT
 
-                    if (TAG && env.GLOBAL_ENVIRONMENT == 'staging') {
+                    if (TAG && GLOBAL_ENVIRONMENT == 'staging') {
                         echo 'Build for production requested via tag: ' + TAG
 
                         // Ask user whether master should be built and deployed to production
@@ -101,7 +101,7 @@ pipeline {
                                 )
 
                                 if (APPROVED) {
-                                    env.GLOBAL_ENVIRONMENT = 'production'
+                                    GLOBAL_ENVIRONMENT = 'production'
                                 } else {
                                     error 'Build for production aborted'
                                 }
@@ -117,15 +117,15 @@ pipeline {
         stage('Build') {
             steps {
                 dir(CURRENT_DIR) {
-                    echo 'Build ' + env.GLOBAL_ENVIRONMENT
+                    echo 'Build ' + GLOBAL_ENVIRONMENT
 
                     script {
-                        if (env.GLOBAL_ENVIRONMENT == 'NO_DEPLOYMENT') {
+                        if (GLOBAL_ENVIRONMENT == 'NO_DEPLOYMENT') {
                             echo 'This is not develop nor main branch and should not be built'
                         } else {
-                            build(env.GLOBAL_ENVIRONMENT)
+                            build(GLOBAL_ENVIRONMENT)
 
-                            if (env.GLOBAL_ENVIRONMENT == 'production') {
+                            if (GLOBAL_ENVIRONMENT == 'production') {
                                 echo 'Additionally, built staging for production release'
                             }
                         }
@@ -137,15 +137,15 @@ pipeline {
         stage('Deploy') {
             steps {
                 dir(CURRENT_DIR) {
-                    echo 'Deploy ' + env.GLOBAL_ENVIRONMENT
+                    echo 'Deploy ' + GLOBAL_ENVIRONMENT
 
                     script {
-                        if (env.GLOBAL_ENVIRONMENT == 'NO_DEPLOYMENT') {
+                        if (GLOBAL_ENVIRONMENT == 'NO_DEPLOYMENT') {
                             echo 'This is not develop nor main branch and should not be deployed'
                         } else {
-                            deploy(env.GLOBAL_ENVIRONMENT)
+                            deploy(GLOBAL_ENVIRONMENT)
 
-                            if (env.GLOBAL_ENVIRONMENT == 'production') {
+                            if (GLOBAL_ENVIRONMENT == 'production') {
                                 echo 'Additionally, deployed staging for production release'
                             }
                         }
