@@ -5,9 +5,9 @@ services:
     image: 'bitnami/redis:latest'
     volumes:
       - redis:/var/lib/redis/data/
+    container_name: 'nearvendor_redis'
     restart: 'always'
     env_file:
-    # Changed from _database.env to match likely existing setup if needed, but keeping consistently
       - _database.env
     networks:
       - nearvendor-backend
@@ -16,6 +16,7 @@ services:
     image: 'postgis/postgis'
     volumes:
       - postgres-data:/var/lib/postgresql/data/
+    container_name: 'nearvendor_db'
     restart: 'always'
     env_file:
       - _database.env
@@ -26,6 +27,7 @@ services:
     build:
       context: .
     image: nearvendor-backend:latest
+    container_name: 'nearvendor_backend'
     depends_on:
       - db
     volumes:
