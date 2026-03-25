@@ -30,11 +30,27 @@ services:
     container_name: 'nearvendor_backend'
     depends_on:
       - db
-    volumes:
-      - ./src:/app/src
-      - .env:/app/.env
+    env_file:
+      - .env
+    # Removed src mounting for production as it can cause sync issues or crashes if folders are missing
     ports:
       - '3836:3836'
+    networks:
+      - nearvendor-backend
+
+  nginx:
+    image: 'nginx:1.27.0-alpine'
+    container_name: 'nearvendor_nginx'
+    restart: 'always'
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./deploy/nginx/conf.d:/etc/nginx/conf.d:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /var/www/certbot:/var/www/certbot:ro
+    depends_on:
+      - backend
     networks:
       - nearvendor-backend
 
