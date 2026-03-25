@@ -165,6 +165,9 @@ def build(ENVIRONMENT) {
 
 def deploy(ENVIRONMENT) {
     echo 'started deploying'
+    script {
+        echo "Testing credential access..."
+    }
     sshagent(credentials: ['vps-ssh-key']) {
         sh 'chmod +x ./jenkins/scripts/remote-deploy.sh'
         sh './jenkins/scripts/remote-deploy.sh'
