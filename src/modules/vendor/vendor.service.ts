@@ -29,6 +29,8 @@ export class VendorService {
         vendor.businessType = vendorDto.businessCategory;
         vendor.status = 'PENDING';
         vendor.isVerified = false;
+        vendor.cnic = vendorDto.cnic || '';
+        vendor.cnicImageUrl = vendorDto.cnicImageUrl || '';
         vendor.user = { id: userId } as any;
         await this.createVendor(vendor);
         return {

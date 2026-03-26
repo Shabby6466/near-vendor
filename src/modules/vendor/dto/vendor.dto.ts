@@ -33,16 +33,16 @@ export class CreateVendorDto {
     @ApiProperty({
         example: "12345-1234567-1"
     })
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
-    cnic: string;
+    cnic?: string;
 
     @ApiProperty({
         example: "https://example.com/image.jpg"
     })
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
-    cnicImageUrl: string;
+    cnicImageUrl?: string;
 }
 
 
