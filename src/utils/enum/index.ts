@@ -24,6 +24,8 @@ export enum ResponseMessage {
   INVALID_ZIP_CODE = "Invalid zip code",
   INVALID_COORDINATES = "Invalid coordinates",
   INVALID_OTP = "Invalid OTP",
+  ITEM_NOT_FOUND = "Item not found",
+  ITEM_ALREADY_EXISTS = 'Item already exists'
 }
 
 export enum ResponseCode {
@@ -52,8 +54,8 @@ export enum ResponseCode {
   INVALID_TOKEN = 401,
   USER_SUSPENDED = 401,
   USER_NOT_FOUND = 401,
-
-
+  ITEM_NOT_FOUND = 401,
+  ITEM_ALREADY_EXISTS = 406,
   EMAIL_ALREADY_EXISTS = 406,
   INVALID_ROLE = 402,
   INVALID_OTP = 403,

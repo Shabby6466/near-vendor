@@ -1,5 +1,5 @@
 import { BaseEntity } from "@modules/common/entity/base.entity";
-import { Entity, Column, ManyToOne, JoinColumn } from "typeorm";
+import { Entity, Column, ManyToOne } from "typeorm";
 import { User } from "./users.entity";
 
 export enum VendorApplicationStatus {
@@ -41,7 +41,6 @@ export class VendorApplication extends BaseEntity {
   rejectionReason: string;
 
   @ManyToOne(() => User, { nullable: true })
-  @JoinColumn()
   reviewedBy?: User;
 
   @Column({ type: "timestamp", nullable: true })

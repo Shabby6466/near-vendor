@@ -1,5 +1,5 @@
 import { BaseEntity } from "@modules/common/entity/base.entity";
-import { Entity, Column, ManyToOne, Index, JoinColumn } from "typeorm";
+import { Entity, Column, ManyToOne, Index } from "typeorm";
 import { Shops } from "./shops.entity";
 
 @Entity({ name: "inventory_items" })
@@ -32,6 +32,5 @@ export class InventoryItem extends BaseEntity {
   document_vector: string;
 
   @ManyToOne(() => Shops, { eager: true, onDelete: "CASCADE" })
-  @JoinColumn()
   shop: Shops;
 }

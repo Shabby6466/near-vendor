@@ -23,7 +23,7 @@ export class ShopController {
     @ApiOperation({ summary: 'Update shop profile' })
     @ApiResponse({ status: 200, description: 'Shop profile updated successfully' })
     async updateShop(@Req() req: any, @Body() shopDto: UpdateShopDto) {
-        return await this.shopService.updateShop(req.user.id, shopDto);
+        return await this.shopService.updateShop(req.user.id, req.user.shopId, shopDto);
     }
 
     @Delete('delete')

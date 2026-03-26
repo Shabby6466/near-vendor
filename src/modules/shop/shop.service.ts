@@ -40,12 +40,8 @@ export class ShopService {
         }
     }
 
-    async updateShop(vendorId: string, updateData: UpdateShopDto): Promise<Shops> {
-        const shop = await this.repository.findOne({
-            where: { vendorProfile: { id: vendorId } }
-        });
-
-        if (!shop) throw new ShopNotFoundException();
+    async updateShop(vendorId: string, shopId: string, updateData: UpdateShopDto): Promise<Shops> {
+        const shop = await this.findByVendorAndId(shopId, vendorId);
 
         if (updateData.shopLongitude || updateData.shopLatitude) {
             shop.location = {
@@ -86,5 +82,13 @@ export class ShopService {
             take: limit,
             skip: (page - 1) * limit,
         });
+    }
+
+    async findByVendorAndId(shopId: string, vendorId: string): Promise<Shops> {
+        const shop = await this.repository.findOne({
+            where: { id: shopId, vendorProfile: { id: vendorId } }
+        });
+        if (!shop) throw new ShopNotFoundException();
+        return shop;
     }
 }

@@ -1,6 +1,7 @@
 import { BaseEntity } from "@modules/common/entity/base.entity";
-import { Entity, Column, ManyToOne, Index } from "typeorm";
+import { Entity, Column, ManyToOne, Index, OneToMany } from "typeorm";
 import { Vendors } from "./vendors.entity";
+import { Item } from "./items.entity";
 
 @Entity({ name: "shops" })
 export class Shops extends BaseEntity {
@@ -40,4 +41,6 @@ export class Shops extends BaseEntity {
     @ManyToOne(() => Vendors, (vendor) => vendor.shops)
     vendorProfile: Vendors;
 
+    @OneToMany(() => Item, (item) => item.shop)
+    items: Item[];
 }
