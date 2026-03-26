@@ -1,10 +1,12 @@
-import { Body, Controller, Get, Post, Put, Req } from "@nestjs/common";
+import { Body, Controller, Get, Post, Put, Req, UseGuards } from "@nestjs/common";
 import { VendorService } from "./vendor.service";
 import { CreateVendorDto, UpdateVendorDto } from "./dto/vendor.dto";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { JwtAuthGuard } from "@modules/auth/auth-utils/jwt-guard";
 
 @Controller('vendor')
 @ApiTags('vendor')
+@UseGuards(JwtAuthGuard)
 export class VendorController {
     constructor(
         private readonly vendorService: VendorService,
