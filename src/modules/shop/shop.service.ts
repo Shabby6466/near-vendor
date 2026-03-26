@@ -18,8 +18,8 @@ export class ShopService {
     async findById(id: string) {
         return this.repository.findOne({ where: { id } });
     }
-    async createShop(vendorId: string, shopData: CreateShopDto) {
-        const vendor = await this.vendorService.findById(vendorId)
+    async createShop(vendorUserId: string, shopData: CreateShopDto) {
+        const vendor = await this.vendorService.findByUserId(vendorUserId)
 
         if (!vendor) {
             throw new VendorNotFoundException();
@@ -40,9 +40,15 @@ export class ShopService {
         }
     }
 
-    async updateShop(vendorId: string, shopId: string, updateData: UpdateShopDto): Promise<Shops> {
-        const shop = await this.findByVendorAndId(shopId, vendorId);
-
+    async updateShop(vendorUserId: string, shopId: string, updateData: UpdateShopDto): Promise<Shops> {
+        const vendor = await this.vendorService.findByUserId(vendorUserId);
+        if (!vendor) {
+            throw new VendorNotFoundException();
+        }
+        const shop = await this.repository.findOne({ where: { id: shopId, vendorProfile: { id: vendor.id } } });
+        if (!shop) {
+            throw new ShopNotFoundException();
+        }
         if (updateData.shopLongitude || updateData.shopLatitude) {
             shop.location = {
                 type: 'Point',

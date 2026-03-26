@@ -61,15 +61,18 @@ export class AuthService {
         };
     }
     async verifyAndCreateUser(email: string, otp: string) {
+        console.log(`Starting verification for ${email} with OTP ${otp}`);
         // Verify OTP
         const isOtpValid = await this.otpService.verifyOtp(email, otp);
         if (!isOtpValid) {
+            console.error(`OTP verification failed for ${email}`);
             throw new InvalidOtpException();
         }
 
         // Retrieve cached DTO
         const dto = await this.otpService.getPendingData<CreateUserDto>(email);
         if (!dto) {
+            console.error(`No pending registration data found for ${email}`);
             throw new InvalidOtpException(); // Or a custom "Registration Expired" exception
         }
 

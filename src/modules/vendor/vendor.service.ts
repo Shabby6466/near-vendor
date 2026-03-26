@@ -14,9 +14,13 @@ export class VendorService {
 
     async findById(id: string) {
         return await this.vendorRepository.findOne({
-            where: {
-                id: id,
-            },
+            where: { id },
+        });
+    }
+
+    async findByUserId(userId: string) {
+        return await this.vendorRepository.findOne({
+            where: { user: { id: userId } },
         });
     }
 
@@ -39,8 +43,8 @@ export class VendorService {
         }
     }
 
-    async getVendorMeProfile(vendorId: string) {
-        const vendor = await this.findById(vendorId);
+    async getVendorMeProfile(userId: string) {
+        const vendor = await this.findByUserId(userId);
         return {
             statusCode: ResponseCode.SUCCESS,
             message: 'Vendor profile fetched successfully',
@@ -48,8 +52,8 @@ export class VendorService {
         }
     }
 
-    async updateVendorProfile(vendorId: string, vendorDto: UpdateVendorDto) {
-        const vendor = await this.findById(vendorId);
+    async updateVendorProfile(userId: string, vendorDto: UpdateVendorDto) {
+        const vendor = await this.findByUserId(userId);
         if (!vendor) {
             return {
                 statusCode: ResponseCode.NOT_FOUND,
@@ -67,8 +71,8 @@ export class VendorService {
         }
     }
 
-    async getMeVendorStatus(vendorId: string) {
-        const vendor = await this.findById(vendorId);
+    async getMeVendorStatus(userId: string) {
+        const vendor = await this.findByUserId(userId);
         if (!vendor) {
             return {
                 statusCode: ResponseCode.NOT_FOUND,
@@ -78,6 +82,34 @@ export class VendorService {
         return {
             statusCode: ResponseCode.SUCCESS,
             data: vendor.status,
+        }
+    }
+
+    async getPendingVendors() {
+        const vendors = await this.vendorRepository.find({
+            where: { status: 'PENDING' },
+        });
+        return {
+            statusCode: ResponseCode.SUCCESS,
+            message: 'Pending vendor profiles fetched successfully',
+            data: vendors,
+        }
+    }
+
+    async approveVendor(vendorId: string) {
+        const vendor = await this.findById(vendorId);
+        if (!vendor) {
+            return {
+                statusCode: ResponseCode.NOT_FOUND,
+                message: 'Vendor not found',
+            }
+        }
+        vendor.status = 'APPROVED';
+        vendor.isVerified = true;
+        await this.createVendor(vendor);
+        return {
+            statusCode: ResponseCode.SUCCESS,
+            message: 'Vendor approved successfully',
         }
     }
 
