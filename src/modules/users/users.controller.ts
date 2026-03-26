@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards, Req, Delete } from "@nestjs/common";
+import { Body, Controller, Post, UseGuards, Req, Delete, Get } from "@nestjs/common";
 import { UserService } from "./users.service";
 import { CreateUserDto, LoginDto, VerifyOtpDto } from "./dto/users.dto";
 import { ChangePasswordDto } from "./dto/change-password.dto";
@@ -32,5 +32,13 @@ export class UsersController {
     @ApiOkResponse({ description: "Account deleted successfully" })
     async deleteAccount(@Body() dto: DeleteAccountDto, @Req() req: any) {
         return await this.service.deleteAccount(req.user, dto.password);
+    }
+
+    @Get("me")
+    @UseGuards(JwtAuthGuard)
+    @ApiOperation({ summary: "Get current user" })
+    @ApiOkResponse({ description: "User found successfully" })
+    async getMe(@Req() req: any) {
+        return await this.service.getUser(req.user.id);
     }
 }

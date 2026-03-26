@@ -4,12 +4,14 @@ import { Vendors } from "../../models/entities/vendors.entity";
 import { Repository } from "typeorm";
 import { CreateVendorDto, UpdateVendorDto } from "./dto/vendor.dto";
 import { ResponseCode } from "@utils/enum";
+import { UserService } from "@modules/users/users.service";
 
 @Injectable()
 export class VendorService {
     constructor(
         @InjectRepository(Vendors)
         private readonly vendorRepository: Repository<Vendors>,
+        private readonly userService: UserService,
     ) { }
 
     async findById(id: string) {
@@ -43,15 +45,6 @@ export class VendorService {
         }
     }
 
-    async getVendorMeProfile(userId: string) {
-        const vendor = await this.findByUserId(userId);
-        return {
-            statusCode: ResponseCode.SUCCESS,
-            message: 'Vendor profile fetched successfully',
-            data: vendor,
-        }
-    }
-
     async updateVendorProfile(userId: string, vendorDto: UpdateVendorDto) {
         const vendor = await this.findByUserId(userId);
         if (!vendor) {
@@ -82,6 +75,16 @@ export class VendorService {
         return {
             statusCode: ResponseCode.SUCCESS,
             data: vendor.status,
+        }
+    }
+
+    async getMeVendorProfile(userId: string) {
+        const user = await this.userService.getUser(userId);
+        const vendor = await this.findByUserId(userId);
+        return {
+            statusCode: ResponseCode.SUCCESS,
+            message: 'Vendor profile fetched successfully',
+            data: { ...user, ...vendor },
         }
     }
 

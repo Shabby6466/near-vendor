@@ -25,14 +25,6 @@ export class VendorController {
         return await this.vendorService.registerVendor(vendorDto, req.user.id);
     }
 
-    @Get('me')
-    @ApiOperation({ summary: 'Get vendor me profile' })
-    @ApiResponse({ status: 200, description: 'Vendor me profile fetched successfully' })
-    @ApiResponse({ status: 404, description: 'Vendor not found' })
-    async getVendorMeProfile(@Req() req: any) {
-        return await this.vendorService.getVendorMeProfile(req.user.id);
-    }
-
     @Put('update')
     @ApiOperation({ summary: 'Update vendor profile' })
     @ApiResponse({ status: 200, description: 'Vendor profile updated successfully' })
@@ -67,6 +59,14 @@ export class VendorController {
     @ApiResponse({ status: 200, description: 'Pending vendor profiles fetched successfully' })
     async getPendingVendors() {
         return await this.vendorService.getPendingVendors();
+    }
+
+    @Get('me/profile')
+    @ApiOperation({ summary: 'Get vendor me profile' })
+    @ApiResponse({ status: 200, description: 'Vendor me profile fetched successfully' })
+    @ApiResponse({ status: 404, description: 'Vendor not found' })
+    async getVendorMeProfile(@Req() req: any) {
+        return await this.vendorService.getMeVendorProfile(req.user.id);
     }
 
 }

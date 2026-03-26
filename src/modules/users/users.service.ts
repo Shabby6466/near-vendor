@@ -36,7 +36,6 @@ export class UserService {
     }
 
 
-
     async changePassword(user: any, oldPassword: string, newPassword: string) {
         const u = await this.userRepo.createQueryBuilder('user')
             .where('user.id = :id', { id: user.id })
