@@ -3,10 +3,12 @@ import { VendorService } from "./vendor.service";
 import { CreateVendorDto, UpdateVendorDto } from "./dto/vendor.dto";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { JwtAuthGuard } from "@modules/auth/auth-utils/jwt-guard";
+import { ApiBearerAuth } from "@nestjs/swagger";
 
 @Controller('vendor')
 @ApiTags('vendor')
 @UseGuards(JwtAuthGuard)
+@ApiBearerAuth()
 export class VendorController {
     constructor(
         private readonly vendorService: VendorService,
