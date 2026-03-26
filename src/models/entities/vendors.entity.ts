@@ -1,11 +1,12 @@
 import { BaseEntity } from "@modules/common/entity/base.entity";
-import { Column, Entity, OneToMany, OneToOne } from "typeorm";
+import { Column, Entity, JoinColumn, OneToMany, OneToOne } from "typeorm";
 import { User } from "./users.entity";
 import { Shops } from "./shops.entity";
 
 @Entity({ name: "vendor_profile" })
 export class Vendors extends BaseEntity {
     @OneToOne(() => User, (user) => user.vendorProfile)
+    @JoinColumn()
     user: User;
 
     @Column({ nullable: false })
