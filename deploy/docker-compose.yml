@@ -5,6 +5,8 @@ services:
     restart: unless-stopped
     volumes:
       - nearvendor_db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
     environment:
       - POSTGRES_DB=${DB_DATABASE}
       - POSTGRES_USER=${DB_USERNAME}
