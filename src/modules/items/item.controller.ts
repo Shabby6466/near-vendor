@@ -1,12 +1,15 @@
-import { Body, Controller, Delete, Get, Post, Put, Req } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Post, Put, Req, UseGuards } from "@nestjs/common";
 import { ItemService } from "./items.service";
 import { ApiBearerAuth, ApiCookieAuth, ApiOperation, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { CreateItemDto, SearchNearbyDto } from "./dto/item.dto";
+import { JwtAuthGuard } from "@modules/auth/auth-utils/jwt-guard";
+import { VerifiedVendorGuard } from "../vendor/guards/verified-vendor.guard";
 
 @ApiTags("items")
 @ApiCookieAuth()
 @ApiBearerAuth()
 @Controller("item")
+@UseGuards(JwtAuthGuard, VerifiedVendorGuard)
 export class ItemController {
     constructor(private readonly service: ItemService) { }
 

@@ -38,6 +38,13 @@ export class VerifiedVendorGuard implements CanActivate {
 
         // Attach vendor to request for convenience in controllers
         request.vendor = vendor;
+
+        // Extract shopId from header if present
+        const shopId = request.headers['x-shop-id'];
+        if (shopId) {
+            request.user.shopId = shopId;
+        }
+
         return true;
     }
 }
