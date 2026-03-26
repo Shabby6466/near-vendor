@@ -21,7 +21,8 @@
     "ts-typeorm": "ts-node -r tsconfig-paths/register ./node_modules/.bin/typeorm",
     "migration:create": "typeorm migration:create -d src/migrations",
     "migration:run": "yarn ts-typeorm migration:run",
-    "migration:revert": "yarn ts-typeorm migration:revert"
+    "migration:revert": "yarn ts-typeorm migration:revert",
+    "create-admin": "ts-node -r tsconfig-paths/register scripts/create-admin.ts"
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^1.6.1",
