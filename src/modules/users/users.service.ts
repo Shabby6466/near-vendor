@@ -24,6 +24,13 @@ export class UserService {
         return await this.userRepo.findOne({ where: { email: email } });
     }
 
+    async findUserByEmailWithPassword(email: string) {
+        return await this.userRepo.createQueryBuilder('user')
+            .where('user.email = :email', { email })
+            .addSelect('user.password')
+            .getOne();
+    }
+
     async saveUser(user: User) {
         return await this.userRepo.save(user);
     }
@@ -31,7 +38,10 @@ export class UserService {
 
 
     async changePassword(user: any, oldPassword: string, newPassword: string) {
-        const u = await this.userRepo.findOne({ where: { id: user.id } });
+        const u = await this.userRepo.createQueryBuilder('user')
+            .where('user.id = :id', { id: user.id })
+            .addSelect('user.password')
+            .getOne();
         if (!u) throw new UserNotFoundException();
 
         const isMatch = await bcrypt.compare(oldPassword, u.password);
@@ -45,7 +55,10 @@ export class UserService {
     }
 
     async deleteAccount(user: any, password: string) {
-        const u = await this.userRepo.findOne({ where: { id: user.id } });
+        const u = await this.userRepo.createQueryBuilder('user')
+            .where('user.id = :id', { id: user.id })
+            .addSelect('user.password')
+            .getOne();
         if (!u) throw new UserNotFoundException();
 
         const isMatch = await bcrypt.compare(password, u.password);
