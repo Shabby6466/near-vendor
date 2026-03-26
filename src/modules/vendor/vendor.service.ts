@@ -24,8 +24,12 @@ export class VendorService {
         return await this.vendorRepository.save(vendor);
     }
 
-    async registerVendor(vendorDto: CreateVendorDto) {
-        const vendor = await this.vendorRepository.create(vendorDto);
+    async registerVendor(vendorDto: CreateVendorDto, userId: string) {
+        const vendor = this.vendorRepository.create(vendorDto);
+        vendor.businessType = vendorDto.businessCategory;
+        vendor.status = 'PENDING';
+        vendor.isVerified = false;
+        vendor.user = { id: userId } as any;
         await this.createVendor(vendor);
         return {
             statusCode: ResponseCode.SUCCESS,

@@ -29,6 +29,20 @@ export class CreateVendorDto {
     @IsNotEmpty()
     @IsString()
     supportContact: string;
+
+    @ApiProperty({
+        example: "12345-1234567-1"
+    })
+    @IsNotEmpty()
+    @IsString()
+    cnic: string;
+
+    @ApiProperty({
+        example: "https://example.com/image.jpg"
+    })
+    @IsNotEmpty()
+    @IsString()
+    cnicImageUrl: string;
 }
 
 

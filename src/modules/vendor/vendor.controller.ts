@@ -14,8 +14,8 @@ export class VendorController {
     @ApiOperation({ summary: 'Register a new vendor' })
     @ApiResponse({ status: 201, description: 'Vendor registered successfully' })
     @ApiResponse({ status: 400, description: 'Invalid request' })
-    async registerVendor(@Body() vendorDto: CreateVendorDto) {
-        return await this.vendorService.registerVendor(vendorDto);
+    async registerVendor(@Req() req: any, @Body() vendorDto: CreateVendorDto) {
+        return await this.vendorService.registerVendor(vendorDto, req.user.id);
     }
 
     @Get('me')
