@@ -4,6 +4,7 @@ import { Repository } from "typeorm";
 import * as bcrypt from "bcryptjs";
 import { UserNotFoundException } from "./users.exception";
 import { InvalidCredentialsException } from "@modules/auth/auth-utils/auth.exception";
+import { UpdateUserDto } from "./dto/update-user.dto";
 
 
 import { Injectable } from "@nestjs/common";
@@ -18,6 +19,20 @@ export class UserService {
 
     async getUser(id: string) {
         return await this.userRepo.findOne({ where: { id: id } });
+    }
+
+    async updateUser(id: string, dto: UpdateUserDto) {
+        const user = await this.getUser(id);
+        if (!user) throw new UserNotFoundException();
+
+        if (dto.fullName) user.fullName = dto.fullName;
+        if (dto.phone) user.phone = dto.phone;
+        if (dto.photoUrl) user.photoUrl = dto.photoUrl;
+        if (dto.latitude) user.lastKnownLatitude = dto.latitude;
+        if (dto.longitude) user.lastKnownLongitude = dto.longitude;
+
+        await this.userRepo.save(user);
+        return { success: true, message: "User updated successfully", user };
     }
 
     async updateUserRole(id: string, role: UserRoles) {

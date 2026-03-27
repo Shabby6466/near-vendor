@@ -21,6 +21,9 @@ export class User extends BaseEntity {
     @Column({ type: 'varchar', length: 20, nullable: true })
     phone: string;
 
+    @Column({ type: 'varchar', nullable: true })
+    photoUrl: string;
+
     @Column({ type: 'boolean', default: false })
     isPhoneVerified: boolean;
 

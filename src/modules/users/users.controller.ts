@@ -1,8 +1,9 @@
-import { Body, Controller, Post, UseGuards, Req, Delete, Get } from "@nestjs/common";
+import { Body, Controller, Post, UseGuards, Req, Delete, Get, Patch } from "@nestjs/common";
 import { UserService } from "./users.service";
 import { CreateUserDto, LoginDto, VerifyOtpDto } from "./dto/users.dto";
 import { ChangePasswordDto } from "./dto/change-password.dto";
 import { DeleteAccountDto } from "./dto/delete-account.dto";
+import { UpdateUserDto } from "./dto/update-user.dto";
 import { JwtAuthGuard } from "@modules/auth/auth-utils/jwt-guard";
 import {
     ApiBearerAuth,
@@ -17,6 +18,14 @@ import {
 @ApiBearerAuth()
 export class UsersController {
     constructor(private readonly service: UserService) { }
+
+    @Patch("update")
+    @UseGuards(JwtAuthGuard)
+    @ApiOperation({ summary: "Update user profile" })
+    @ApiOkResponse({ description: "User updated successfully" })
+    async updateUser(@Body() dto: UpdateUserDto, @Req() req: any) {
+        return await this.service.updateUser(req.user.id, dto);
+    }
 
     @Post("change-password")
     @UseGuards(JwtAuthGuard)
