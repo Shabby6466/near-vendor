@@ -7,7 +7,7 @@ import { InvalidCredentialsException } from "@modules/auth/auth-utils/auth.excep
 
 
 import { Injectable } from "@nestjs/common";
-import { ResponseCode } from "@utils/enum";
+import { ResponseCode, UserRoles } from "@utils/enum";
 
 @Injectable()
 export class UserService {
@@ -18,6 +18,14 @@ export class UserService {
 
     async getUser(id: string) {
         return await this.userRepo.findOne({ where: { id: id } });
+    }
+
+    async updateUserRole(id: string, role: UserRoles) {
+        const user = await this.getUser(id);
+        if (!user) throw new UserNotFoundException();
+        user.role = role;
+        await this.userRepo.save(user);
+        return true;
     }
 
     async findUserByEmail(email: string) {

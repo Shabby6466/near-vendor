@@ -3,7 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Vendors } from "../../models/entities/vendors.entity";
 import { Repository } from "typeorm";
 import { CreateVendorDto, UpdateVendorDto } from "./dto/vendor.dto";
-import { ResponseCode } from "@utils/enum";
+import { ResponseCode, UserRoles } from "@utils/enum";
 import { UserService } from "@modules/users/users.service";
 
 @Injectable()
@@ -17,12 +17,14 @@ export class VendorService {
     async findById(id: string) {
         return await this.vendorRepository.findOne({
             where: { id },
+            relations: ['user']
         });
     }
 
     async findByUserId(userId: string) {
         return await this.vendorRepository.findOne({
             where: { user: { id: userId } },
+            relations: ['user']
         });
     }
 
@@ -31,6 +33,13 @@ export class VendorService {
     }
 
     async registerVendor(vendorDto: CreateVendorDto, userId: string) {
+        const existingVendor = await this.findByUserId(userId);
+        if (existingVendor) {
+            return {
+                statusCode: ResponseCode.BAD_REQUEST,
+                message: 'Vendor profile already exists for this user',
+            }
+        }
         const vendor = this.vendorRepository.create(vendorDto);
         vendor.businessType = vendorDto.businessCategory;
         vendor.status = 'PENDING';
@@ -108,6 +117,7 @@ export class VendorService {
             }
         }
         vendor.status = 'APPROVED';
+        await this.userService.updateUserRole(vendor.user.id, UserRoles.VENDOR);
         vendor.isVerified = true;
         await this.createVendor(vendor);
         return {

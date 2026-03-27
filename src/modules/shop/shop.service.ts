@@ -63,10 +63,10 @@ export class ShopService {
         return this.repository.save(shop);
     }
 
-    async deleteShop(vendorId: string, shopId: string): Promise<void> {
+    async deleteShop(vendorUserId: string, shopId: string): Promise<void> {
         const result = await this.repository.softDelete({
             id: shopId,
-            vendorProfile: { id: vendorId }
+            vendorProfile: { user: { id: vendorUserId } }
         });
 
         if (result.affected === 0) {
@@ -74,14 +74,14 @@ export class ShopService {
         }
     }
 
-    async findByVendorId(vendorId: string): Promise<Shops[]> {
-        return this.repository.find({ where: { vendorProfile: { id: vendorId } } });
+    async findByVendorId(vendorUserId: string): Promise<Shops[]> {
+        return this.repository.find({ where: { vendorProfile: { user: { id: vendorUserId } } } });
     }
 
-    async findByVendor(vendorId: string, page: number = 1, limit: number = 10): Promise<[Shops[], number]> {
+    async findByVendor(vendorUserId: string, page: number = 1, limit: number = 10): Promise<[Shops[], number]> {
         return this.repository.findAndCount({
             where: {
-                vendorProfile: { id: vendorId },
+                vendorProfile: { user: { id: vendorUserId } },
                 isActive: true
             },
             order: { createdAt: 'DESC' },
@@ -90,9 +90,9 @@ export class ShopService {
         });
     }
 
-    async findByVendorAndId(shopId: string, vendorId: string): Promise<Shops> {
+    async findByVendorAndId(shopId: string, vendorUserId: string): Promise<Shops> {
         const shop = await this.repository.findOne({
-            where: { id: shopId, vendorProfile: { id: vendorId } }
+            where: { id: shopId, vendorProfile: { user: { id: vendorUserId } } }
         });
         if (!shop) throw new ShopNotFoundException();
         return shop;

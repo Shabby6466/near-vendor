@@ -34,7 +34,7 @@ export class ShopController {
     }
 
     @Get('me/shops')
-    @ApiOperation({ summary: 'Find shops by vendor id' })
+    @ApiOperation({ summary: 'Find my all shops' })
     @ApiResponse({ status: 200, description: 'Shop found successfully' })
     async findShopByVendorId(@Req() req: any,) {
         return await this.shopService.findByVendor(req.user.id,);
