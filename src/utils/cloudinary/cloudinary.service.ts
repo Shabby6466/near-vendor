@@ -43,6 +43,9 @@ export class CloudinaryService {
           folder,
           public_id: opts?.publicId,
           resource_type: "image",
+          transformation: [
+            { quality: "auto", fetch_format: "auto" }
+          ]
         });
       } else {
         res = await new Promise<any>((resolve, reject) => {
@@ -51,6 +54,9 @@ export class CloudinaryService {
               folder,
               public_id: opts?.publicId,
               resource_type: "image",
+              transformation: [
+                { quality: "auto", fetch_format: "auto" }
+              ]
             },
             (error, result) => {
               if (error) return reject(error);
