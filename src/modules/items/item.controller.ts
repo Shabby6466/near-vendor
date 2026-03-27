@@ -1,6 +1,6 @@
-import { Body, Controller, Delete, Get, Post, Put, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Put, Req, UseGuards } from "@nestjs/common";
 import { ItemService } from "./items.service";
-import { ApiBearerAuth, ApiCookieAuth, ApiOperation, ApiQuery, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiCookieAuth, ApiOperation, ApiParam, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { CreateItemDto, SearchNearbyDto } from "./dto/item.dto";
 import { JwtAuthGuard } from "@modules/auth/auth-utils/jwt-guard";
 import { VerifiedVendorGuard } from "../vendor/guards/verified-vendor.guard";
@@ -17,10 +17,10 @@ export class ItemController {
     @Post('create')
     @ApiOperation({
         summary: 'Create a new item',
-        description: 'Creates a new item for the authenticated vendor',
+        description: 'Creates a new item for the authenticated vendor in a specific shop',
     })
     async createItem(@Body() itemDto: CreateItemDto, @Req() req: any) {
-        return await this.service.createItem(req.user.id, itemDto, req.user.shopId);
+        return await this.service.createItem(req.user.id, itemDto);
     }
 
     @Put('update/:id')
@@ -28,8 +28,8 @@ export class ItemController {
         summary: 'Update an item',
         description: 'Updates an item for the authenticated vendor',
     })
-    async updateItem(@Body() itemDto: CreateItemDto, @Req() req: any) {
-        return await this.service.updateItem(req.user.id, itemDto, req.user.shopId);
+    async updateItem(@Param('id') id: string, @Body() itemDto: CreateItemDto, @Req() req: any) {
+        return await this.service.updateItem(id, itemDto, req.user.id);
     }
 
     @Delete('delete/:id')
@@ -37,24 +37,24 @@ export class ItemController {
         summary: 'Delete an item',
         description: 'Deletes an item for the authenticated vendor',
     })
-    async deleteItem(@Req() req: any) {
-        return await this.service.deleteItem(req.user.id, req.user.shopId);
+    async deleteItem(@Param('id') id: string, @Req() req: any) {
+        return await this.service.deleteItem(id, req.user.id);
     }
 
-    @Get('get-all-by-shop-id')
+    @Get('get-all-by-shop/:shopId')
     @ApiOperation({
         summary: 'Get all items by shop id',
-        description: 'Gets all items for the authenticated vendor',
+        description: 'Gets all items for the authenticated vendor in a specific shop',
     })
-    async getAllByShopId(@Req() req: any) {
-        return await this.service.getAllByShopId(req.user.id, req.user.shopId);
+    async getAllByShopId(@Param('shopId') shopId: string, @Req() req: any) {
+        return await this.service.getAllByShopId(req.user.id, shopId);
     }
 
 
-    @Get('search-vendor-inventory')
+    @Get('search-vendor-inventory/:shopId')
     @ApiOperation({
         summary: 'Search vendor inventory',
-        description: 'Searches for items in the authenticated vendor\'s inventory',
+        description: 'Searches for items in the authenticated vendor\'s shop inventory',
     })
     @ApiQuery({
         name: 'searchTerm',
@@ -62,8 +62,8 @@ export class ItemController {
         required: true,
         type: String,
     })
-    async searchVendorInventory(@Req() req: any) {
-        return await this.service.searchVendorInventory(req.user.id, req.user.shopId, req.query.searchTerm);
+    async searchVendorInventory(@Param('shopId') shopId: string, @Req() req: any) {
+        return await this.service.searchVendorInventory(req.user.id, shopId, req.query.searchTerm);
     }
 
     @Get('search-nearby')

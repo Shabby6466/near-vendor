@@ -25,11 +25,12 @@ export class ItemService {
         return item;
     }
 
-    async createItem(vendorId: string, itemDto: CreateItemDto, shopId: string) {
+    async createItem(vendorId: string, itemDto: CreateItemDto) {
+        const { shopId, ...rest } = itemDto;
         const shop = await this.shopService.findByVendorAndId(shopId, vendorId);
 
         const newItem = this.itemRepo.create({
-            ...itemDto,
+            ...rest,
             shop,
         });
 
@@ -70,8 +71,7 @@ export class ItemService {
                     id: shopId,
                     vendorProfile: { user: { id: vendorId } }
                 }
-            },
-            relations: ['shop']
+            }
         });
 
         if (items.length === 0) {

@@ -36,6 +36,11 @@ export class CreateItemDto {
     @IsNumber()
     @IsOptional()
     discount?: number;
+
+    @ApiProperty({ example: 'shop-uuid' })
+    @IsString()
+    @IsNotEmpty()
+    shopId: string;
 }
 
 export class SearchNearbyDto {
