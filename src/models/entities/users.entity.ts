@@ -38,10 +38,10 @@ export class User extends BaseEntity {
     @Column({ type: 'boolean', default: true })
     isActive: boolean;
 
-    @Column({ type: 'decimal', precision: 10, scale: 6, nullable: true })
+    @Column({ type: 'decimal', nullable: true })
     lastKnownLongitude: number;
 
-    @Column({ type: 'decimal', precision: 10, scale: 6, nullable: true })
+    @Column({ type: 'decimal', nullable: true })
     lastKnownLatitude: number;
 
     @Column({ type: 'timestamp', nullable: true })
