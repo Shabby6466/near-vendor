@@ -86,14 +86,14 @@ export class CreateShopDto {
     })
     @IsNotEmpty()
     @IsString()
-    coverImageUrl: string;
+    shopImageUrl: string;
 
     @ApiProperty({
         example: 'https://example.com/logo.jpg'
     })
     @IsNotEmpty()
     @IsString()
-    storeLogoUrl: string;
+    shopLogoUrl: string;
 
 }
 

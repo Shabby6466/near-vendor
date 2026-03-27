@@ -30,11 +30,11 @@ export class CreateUserDto {
 
 
 export class LoginDto {
-    @ApiProperty({ example: "[EMAIL_ADDRESS]" })
+    @ApiProperty({ example: "admin@nearvendor.com" })
     @IsNotEmpty()
     email: string;
 
-    @ApiProperty({ example: "password" })
+    @ApiProperty({ example: "pswd123" })
     @IsNotEmpty()
     password: string;
 }

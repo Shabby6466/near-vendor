@@ -100,6 +100,7 @@ export class VendorService {
     async getPendingVendors() {
         const vendors = await this.vendorRepository.find({
             where: { status: 'PENDING' },
+            relations: ['user'],
         });
         return {
             statusCode: ResponseCode.SUCCESS,

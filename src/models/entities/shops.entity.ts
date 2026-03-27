@@ -35,6 +35,21 @@ export class Shops extends BaseEntity {
     })
     location: any;
 
+    @Column({ type: 'varchar', nullable: true })
+    shopLogoUrl: string;
+
+    @Column({ type: 'varchar', length: 100, nullable: true })
+    businessCategory: string;
+
+    @Column({ type: 'varchar', length: 100, nullable: true })
+    registrationNumber: string;
+
+    @Column({ type: 'varchar', length: 20, nullable: true })
+    shopContactPhone: string;
+
+    @Column({ type: 'varchar', length: 100, nullable: true })
+    storeEmail: string;
+
     @Column({ type: 'jsonb', nullable: true })
     operatingHours: any;
 
