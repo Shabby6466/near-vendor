@@ -63,7 +63,7 @@ export const imports: ModuleMetadata["imports"] = [
   CommonModule,
   MulterModule.register({
     limits: {
-      fileSize: 50,
+      fileSize: 50 * 1024 * 1024, // 50MB
     },
   }),
   SeedModule,
