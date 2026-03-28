@@ -1,6 +1,8 @@
 services:
   db:
-    image: postgis/postgis:15-3.4-alpine
+    build:
+      context: .
+      dockerfile: postgres.Dockerfile
     container_name: nearvendor_db
     restart: unless-stopped
     volumes:
