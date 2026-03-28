@@ -347,7 +347,7 @@ export class ItemService {
             );
 
         const textScore = searchTerm && searchTerm.trim() ? `similarity(item.name::text, :query)` : `0`;
-        const semanticScore = queryVector ? `1 - (item.embedding <=> :queryVector::vector)` : `0`;
+        const semanticScore = queryVector ? `1 - (item.embedding::vector <=> :queryVector::vector)` : `0`;
         const hybridScore = `((${textScore} * 0.4) + (${semanticScore} * 0.6))`;
 
         qb.addSelect(hybridScore, 'hybrid_score');
