@@ -25,7 +25,7 @@ export class ExploreService {
     ) { }
 
     async searchItems(query: string, lat: number, lon: number, radius: number = 5000, page: number = 1, limit: number = 10, userId?: string) {
-        return await this.itemService.searchNearby(query, lat, lon, radius, page, limit, userId);
+        return await this.itemService.searchHybrid(query, lat, lon, radius, page, limit, userId);
     }
 
     async getRecentItems(userId: string) {

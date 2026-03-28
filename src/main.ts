@@ -40,6 +40,7 @@ const bootstrap = async () => {
   appSwaggerDoc(app, imports);
   adminSwaggerDoc(app, adminModulesImports);
 
+  app.enableShutdownHooks();
   await app.listen(process.env.APP_PORT);
   AppService.startup();
 };

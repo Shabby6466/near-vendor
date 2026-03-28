@@ -30,6 +30,6 @@ export class SearchController {
       userLon: body.userLon,
       limit: body.limit || 60,
     });
-    return { success: true, results };
+    return { success: true, ...results };
   }
 }

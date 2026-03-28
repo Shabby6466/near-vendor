@@ -1823,7 +1823,7 @@
   resolved "https://registry.npmjs.org/@webpack-cli/serve/-/serve-2.0.5.tgz"
   integrity sha512-lqaoKnRYBdo1UgDX8uF24AfGMifWK19TxPmM5FHc2vAGxrJ/qtyUyFBWoY1tISZdelsQ5fBcOusifo5o5wSJxQ==
 
-"@xenova/transformers@^2.17.1":
+"@xenova/transformers@^2.17.2":
   version "2.17.2"
   resolved "https://registry.npmjs.org/@xenova/transformers/-/transformers-2.17.2.tgz"
   integrity sha512-lZmHqzrVIkSvZdKZEx7IYY51TK0WDrC8eR0c5IMnBsO8di8are1zzw8BlLhyO2TklZKLN5UffNGs1IJwT6oOqQ==

@@ -29,8 +29,11 @@ import { ShopModule } from "@modules/shop/shop.module";
 import { CategoriesModule } from "@modules/categories/categories.module";
 import { ExploreModule } from "@modules/explore/explore.module";
 import { AnalyticsModule } from "@modules/analytics/analytics.module";
+import { AIModule } from "@modules/ai/ai.module";
+import { AdminModule } from "@modules/admin/admin.module";
 
 export const adminModulesImports: ModuleMetadata["imports"] = [
+  AdminModule,
 ];
 
 export const imports: ModuleMetadata["imports"] = [
@@ -81,6 +84,7 @@ export const imports: ModuleMetadata["imports"] = [
   CategoriesModule,
   ExploreModule,
   AnalyticsModule,
+  AIModule,
 ];
 
 @Module({

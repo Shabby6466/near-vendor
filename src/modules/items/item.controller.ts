@@ -87,6 +87,16 @@ export class ItemController {
         return await this.service.searchNearby(dto.query, dto.lat, dto.lon, dto.radius, dto.page, dto.limit, user?.id);
     }
 
+    @Get('search-hybrid')
+    @UseGuards(OptionalAuthGuard)
+    @ApiOperation({
+        summary: 'Hybrid search nearby items (Semantic + Trigrams)',
+        description: 'Searches for items near a given location using Hybrid Search (Public API)',
+    })
+    async searchHybrid(@Query() dto: SearchNearbyDto, @CurrentUser() user?: User) {
+        return await this.service.searchHybrid(dto.query, dto.lat, dto.lon, dto.radius, dto.page, dto.limit, user?.id);
+    }
+
     @Get(':id')
     @UseGuards(OptionalAuthGuard)
     @ApiOperation({

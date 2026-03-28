@@ -4,6 +4,7 @@ import { ILike, Repository } from "typeorm";
 import { Item } from "models/entities/items.entity";
 import { CreateItemDto, ItemByIdResponseDto, ItemResponseDto, UpdateItemDto } from "./dto/item.dto";
 import { ShopService } from "@modules/shop/shop.service";
+import { AIService } from "@modules/ai/ai.service";
 import { ShopNotFoundException } from "@modules/shop/shop.exception";
 import { ItemNotFoundException } from "./item.exception";
 import { paginate, IPaginationOptions, Pagination } from "nestjs-typeorm-paginate";
@@ -28,6 +29,7 @@ export class ItemService {
         private readonly recentItemRepo: Repository<RecentItem>,
         private readonly shopService: ShopService,
         private readonly analyticsService: AnalyticsService,
+        private readonly aiService: AIService,
     ) { }
 
     async findById(id: string, userId?: string): Promise<Item> {
@@ -56,6 +58,18 @@ export class ItemService {
         });
 
         await this.itemRepo.save(newItem);
+
+        // Generate and update embedding separately using raw SQL for pgvector compatibility
+        try {
+            const embeddingText = `${newItem.name} ${newItem.description || ''}`;
+            const embedding = await this.aiService.generateEmbedding(embeddingText);
+            await this.itemRepo.query(
+                `UPDATE items SET embedding = $1::vector WHERE id = $2`,
+                [`[${embedding.join(",")}]`, newItem.id]
+            );
+        } catch (error) {
+            console.error("Failed to generate embedding for new item:", error);
+        }
         await this.shopService.updateShopActivity(shop.id);
         return {
             success: true,
@@ -75,8 +89,27 @@ export class ItemService {
 
         if (!item) throw new ItemNotFoundException();
 
+        const oldName = item.name;
+        const oldDesc = item.description;
+
         Object.assign(item, updateDto);
+
         await this.itemRepo.save(item);
+
+        // Regenerate embedding if name or description changed
+        if (updateDto.name !== undefined && updateDto.name !== oldName ||
+            updateDto.description !== undefined && updateDto.description !== oldDesc) {
+            try {
+                const embeddingText = `${item.name} ${item.description || ''}`;
+                const embedding = await this.aiService.generateEmbedding(embeddingText);
+                await this.itemRepo.query(
+                    `UPDATE items SET embedding = $1::vector WHERE id = $2`,
+                    [`[${embedding.join(",")}]`, item.id]
+                );
+            } catch (error) {
+                console.error("Failed to regenerate embedding for updated item:", error);
+            }
+        }
         await this.shopService.updateShopActivity(item.shop.id);
         return {
             success: true,
@@ -280,4 +313,114 @@ export class ItemService {
         };
     }
 
+    /**
+     * Hybrid Search Logic:
+     * 1. Vectorize query using AIService.
+     * 2. Single Postgres query: spatial filter, text match (trigrams), semantic match (vector similarity).
+     * 3. Weighted score: (text_score * 0.4) + (semantic_score * 0.6).
+     */
+    async searchHybrid(
+        searchTerm: string,
+        lat: number,
+        lon: number,
+        radius: number = 5000,
+        page: number = 1,
+        limit: number = 10,
+        userId?: string
+    ) {
+        let queryVector: number[] | null = null;
+        if (searchTerm && searchTerm.trim()) {
+            queryVector = await this.aiService.generateEmbedding(searchTerm).catch((err) => {
+                console.error("Embedding generation failed:", err);
+                return null;
+            });
+        }
+
+        const skip = (page - 1) * limit;
+
+        const qb = this.itemRepo.createQueryBuilder('item')
+            .innerJoinAndSelect('item.shop', 'shop')
+            .addSelect(`similarity(item.name::text, :query)`, 'name_sim')
+            .addSelect(
+                `ST_Distance(shop.location, ST_SetSRID(ST_Point(:lon, :lat), 4326)::geography)`,
+                'dist'
+            );
+
+        const textScore = searchTerm && searchTerm.trim() ? `similarity(item.name::text, :query)` : `0`;
+        const semanticScore = queryVector ? `1 - (item.embedding <=> :queryVector::vector)` : `0`;
+        const hybridScore = `((${textScore} * 0.4) + (${semanticScore} * 0.6))`;
+
+        qb.addSelect(hybridScore, 'hybrid_score');
+
+        if (searchTerm && searchTerm.trim()) {
+            if (queryVector) {
+                qb.andWhere(`(similarity(item.name::text, :query) > 0.3 OR (1 - (item.embedding <=> :queryVector::vector)) > 0.3)`);
+            } else {
+                qb.andWhere(`similarity(item.name::text, :query) > 0.3`);
+            }
+        }
+
+        qb.andWhere('ST_DWithin(shop.location, ST_SetSRID(ST_Point(:lon, :lat), 4326)::geography, :radius)')
+            .andWhere('item.isAvailable = :itemAvailable')
+            .andWhere('shop.isActive = :shopActive')
+            .andWhere('item.deletedAt IS NULL')
+            .andWhere('shop.deletedAt IS NULL');
+
+        qb.setParameters({
+            query: searchTerm,
+            lon,
+            lat,
+            radius,
+            itemAvailable: true,
+            shopActive: true,
+        });
+
+        if (queryVector) {
+            qb.setParameter("queryVector", `[${queryVector.join(",")}]`);
+        }
+
+        qb.orderBy('hybrid_score', 'DESC')
+            .addOrderBy('dist', 'ASC')
+            .skip(skip)
+            .take(limit);
+
+        const { entities, raw } = await qb.getRawAndEntities();
+
+        const items = entities.map((entity, index) => {
+            const r = raw[index];
+            return {
+                ...ItemResponseDto.fromEntity(entity),
+                distance_m: r.dist ? parseFloat(r.dist) : null,
+                searchScore: r.hybrid_score ? parseFloat(r.hybrid_score) : 0,
+            };
+        });
+
+        const total = await qb.getCount();
+
+        if (items.length > 0) {
+            void this.analyticsService.trackSearch(searchTerm, lat, lon, entities.map(i => i.id), userId);
+        }
+
+        let suggestedCategories = [];
+        if (items.length === 0 && searchTerm) {
+            suggestedCategories = await this.categoryRepo.createQueryBuilder('category')
+                .where('category.categoryName % :query', { query: searchTerm })
+                .take(5)
+                .getMany();
+        }
+
+        return {
+            success: true,
+            statusCode: 200,
+            data: items,
+            suggestedCategories: suggestedCategories.length > 0 ? suggestedCategories : undefined,
+            meta: {
+                totalItems: total,
+                itemCount: items.length,
+                itemsPerPage: limit,
+                totalPages: Math.ceil(total / limit),
+                currentPage: page,
+            }
+        };
+    }
 }

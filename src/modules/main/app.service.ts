@@ -32,6 +32,8 @@ export class AppService {
       },
       logging: false,
       namingStrategy: new SnakeNamingStrategy(),
+      migrations: [__dirname + '/../../migrations/*{.ts,.js}'],
+      migrationsTableName: 'migrations',
       subscribers: [],
     };
 

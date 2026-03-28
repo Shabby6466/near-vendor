@@ -27,6 +27,19 @@ export class Item extends BaseEntity {
     @Column({ type: 'integer', default: 0 })
     stockCount: number;
 
+    @Column({
+        type: "text",
+        nullable: true,
+        select: false,
+        insert: false,
+        update: false,
+        transformer: {
+            to: (value: number[]) => (value && Array.isArray(value)) ? `[${value.join(",")}]` : value,
+            from: (value: string) => (typeof value === "string") ? value.replace(/[\[\]]/g, "").split(",").map(Number) : value
+        }
+    })
+    embedding?: number[];
+
     @ManyToOne(() => Shops, (shop) => shop.items, { onDelete: 'CASCADE' })
     shop: Shops;
 
