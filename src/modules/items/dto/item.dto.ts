@@ -164,6 +164,9 @@ export class ItemResponseDto {
     @ApiProperty({ example: true })
     isAvailable: boolean;
 
+    @ApiProperty({ example: 'shop-uuid' })
+    shopId: string;
+
     static fromEntity(item: Item): ItemResponseDto {
         const dto = new ItemResponseDto();
         dto.id = item.id;
@@ -173,6 +176,7 @@ export class ItemResponseDto {
         dto.unit = item.unit;
         dto.stockCount = item.stockCount;
         dto.imageUrl = item.imageUrl;
+        dto.shopId = item.shop.id;
         dto.isAvailable = item.isAvailable;
         return dto;
     }

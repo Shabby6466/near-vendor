@@ -1,4 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, Req, Res, UseGuards } from "@nestjs/common";
+import { OptionalAuthGuard } from "@modules/auth/auth-utils/optional-guard";
+import { CurrentUser } from "@modules/common/decorator/current-user.decorator";
+import { User } from "models/entities/users.entity";
 import { ItemService } from "./items.service";
 import { ApiBearerAuth, ApiCookieAuth, ApiOperation, ApiParam, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { CreateItemDto, SearchNearbyDto, UpdateItemDto } from "./dto/item.dto";
@@ -75,22 +78,24 @@ export class ItemController {
     }
 
     @Get('search-nearby')
+    @UseGuards(OptionalAuthGuard)
     @ApiOperation({
         summary: 'Search nearby items',
         description: 'Searches for items near a given location (Public API)',
     })
-    async searchNearby(@Query() dto: SearchNearbyDto) {
-        return await this.service.searchNearby(dto.query, dto.lat, dto.lon, dto.radius, dto.page, dto.limit);
+    async searchNearby(@Query() dto: SearchNearbyDto, @CurrentUser() user?: User) {
+        return await this.service.searchNearby(dto.query, dto.lat, dto.lon, dto.radius, dto.page, dto.limit, user?.id);
     }
 
     @Get(':id')
+    @UseGuards(OptionalAuthGuard)
     @ApiOperation({
         summary: 'Get item by id',
         description: 'Gets an item by its id',
     })
     @ApiParam({ name: "id", description: "The UUID of the item", example: "8181903d-b6cb-43ee-889f-b3b2999601ef" })
-    async getItemById(@Param('id') id: string) {
-        return await this.service.getItemById(id);
+    async getItemById(@Param('id') id: string, @CurrentUser() user?: User) {
+        return await this.service.getItemById(id, user?.id);
     }
 
 }

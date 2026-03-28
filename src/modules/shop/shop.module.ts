@@ -5,9 +5,10 @@ import { ShopController } from "./shop.controller";
 import { ShopService } from "./shop.service";
 import { VendorModule } from "../vendor/vendor.module";
 import { AuthModule } from "../auth/auth.module";
+import { AnalyticsModule } from "@modules/analytics/analytics.module";
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Shops]), VendorModule, AuthModule],
+    imports: [TypeOrmModule.forFeature([Shops]), VendorModule, AuthModule, AnalyticsModule],
     controllers: [ShopController],
     providers: [ShopService],
     exports: [ShopService],

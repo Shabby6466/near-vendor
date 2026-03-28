@@ -27,6 +27,8 @@ import { AuthModule } from "@modules/auth/auth.module";
 import { VendorModule } from "@modules/vendor/vendor.module";
 import { ShopModule } from "@modules/shop/shop.module";
 import { CategoriesModule } from "@modules/categories/categories.module";
+import { ExploreModule } from "@modules/explore/explore.module";
+import { AnalyticsModule } from "@modules/analytics/analytics.module";
 
 export const adminModulesImports: ModuleMetadata["imports"] = [
 ];
@@ -77,6 +79,8 @@ export const imports: ModuleMetadata["imports"] = [
   ItemModule,
   SearchModule,
   CategoriesModule,
+  ExploreModule,
+  AnalyticsModule,
 ];
 
 @Module({

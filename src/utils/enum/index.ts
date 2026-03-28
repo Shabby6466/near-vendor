@@ -25,7 +25,8 @@ export enum ResponseMessage {
   INVALID_COORDINATES = "Invalid coordinates",
   INVALID_OTP = "Invalid OTP",
   ITEM_NOT_FOUND = "Item not found",
-  ITEM_ALREADY_EXISTS = 'Item already exists'
+  ITEM_ALREADY_EXISTS = 'Item already exists',
+  NO_NEARBY_SHOPS = 'No nearby shops found'
 }
 
 export enum ResponseCode {

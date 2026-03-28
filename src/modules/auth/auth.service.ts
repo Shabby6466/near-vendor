@@ -40,7 +40,6 @@ export class AuthService {
     async createUser(dto: CreateUserDto) {
         console.log(dto);
 
-        // Check if user already exists
         const existingUser = await this.userService.findUserByEmail(dto.email);
         if (existingUser) {
             throw new PhoneNumberAlreadyExistsException();
@@ -91,6 +90,9 @@ export class AuthService {
         // Clear OTP and cached data
         await this.otpService.clearOtp(email);
 
+        user.lastLoginAt = new Date();
+        await this.userService.saveUser(user);
+
         const tokenData = await this.createToken(user);
         delete user.password;
         return {
@@ -113,6 +115,10 @@ export class AuthService {
         if (!isPasswordMatched) {
             throw new InvalidCredentialsException();
         }
+        
+        user.lastLoginAt = new Date();
+        await this.userService.saveUser(user);
+
         const tokenData = await this.createToken(user);
         delete user.password;
         return {

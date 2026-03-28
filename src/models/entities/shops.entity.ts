@@ -52,6 +52,9 @@ export class Shops extends BaseEntity {
 
     @Column({ type: 'jsonb', nullable: true })
     operatingHours: any;
+  
+    @Column({ type: 'timestamptz', nullable: true })
+    lastInventoryUpdate: Date;
 
     @ManyToOne(() => Vendors, (vendor) => vendor.shops)
     vendorProfile: Vendors;

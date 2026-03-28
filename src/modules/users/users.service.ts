@@ -5,6 +5,7 @@ import * as bcrypt from "bcryptjs";
 import { UserNotFoundException } from "./users.exception";
 import { InvalidCredentialsException } from "@modules/auth/auth-utils/auth.exception";
 import { UpdateUserDto } from "./dto/update-user.dto";
+import { UpdateLocationDto } from "./dto/update-location.dto";
 
 
 import { Injectable } from "@nestjs/common";
@@ -91,5 +92,16 @@ export class UserService {
         await this.userRepo.softDelete(u.id);
 
         return { success: true, message: "Account deleted successfully" };
+    }
+
+    async updateLocation(userId: string, dto: UpdateLocationDto) {
+        const user = await this.getUser(userId);
+        if (!user) throw new UserNotFoundException();
+
+        user.lastKnownLatitude = dto.latitude;
+        user.lastKnownLongitude = dto.longitude;
+
+        await this.userRepo.save(user);
+        return { success: true, message: "Location updated successfully" };
     }
 }

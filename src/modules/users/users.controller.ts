@@ -4,6 +4,7 @@ import { CreateUserDto, LoginDto, VerifyOtpDto } from "./dto/users.dto";
 import { ChangePasswordDto } from "./dto/change-password.dto";
 import { DeleteAccountDto } from "./dto/delete-account.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
+import { UpdateLocationDto } from "./dto/update-location.dto";
 import { JwtAuthGuard } from "@modules/auth/auth-utils/jwt-guard";
 import {
     ApiBearerAuth,
@@ -49,5 +50,13 @@ export class UsersController {
     @ApiOkResponse({ description: "User found successfully" })
     async getMe(@Req() req: any) {
         return await this.service.getUser(req.user.id);
+    }
+
+    @Patch("location")
+    @UseGuards(JwtAuthGuard)
+    @ApiOperation({ summary: "Update user's location" })
+    @ApiOkResponse({ description: "Location updated successfully" })
+    async updateLocation(@Body() dto: UpdateLocationDto, @Req() req: any) {
+        return await this.service.updateLocation(req.user.id, dto);
     }
 }

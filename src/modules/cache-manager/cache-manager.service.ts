@@ -136,4 +136,55 @@ export class CacheManagerService {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return await this.del(`${PREFIXES.OTP}${email}`);
   }
+
+  // --- Redis Native Operations for Analytics ---
+
+  private getRedisClient() {
+    return (this.cacheManager.store as any).getClient();
+  }
+
+  async exists(key: string): Promise<number> {
+    const client = this.getRedisClient();
+    return await client.exists(key);
+  }
+
+  async rPush(key: string, value: string): Promise<number> {
+    const client = this.getRedisClient();
+    return await client.rpush(key, value);
+  }
+
+  async rename(oldKey: string, newKey: string): Promise<string> {
+    const client = this.getRedisClient();
+    return await client.rename(oldKey, newKey);
+  }
+
+  async lRange(key: string, start: number, stop: number): Promise<string[]> {
+    const client = this.getRedisClient();
+    return await client.lrange(key, start, stop);
+  }
+
+  async lLen(key: string): Promise<number> {
+    const client = this.getRedisClient();
+    return await client.llen(key);
+  }
+
+  async sAdd(key: string, value: string): Promise<number> {
+    const client = this.getRedisClient();
+    return await client.sadd(key, value);
+  }
+
+  async sIsMember(key: string, value: string): Promise<number> {
+    const client = this.getRedisClient();
+    return await client.sismember(key, value);
+  }
+
+  async expire(key: string, seconds: number): Promise<number> {
+    const client = this.getRedisClient();
+    return await client.expire(key, seconds);
+  }
+
+  async redisDel(key: string): Promise<number> {
+    const client = this.getRedisClient();
+    return await client.del(key);
+  }
 }

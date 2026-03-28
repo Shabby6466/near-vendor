@@ -40,5 +40,20 @@ export class ShopController {
         return await this.shopService.findByVendor(req.user.id,);
     }
 
+    @Get('completion-status/:id')
+    @ApiOperation({ summary: 'Get shop completion checklist' })
+    @ApiResponse({ status: 200, description: 'Shop completion status retrieved successfully' })
+    async getCompletionStatus(@Param('id') id: string, @Req() req: any) {
+        return await this.shopService.getShopCompletionStatus(req.user.id, id);
+    }
+
+    @Get(':id')
+    @ApiOperation({ summary: 'Get shop by ID' })
+    @ApiResponse({ status: 200, description: 'Shop found successfully' })
+    @UseGuards(JwtAuthGuard)
+    async getShopById(@Param('id') id: string) {
+        return await this.shopService.getShopById(id);
+    }
+
 
 }

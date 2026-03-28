@@ -138,3 +138,41 @@ export class DeleteShopDto {
     @IsString()
     shopId: string;
 }
+
+export class ShopResponseDto {
+    @ApiProperty({ example: '8181903d-b6cb-43ee-889f-b3b2999601ef' })
+    id: string;
+
+    @ApiProperty({ example: 'Store Name' })
+    shopName: string;
+
+    @ApiProperty({ example: 'https://example.com/cover.jpg' })
+    shopImageUrl: string;
+
+    @ApiProperty({ example: 'https://example.com/logo.jpg' })
+    shopLogoUrl: string;
+
+    @ApiProperty({ example: '123 Main St' })
+    shopAddress: string;
+
+    @ApiProperty({ example: '+923123456789' })
+    whatsappNumber: string;
+
+    @ApiProperty({ example: 85 })
+    completionPercentage: number;
+
+    @ApiProperty({ example: true })
+    isVerifiedBadge: boolean;
+
+    @ApiProperty({ example: true })
+    isRecentlyActive: boolean;
+
+    @ApiProperty({ example: 15 })
+    itemCount: number;
+
+    @ApiProperty({ example: true })
+    isActive: boolean;
+
+    @ApiProperty({ example: 1.5, description: 'Distance in kilometers' })
+    distance?: number;
+}
