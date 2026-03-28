@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Patch, Post, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UseGuards } from "@nestjs/common";
 import { ApiTags, ApiBearerAuth, ApiResponse, ApiOperation } from "@nestjs/swagger";
 import { ShopService } from "./shop.service";
 import { JwtAuthGuard } from "../auth/auth-utils/jwt-guard";
@@ -19,11 +19,11 @@ export class ShopController {
         return await this.shopService.createShop(req.user.id, shopDto);
     }
 
-    @Patch('update')
+    @Patch('update/:id')
     @ApiOperation({ summary: 'Update shop profile' })
     @ApiResponse({ status: 200, description: 'Shop profile updated successfully' })
-    async updateShop(@Req() req: any, @Body() shopDto: UpdateShopDto) {
-        return await this.shopService.updateShop(req.user.id, req.user.shopId, shopDto);
+    async updateShop(@Param('id') id: string, @Req() req: any, @Body() shopDto: UpdateShopDto) {
+        return await this.shopService.updateShop(req.user.id, id, shopDto);
     }
 
     @Delete('delete')

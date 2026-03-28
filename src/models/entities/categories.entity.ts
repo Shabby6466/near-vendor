@@ -6,10 +6,10 @@ import { Item } from "./items.entity";
 
 @Entity({ name: "categories" })
 export class Category extends BaseEntity {
-    @Column({ type: 'varchar', length: 50 })
+    @Column({ type: 'varchar', length: 150 })
     categoryName: string;
 
-    @Column({ type: 'varchar', length: 100 })
+    @Column({ type: 'varchar', nullable: true })
     iconUrl: string;
 
     @OneToOne(() => Item, (item) => item.category)

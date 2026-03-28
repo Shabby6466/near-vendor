@@ -5,6 +5,7 @@ import { LoggerService } from "@utils/logger/logger.service";
 import { User } from "models/entities/users.entity";
 import { UserRoles } from "@utils/enum";
 import * as bcrypt from "bcryptjs";
+import { Category } from "models/entities/categories.entity";
 
 @Injectable()
 export class SeedService {
@@ -19,6 +20,7 @@ export class SeedService {
 
   async seedData() {
     await this.createSuperAdmin();
+    await this.seedCategories();
   }
 
   private async createSuperAdmin() {
@@ -50,5 +52,34 @@ export class SeedService {
 
     await userRepo.save(admin);
     Logger.log(`✅ Super admin created: ${adminEmail}`);
+  }
+
+  private async seedCategories() {
+    const categories = [
+      "Electronics",
+      "Fashion & Apparel items",
+      "Pharmacy items",
+      "Home & Living",
+      "Flowers & Bouquets",
+      "Home Maintainance",
+      "Automotive items",
+    ];
+
+    const categoryRepo = this.dataSource.getRepository(Category);
+
+    // Clean up categories with null names that caused sync issues
+    await categoryRepo.createQueryBuilder()
+      .delete()
+      .where("categoryName IS NULL")
+      .execute();
+
+    for (const name of categories) {
+      const existing = await categoryRepo.findOne({ where: { categoryName: name } });
+      if (!existing) {
+        const category = categoryRepo.create({ categoryName: name });
+        await categoryRepo.save(category);
+        Logger.log(`✅ Category created: ${name}`);
+      }
+    }
   }
 }

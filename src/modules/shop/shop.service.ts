@@ -40,7 +40,7 @@ export class ShopService {
         }
     }
 
-    async updateShop(vendorUserId: string, shopId: string, updateData: UpdateShopDto): Promise<Shops> {
+    async updateShop(vendorUserId: string, shopId: string, updateData: UpdateShopDto) {
         const vendor = await this.vendorService.findByUserId(vendorUserId);
         if (!vendor) {
             throw new VendorNotFoundException();
@@ -60,17 +60,31 @@ export class ShopService {
         }
 
         Object.assign(shop, updateData);
-        return this.repository.save(shop);
+        await this.repository.save(shop);
+        return {
+            success: true,
+            statusCode: ResponseCode.SUCCESS,
+            message: 'Shop updated successfully',
+        }
     }
 
-    async deleteShop(vendorUserId: string, shopId: string): Promise<void> {
-        const result = await this.repository.softDelete({
-            id: shopId,
-            vendorProfile: { user: { id: vendorUserId } }
+    async deleteShop(vendorUserId: string, shopId: string) {
+        const shop = await this.repository.findOne({
+            where: {
+                id: shopId,
+                vendorProfile: { user: { id: vendorUserId } }
+            }
         });
 
-        if (result.affected === 0) {
-            throw new ShopNotFoundException()
+        if (!shop) {
+            throw new ShopNotFoundException();
+        }
+
+        await this.repository.softDelete(shop.id);
+        return {
+            success: true,
+            statusCode: ResponseCode.SUCCESS,
+            message: 'Shop deleted successfully',
         }
     }
 

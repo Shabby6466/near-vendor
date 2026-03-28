@@ -1,4 +1,4 @@
-import { ApiProperty, PartialType } from "@nestjs/swagger";
+import { ApiProperty, PartialType, OmitType } from "@nestjs/swagger";
 import { IsNotEmpty, IsOptional, IsNumber, IsString, IsUrl, IsNotEmptyObject, IsObject, IsBoolean } from "class-validator";
 
 
@@ -119,7 +119,7 @@ export class CreateShopDto {
 //     whatsappNumber?: string;
 // }
 
-export class UpdateShopDto extends PartialType(CreateShopDto) {
+export class UpdateShopDto extends PartialType(OmitType(CreateShopDto, ['vendorId'] as const)) {
     @ApiProperty({
         example: true,
         required: false,

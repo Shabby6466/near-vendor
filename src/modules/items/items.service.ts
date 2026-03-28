@@ -2,10 +2,12 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { ILike, Repository } from "typeorm";
 import { Item } from "models/entities/items.entity";
-import { CreateItemDto } from "./dto/item.dto";
+import { CreateItemDto, ItemByIdResponseDto, ItemResponseDto, UpdateItemDto } from "./dto/item.dto";
 import { ShopService } from "@modules/shop/shop.service";
 import { ShopNotFoundException } from "@modules/shop/shop.exception";
 import { ItemNotFoundException } from "./item.exception";
+import { paginate, IPaginationOptions, Pagination } from "nestjs-typeorm-paginate";
+import { ResponseCode } from "@utils/enum";
 
 
 @Injectable()
@@ -34,10 +36,15 @@ export class ItemService {
             shop,
         });
 
-        return await this.itemRepo.save(newItem);
+        await this.itemRepo.save(newItem);
+        return {
+            success: true,
+            statusCode: ResponseCode.SUCCESS,
+            message: 'Item created successfully',
+        }
     }
 
-    async updateItem(id: string, updateDto: CreateItemDto, vendorId: string) {
+    async updateItem(id: string, updateDto: UpdateItemDto, vendorId: string) {
         const item = await this.itemRepo.findOne({
             where: {
                 id,
@@ -48,7 +55,10 @@ export class ItemService {
         if (!item) throw new ItemNotFoundException();
 
         Object.assign(item, updateDto);
-        return await this.itemRepo.save(item);
+        return {
+            success: true,
+            statusCode: ResponseCode.SUCCESS,
+        };
     }
 
     async deleteItem(id: string, vendorId: string) {
@@ -61,24 +71,30 @@ export class ItemService {
 
         if (!item) throw new ItemNotFoundException();
 
-        return await this.itemRepo.softRemove(item);
+        await this.itemRepo.softRemove(item);
+        return {
+            success: true,
+            statusCode: ResponseCode.SUCCESS,
+            message: 'Item deleted successfully',
+        };
     }
 
-    async getAllByShopId(vendorId: string, shopId: string) {
-        const items = await this.itemRepo.find({
-            where: {
-                shop: {
-                    id: shopId,
-                    vendorProfile: { user: { id: vendorId } }
-                }
-            }
-        });
+    async getAllItemsByShopId(shopId: string, options: IPaginationOptions): Promise<any> {
+        const queryBuilder = this.itemRepo.createQueryBuilder('item')
+            .leftJoinAndSelect('item.shop', 'shop')
+            .where('shop.id = :shopId', { shopId });
 
-        if (items.length === 0) {
-            await this.shopService.findByVendorAndId(shopId, vendorId);
-        }
+        const paginatedItems = await paginate<Item>(queryBuilder, options);
 
-        return items;
+        return {
+            success: true,
+            statusCode: ResponseCode.SUCCESS,
+            data: new Pagination<ItemResponseDto>(
+                paginatedItems.items.map((item) => ItemResponseDto.fromEntity(item)),
+                paginatedItems.meta,
+                paginatedItems.links,
+            ),
+        };
     }
 
     async searchVendorInventory(vendorId: string, shopId: string, searchTerm: string) {
@@ -96,6 +112,7 @@ export class ItemService {
     async searchNearby(query: string, lat: number, lon: number, radius: number = 5000, page: number = 1, limit: number = 10) {
         const queryBuilder = this.itemRepo.createQueryBuilder('item')
             .innerJoinAndSelect('item.shop', 'shop')
+            .addSelect('ST_Distance(shop.location, ST_SetSRID(ST_Point(:lon, :lat), 4326)::geography)', 'distance')
             .where('ST_DWithin(shop.location, ST_SetSRID(ST_Point(:lon, :lat), 4326)::geography, :radius)')
             .andWhere('(item.name ILIKE :query OR item.description ILIKE :query)')
             .andWhere('shop.isActive = :shopActive', { shopActive: true })
@@ -106,11 +123,29 @@ export class ItemService {
                 radius,
                 query: `%${query}%`,
             })
-            .orderBy('ST_Distance(shop.location, ST_SetSRID(ST_Point(:lon, :lat), 4326)::geography)', 'ASC')
+            .orderBy('distance', 'ASC')
             .take(limit)
             .skip((page - 1) * limit);
 
-        return await queryBuilder.getMany();
+        const items = await queryBuilder.getMany();
+        return {
+            success: true,
+            statusCode: ResponseCode.SUCCESS,
+            data: items,
+        };
+    }
+
+    async getItemById(id: string) {
+        const item = await this.itemRepo.findOne({
+            where: { id },
+            relations: ['shop']
+        });
+        if (!item) throw new ItemNotFoundException();
+        return {
+            success: true,
+            statusCode: ResponseCode.SUCCESS,
+            data: ItemByIdResponseDto.fromEntity(item),
+        };
     }
 
 }

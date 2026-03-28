@@ -26,6 +26,7 @@ import { ThrottlerModule } from "@nestjs/throttler";
 import { AuthModule } from "@modules/auth/auth.module";
 import { VendorModule } from "@modules/vendor/vendor.module";
 import { ShopModule } from "@modules/shop/shop.module";
+import { CategoriesModule } from "@modules/categories/categories.module";
 
 export const adminModulesImports: ModuleMetadata["imports"] = [
 ];
@@ -75,6 +76,7 @@ export const imports: ModuleMetadata["imports"] = [
   ShopModule,
   ItemModule,
   SearchModule,
+  CategoriesModule,
 ];
 
 @Module({
