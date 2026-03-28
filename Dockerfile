@@ -27,7 +27,7 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/worker.js ./worker.js
 COPY --from=builder /app/package.json ./package.json
 
-EXPOSE 3837
+EXPOSE 3836
 
 # Run via worker.js which requires dist/main.js
 CMD ["node", "worker.js"]
