@@ -4,6 +4,7 @@ import { Shops } from "./shops.entity";
 import { IsNotEmpty } from "class-validator";
 import { UserRoles } from "@utils/enum";
 import { Vendors } from "./vendors.entity";
+import { Wishlist } from "./wishlist.entity";
 
 @Entity({ name: "users" })
 export class User extends BaseEntity {
@@ -49,4 +50,7 @@ export class User extends BaseEntity {
 
     @OneToOne(() => Vendors, (vendor) => vendor.user)
     vendorProfile: Vendors;
+
+    @OneToMany(() => Wishlist, (wishlist) => wishlist.user)
+    wishlists: Wishlist[];
 }

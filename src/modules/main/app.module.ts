@@ -31,6 +31,7 @@ import { ExploreModule } from "@modules/explore/explore.module";
 import { AnalyticsModule } from "@modules/analytics/analytics.module";
 import { AIModule } from "@modules/ai/ai.module";
 import { AdminModule } from "@modules/admin/admin.module";
+import { WishlistModule } from "@modules/wishlist/wishlist.module";
 
 export const adminModulesImports: ModuleMetadata["imports"] = [
   AdminModule,
@@ -85,6 +86,7 @@ export const imports: ModuleMetadata["imports"] = [
   ExploreModule,
   AnalyticsModule,
   AIModule,
+  WishlistModule,
 ];
 
 @Module({

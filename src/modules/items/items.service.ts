@@ -317,7 +317,7 @@ export class ItemService {
 
         if (searchTerm && searchTerm.trim()) {
             if (queryVector) {
-                qb.andWhere(`(similarity(item.name::text, :query) > 0.3 OR (1 - (item.embedding <=> :queryVector::vector)) > 0.3)`);
+                qb.andWhere(`(similarity(item.name::text, :query) > 0.3 OR (1 - (item.embedding::vector <=> :queryVector::vector)) > 0.3)`);
             } else {
                 qb.andWhere(`similarity(item.name::text, :query) > 0.3`);
             }
