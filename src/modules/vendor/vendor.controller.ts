@@ -41,26 +41,6 @@ export class VendorController {
         return await this.vendorService.getMeVendorStatus(req.user.id);
     }
 
-    @Patch('approve/:vendorId')
-    @Roles(UserRoles.SUPERADMIN)
-    @UseGuards(RolesGuard)
-    @ApiOperation({ summary: 'Approve a vendor (SUPERADMIN only)' })
-    @ApiParam({ name: 'vendorId', description: 'The vendor profile UUID' })
-    @ApiResponse({ status: 200, description: 'Vendor approved successfully' })
-    @ApiResponse({ status: 404, description: 'Vendor not found' })
-    async approveVendor(@Param('vendorId') vendorId: string) {
-        return await this.vendorService.approveVendor(vendorId);
-    }
-
-    @Get('pending')
-    @Roles(UserRoles.SUPERADMIN)
-    @UseGuards(RolesGuard)
-    @ApiOperation({ summary: 'Get all pending vendor profiles (SUPERADMIN only)' })
-    @ApiResponse({ status: 200, description: 'Pending vendor profiles fetched successfully' })
-    async getPendingVendors() {
-        return await this.vendorService.getPendingVendors();
-    }
-
     @Get('me/profile')
     @ApiOperation({ summary: 'Get vendor me profile' })
     @ApiResponse({ status: 200, description: 'Vendor me profile fetched successfully' })

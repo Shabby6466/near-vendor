@@ -25,15 +25,7 @@ export class AuthController {
     return await this.authService.verifyAndCreateUser(dto.email, dto.otp);
   }
 
-  @Post("admin/login")
-  @ApiOperation({ summary: "Admin login (SUPERADMIN only)" })
-  async adminLogin(@Body() dto: LoginDto) {
-    const res: any = await this.authService.login(dto);
-    if (res?.user?.role !== UserRoles.SUPERADMIN) {
-      throw new InvalidPortalRoleException();
-    }
-    return res;
-  }
+
 
   @Post("/login")
   @ApiOperation({ summary: "Login" })

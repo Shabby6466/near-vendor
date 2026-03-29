@@ -104,4 +104,15 @@ export class UserService {
         await this.userRepo.save(user);
         return { success: true, message: "Location updated successfully" };
     }
+
+    async findAllUsers(page: number = 1, limit: number = 20) {
+        const skip = (page - 1) * limit;
+        const [users, total] = await this.userRepo.findAndCount({
+            relations: ['vendorProfile'],
+            skip,
+            take: limit,
+            order: { createdAt: 'DESC' } as any
+        });
+        return { users, total };
+    }
 }

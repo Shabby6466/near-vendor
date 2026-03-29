@@ -1,159 +1,98 @@
-import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository, DeepPartial } from "typeorm";
-import { VendorApplication, VendorApplicationStatus } from "models/entities/vendor-applications.entity";
-import { User } from "models/entities/users.entity";
-import { Shops } from "models/entities/shops.entity";
+import { Repository } from "typeorm";
+import { VendorApplication } from "models/entities/vendor-applications.entity";
+import { UserService } from "@modules/users/users.service";
+import { VendorService } from "@modules/vendor/vendor.service";
+import { AuthService } from "@modules/auth/auth.service";
 import { UserRoles } from "@utils/enum";
-import * as bcrypt from "bcryptjs";
-import { InventoryItem } from "models/entities/inventory-item.entity";
-
-function generatePassword(length = 10) {
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%";
-  let out = "";
-  for (let i = 0; i < length; i++) out += chars[Math.floor(Math.random() * chars.length)];
-  return out;
-}
 
 @Injectable()
 export class AdminService {
   constructor(
     @InjectRepository(VendorApplication) private readonly apps: Repository<VendorApplication>,
-    @InjectRepository(User) private readonly users: Repository<User>,
-    @InjectRepository(Shops) private readonly shops: Repository<Shops>,
-    @InjectRepository(InventoryItem) private readonly inventory: Repository<InventoryItem>,
+    private readonly userService: UserService,
+    private readonly vendorService: VendorService,
+    private readonly authService: AuthService,
   ) { }
 
   async listVendorApps(status?: string) {
     const where: any = {};
     if (status) where.status = status;
     const data = await this.apps.find({ where, order: { createdAt: "DESC" } as any });
-    return { success: true, data };
+    return { success: true, statusCode: 200, data };
   }
 
   async getVendorApp(id: string) {
     const app = await this.apps.findOne({ where: { id } });
     if (!app) throw new NotFoundException("Application not found");
-    return { success: true, data: app };
+    return { success: true, statusCode: 200, data: app };
   }
 
-  async approveVendorApp(id: string, reviewer: User) {
-    const app = await this.apps.findOne({ where: { id } });
-    if (!app) throw new NotFoundException("Application not found");
-    if (app.status !== VendorApplicationStatus.PENDING) {
-      throw new BadRequestException("Application is not pending");
-    }
-
-    // Create vendor user
-    const passwordPlain = generatePassword();
-    const passwordHash = await bcrypt.hash(passwordPlain, 10);
-
-    const existing = await this.users.findOne({ where: { email: app.email } });
-    let vendorUser: User;
-
-    if (existing) {
-      vendorUser = existing;
-      vendorUser.role = UserRoles.VENDOR;
-      vendorUser.password = passwordHash;
-      vendorUser.isActive = true;
-      vendorUser.fullName = app.fullName;
-    } else {
-      vendorUser = this.users.create({
-        fullName: app.fullName,
-        phoneNumber: app.phoneNumber,
-        password: passwordHash,
-        role: UserRoles.VENDOR,
-        isActive: true,
-        lastKnownLatitude: app.shopLatitude as any,
-        lastKnownLongitude: app.shopLongitude as any,
-      } as DeepPartial<User>);
-    }
-
-    vendorUser = await this.users.save(vendorUser);
-
-    // One shop per vendor (MVP)
-    const shop: Shops = this.shops.create({
-      shopName: app.shopName,
-      shopImageUrl: app.shopImageUrl || "",
-      shopLatitude: app.shopLatitude as any,
-      shopLongitude: app.shopLongitude as any,
-      shopAddress: app.shopAddress || "",
-      whatsappNumber: app.phoneNumber,
-      isActive: true,
-      user: vendorUser,
-      location: {
-        type: "Point",
-        coordinates: [Number(app.shopLongitude), Number(app.shopLatitude)],
-      } as any,
-    } as any as DeepPartial<Shops>);
-
-    await this.shops.save(shop);
-
-    app.status = VendorApplicationStatus.APPROVED;
-    app.reviewedBy = reviewer;
-    app.reviewedAt = new Date();
-    await this.apps.save(app);
-
-    // IMPORTANT: For now we return password to SUPERADMIN so you can send it via WhatsApp.
-    // In a later step we can integrate WhatsApp sending automatically.
+  async getAllUsers(page: number = 1, limit: number = 20) {
+    const { users, total } = await this.userService.findAllUsers(page, limit);
     return {
       success: true,
-      vendorUserId: vendorUser.id,
-      shopId: shop.id,
-      tempPassword: passwordPlain,
-      message: "Approved. Share tempPassword with vendor via WhatsApp. Vendor must change password after first login.",
+      statusCode: 200,
+      data: {
+        users,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit)
+        }
+      }
     };
   }
 
-  async rejectVendorApp(id: string, reason: string, reviewer: User) {
-    const app = await this.apps.findOne({ where: { id } });
-    if (!app) throw new NotFoundException("Application not found");
-    if (app.status !== VendorApplicationStatus.PENDING) {
-      throw new BadRequestException("Application is not pending");
+  async getAllVendors(status?: string, page: number = 1, limit: number = 20) {
+    const { vendors, total } = await this.vendorService.findAllVendors(status, page, limit);
+    return {
+      success: true,
+      statusCode: 200,
+      data: {
+        vendors,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit)
+        }
+      }
+    };
+  }
+
+  async getVendorById(id: string) {
+    const vendor = await this.vendorService.getVendorById(id);
+    if (!vendor) {
+      throw new NotFoundException("Vendor not found");
     }
 
-    app.status = VendorApplicationStatus.REJECTED;
-    app.rejectionReason = reason || "Rejected";
-    app.reviewedBy = reviewer;
-    app.reviewedAt = new Date();
-    await this.apps.save(app);
-
-    return { success: true };
+    return {
+      success: true,
+      statusCode: 200,
+      data: vendor
+    };
   }
 
-  // async resetVendorPasswordByPhone(email: string) {
-  //   const user = await this.users.findOne({ where: { email } });
-  //   if (!user) throw new NotFoundException("User not found");
-  //   if (user.role !== UserRoles.VENDOR) {
-  //     throw new BadRequestException("User is not a vendor");
-  //   }
-
-  //   const passwordPlain = generatePassword();
-  //   user.password = await bcrypt.hash(passwordPlain, 10);
-  //   user.isActive = true;
-  //   await this.users.save(user);
-
-  //   return {
-  //     success: true,
-  //     phoneNumber,
-  //     tempPassword: passwordPlain,
-  //     message: "Password reset. Share tempPassword with vendor via WhatsApp. Vendor must change password after first login.",
-  //   };
-  // }
-
-  async setShopActive(shopId: string, active: boolean) {
-    const shop = await this.shops.findOne({ where: { id: shopId } });
-    if (!shop) throw new NotFoundException("Shop not found");
-    (shop as any).isActive = active;
-    await this.shops.save(shop);
-    return { success: true };
+  async getPendingVendors() {
+    const result = await this.vendorService.getPendingVendors();
+    return { success: true, statusCode: 200, data: (result as any).data || result };
   }
 
-  async setInventoryItemActive(itemId: string, active: boolean) {
-    const item = await this.inventory.findOne({ where: { id: itemId } });
-    if (!item) throw new NotFoundException("Inventory item not found");
-    (item as any).isActive = active;
-    await this.inventory.save(item);
-    return { success: true };
+  async approveVendor(vendorId: string) {
+    const result = await this.vendorService.approveVendor(vendorId);
+    return { success: true, statusCode: 200, data: (result as any).data || null };
+  }
+
+  async adminLogin(dto: any) {
+    const res: any = await this.authService.login(dto);
+    if (res?.user?.role !== UserRoles.SUPERADMIN) {
+      throw new BadRequestException("Invalid portal role");
+    }
+    return { success: true, statusCode: 200, data: res };
   }
 }
+
+

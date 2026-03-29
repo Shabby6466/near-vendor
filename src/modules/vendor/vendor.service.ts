@@ -252,4 +252,26 @@ export class VendorService {
             }
         };
     }
+
+    async findAllVendors(status?: string, page: number = 1, limit: number = 20) {
+        const skip = (page - 1) * limit;
+        const where: any = {};
+        if (status) where.status = status;
+        
+        const [vendors, total] = await this.vendorRepository.findAndCount({
+            where,
+            relations: ['user'],
+            skip,
+            take: limit,
+            order: { createdAt: 'DESC' } as any
+        });
+        return { vendors, total };
+    }
+
+    async getVendorById(id: string) {
+        return await this.vendorRepository.findOne({ 
+            where: { id },
+            relations: ['user', 'shops']
+        });
+    }
 }
