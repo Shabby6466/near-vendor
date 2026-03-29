@@ -1,7 +1,7 @@
 import { Injectable, Logger, ConflictException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Wishlist, WishlistStatus } from 'models/entities/wishlist.entity';
+import { Wishlist, WishlistStatus } from '../../models/entities/wishlist.entity';
 import { CreateWishlistDto } from './dto/wishlist.dto';
 import { ResponseCode } from '@utils/enum';
 

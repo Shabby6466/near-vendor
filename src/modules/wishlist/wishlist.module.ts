@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Wishlist } from 'models/entities/wishlist.entity';
+import { Wishlist } from '../../models/entities/wishlist.entity';
 import { WishlistService } from './wishlist.service';
 import { WishlistController } from './wishlist.controller';
 import { AuthModule } from '@modules/auth/auth.module';
