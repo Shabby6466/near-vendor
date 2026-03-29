@@ -24,6 +24,10 @@ export class ExploreService {
         return await this.itemService.searchHybrid(query, lat, lon, radius, page, limit, userId);
     }
 
+    async searchVisual(file: Express.Multer.File, lat: number, lon: number, radius: number = 5000, page: number = 1, limit: number = 10, userId?: string) {
+        return await this.itemService.searchVisual(file.buffer, lat, lon, radius, page, limit, userId);
+    }
+
     async getRecentItems(userId: string) {
         const recent = await this.historyService.getRecentItems(userId);
 

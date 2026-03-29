@@ -12,6 +12,7 @@ import { Vendors } from "models/entities/vendors.entity";
 import { VendorModule } from "@modules/vendor/vendor.module";
 import { AuthModule } from "@modules/auth/auth.module";
 import { UsersModule } from "@modules/users/users.module";
+import { ItemModule } from "@modules/items/item.module";
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { UsersModule } from "@modules/users/users.module";
     VendorModule,
     AuthModule,
     UsersModule,
+    ItemModule,
   ],
   providers: [AdminService],
   controllers: [AdminSyncController, AdminController],

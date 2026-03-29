@@ -18,14 +18,38 @@ export class Item extends BaseEntity {
     @Column({ type: 'varchar', length: 50, nullable: true })
     unit: string;
 
-    @Column({ type: 'text', nullable: true })
-    imageUrl: string;
+    @Column("text", { array: true, default: '{}' })
+    imageUrls: string[];
 
     @Column({ type: 'boolean', default: true })
     isAvailable: boolean;
 
     @Column({ type: 'integer', default: 0 })
     stockCount: number;
+
+    @Column({
+        type: "text",
+        nullable: true,
+        select: false,
+        name: 'text_embedding',
+        transformer: {
+            to: (value: number[]) => (value && Array.isArray(value)) ? `[${value.join(",")}]` : value,
+            from: (value: string) => (typeof value === "string") ? value.replace(/[\[\]]/g, "").split(",").map(Number) : value
+        }
+    })
+    textEmbedding?: number[];
+
+    @Column({
+        type: "text",
+        nullable: true,
+        select: false,
+        name: 'image_embedding',
+        transformer: {
+            to: (value: number[]) => (value && Array.isArray(value)) ? `[${value.join(",")}]` : value,
+            from: (value: string) => (typeof value === "string") ? value.replace(/[\[\]]/g, "").split(",").map(Number) : value
+        }
+    })
+    imageEmbedding?: number[];
 
     @Column({
         type: "text",

@@ -161,7 +161,7 @@ export class VendorService {
                 id: true,
                 name: true,
                 price: true,
-                imageUrl: true,
+                imageUrls: true,
                 stockCount: true,
                 shop: {
                     id: true,
@@ -211,7 +211,7 @@ export class VendorService {
                         id: true,
                         name: true,
                         price: true,
-                        imageUrl: true,
+                        imageUrls: true,
                         stockCount: true,
                         shop: {
                             id: true,
@@ -232,7 +232,7 @@ export class VendorService {
                         id: true,
                         name: true,
                         price: true,
-                        imageUrl: true,
+                        imageUrls: true,
                         stockCount: true,
                         shop: {
                             id: true,

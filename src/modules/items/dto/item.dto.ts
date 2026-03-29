@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Type } from "class-transformer";
-import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString, IsUrl, Max, Min } from "class-validator";
+import { ArrayMaxSize, ArrayMinSize, IsArray, IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString, IsUrl, Max, Min } from "class-validator";
 import { Item } from "models/entities/items.entity";
 
 
@@ -30,10 +30,12 @@ export class CreateItemDto {
     @IsOptional()
     stockCount?: number;
 
-    @ApiProperty({ example: 'https://cdn.com/milk.jpg' })
-    @IsUrl()
-    @IsOptional()
-    imageUrl?: string;
+    @ApiProperty({ example: ['https://cdn.com/milk1.jpg', 'https://cdn.com/milk2.jpg'] })
+    @IsArray()
+    @ArrayMinSize(2)
+    @ArrayMaxSize(6)
+    @IsUrl({}, { each: true })
+    imageUrls: string[];
 
     @ApiProperty({ example: 10 })
     @IsNumber()
@@ -72,10 +74,13 @@ export class UpdateItemDto {
     @IsOptional()
     stockCount?: number;
 
-    @ApiProperty({ example: 'https://cdn.com/milk.jpg' })
-    @IsUrl()
+    @ApiProperty({ example: ['https://cdn.com/milk1.jpg', 'https://cdn.com/milk2.jpg'] })
+    @IsArray()
     @IsOptional()
-    imageUrl?: string;
+    @ArrayMinSize(2)
+    @ArrayMaxSize(6)
+    @IsUrl({}, { each: true })
+    imageUrls?: string[];
 
     @ApiProperty({ example: 10 })
     @IsNumber()
@@ -157,15 +162,21 @@ export class ItemResponseDto {
     @IsNumber()
     stockCount: number;
 
-    @ApiProperty({ example: 'https://cdn.com/milk.jpg' })
-    @IsUrl()
-    imageUrl: string;
+    @ApiProperty({ example: ['https://cdn.com/milk1.jpg', 'https://cdn.com/milk2.jpg'] })
+    @IsArray()
+    imageUrls: string[];
 
     @ApiProperty({ example: true })
     isAvailable: boolean;
 
     @ApiProperty({ example: 'shop-uuid' })
     shopId: string;
+
+    @ApiProperty({ example: 22.32 })
+    lat: number;
+
+    @ApiProperty({ example: 22.32434 })
+    long: number;
 
     static fromEntity(item: Item): ItemResponseDto {
         const dto = new ItemResponseDto();
@@ -175,9 +186,11 @@ export class ItemResponseDto {
         dto.price = Number(item.price);
         dto.unit = item.unit;
         dto.stockCount = item.stockCount;
-        dto.imageUrl = item.imageUrl;
+        dto.imageUrls = item.imageUrls;
         dto.shopId = item.shop.id;
         dto.isAvailable = item.isAvailable;
+        dto.lat = item.shop?.shopLatitude ? Number(item.shop.shopLatitude) : null;
+        dto.long = item.shop?.shopLongitude ? Number(item.shop.shopLongitude) : null;
         return dto;
     }
 
@@ -196,9 +209,9 @@ export class ItemByIdResponseDto {
     @IsString()
     description: string;
 
-    @ApiProperty({ example: 'https://cdn.com/milk.jpg' })
-    @IsUrl()
-    imageUrl: string;
+    @ApiProperty({ example: ['https://cdn.com/milk1.jpg', 'https://cdn.com/milk2.jpg'] })
+    @IsArray()
+    imageUrls: string[];
 
     @ApiProperty({ example: 'Shop Name' })
     @IsString()
@@ -229,7 +242,7 @@ export class ItemByIdResponseDto {
         dto.id = item.id;
         dto.name = item.name;
         dto.description = item.description;
-        dto.imageUrl = item.imageUrl;
+        dto.imageUrls = item.imageUrls;
         dto.shopName = item.shop.shopName;
         dto.shopId = item.shop.id;
         dto.price = Number(item.price);

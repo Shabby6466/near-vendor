@@ -3,12 +3,12 @@ import { ApiProperty } from "@nestjs/swagger";
 import { Type } from "class-transformer";
 
 export class NearbyShopsQueryDto {
-    @ApiProperty({ example: 24.860734 })
+    @ApiProperty({ example: 33.589833836348305 })
     @IsNumber()
     @Type(() => Number)
     lat: number;
 
-    @ApiProperty({ example: 67.001122 })
+    @ApiProperty({ example: 73.02213427537568 })
     @IsNumber()
     @Type(() => Number)
     lon: number;
@@ -50,3 +50,5 @@ export class SearchShopsQueryDto extends NearbyShopsQueryDto {
     @IsNotEmpty()
     query: string;
 }
+
+export class VisualSearchQueryDto extends NearbyShopsQueryDto { }

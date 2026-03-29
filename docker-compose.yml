@@ -64,6 +64,8 @@ services:
       - "3836:3836"
     networks:
       - nearvendor_network
+    volumes:
+      - nearvendor_models_data:/app/models
 
   nginx:
     image: nginx:1.27.0-alpine
@@ -92,6 +94,8 @@ volumes:
   nearvendor_db_data:
     driver: local
   nearvendor_redis_data:
+    driver: local
+  nearvendor_models_data:
     driver: local
 
 networks:
