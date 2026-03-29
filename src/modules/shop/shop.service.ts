@@ -57,6 +57,9 @@ export class ShopService {
             isRecentlyActive,
             itemCount,
             isActive: shop.isActive,
+            categoryId: shop.categoryId || shop.category?.id,
+            shopLongitude: shop.location?.coordinates[0],
+            shopLatitude: shop.location?.coordinates[1],
             distance: distance ? parseFloat((distance / 1000).toFixed(2)) : undefined
         };
     }
@@ -105,11 +108,12 @@ export class ShopService {
             vendorProfile: vendor,
             location: {
                 type: 'Point',
-                coordinates: [shopData.shopLongitude, shopData.shopLatitude],
-            },
+                coordinates: [shopData.shopLongitude, shopData.shopLatitude]
+            }
         });
         await this.repository.save(shop);
         return {
+            success: true,
             message: 'Shop created successfully',
             statusCode: ResponseCode.SUCCESS,
         }
@@ -241,21 +245,99 @@ export class ShopService {
         };
     }
 
-    async findNearby(lat: number, lon: number, radius?: number, page: number = 1, limit: number = 10) {
-        const queryBuilder = this.repository.createQueryBuilder('shop')
+    async findNearby(
+        lat: number,
+        lon: number,
+        radius?: number,
+        page: number = 1,
+        limit: number = 10,
+        categoryId?: string,
+    ) {
+        const qb = this.repository
+            .createQueryBuilder('shop')
             .leftJoinAndSelect('shop.items', 'items')
+            .leftJoinAndSelect('items.category', 'itemCategory')
+            .leftJoinAndSelect('shop.category', 'shopCategory')
             .leftJoinAndSelect('shop.vendorProfile', 'vendorProfile')
-            .addSelect('ST_Distance(shop.location, ST_SetSRID(ST_Point(:lon, :lat), 4326)::geography)', 'distance')
-            .andWhere('shop.isActive = :isActive', { isActive: true })
-            .setParameters({ lat, lon, radius });
+            .where('shop.is_active = :isActive', { isActive: true })
+            .setParameters({ lat, lon });
 
         if (radius) {
-            queryBuilder.andWhere('ST_DWithin(shop.location, ST_SetSRID(ST_Point(:lon, :lat), 4326)::geography, :radius)');
+            qb.andWhere(
+                'ST_DWithin(shop.location, ST_SetSRID(ST_MakePoint(:lon, :lat), 4326)::geography, :radius)',
+                { radius },
+            );
         }
 
-        queryBuilder
+        const isUuid =
+            categoryId &&
+            /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(
+                categoryId,
+            );
+
+        if (isUuid) {
+            qb.andWhere('shop.category_id = :categoryId', { categoryId });
+        }
+
+        qb.addSelect(
+            'ST_Distance(shop.location, ST_SetSRID(ST_MakePoint(:lon, :lat), 4326)::geography)',
+            'distance',
+        )
             .orderBy('vendorProfile.isVerified', 'DESC')
             .addOrderBy('shop.lastInventoryUpdate', 'DESC', 'NULLS LAST')
+            .addOrderBy('distance', 'ASC')
+            .skip((page - 1) * limit)
+            .take(limit);
+
+        const { entities, raw } = await qb.getRawAndEntities();
+        const total = await qb.getCount();
+
+        const shopItems = entities.map((shop, i) => {
+            const distance = parseFloat(raw[i]?.distance ?? '0');
+            return this.mapToResponseDto(shop, distance);
+        });
+
+        const totalPages = Math.ceil(total / limit);
+
+        return {
+            items: shopItems,
+            meta: {
+                totalItems: total,
+                itemCount: shopItems.length,
+                itemsPerPage: limit,
+                totalPages,
+                currentPage: Number(page),
+            },
+        };
+    }
+
+    async searchByName(query: string, lat: number, lon: number, radius?: number, page: number = 1, limit: number = 10) {
+        const queryBuilder = this.repository.createQueryBuilder('shop')
+            .leftJoinAndSelect('shop.items', 'items')
+            .leftJoinAndSelect('shop.vendorProfile', 'vendorProfile');
+
+        // Text Similarity Score (70% weight)
+        queryBuilder.addSelect('similarity(shop.shopName, :query)', 'similarity_score');
+
+        // Proximity Score (30% weight)
+        queryBuilder.addSelect('ST_Distance(shop.location, ST_SetSRID(ST_Point(:lon, :lat), 4326)::geography)', 'distance');
+
+        const params: any = { query, lat, lon, isActive: true };
+        const conditions: string[] = [
+            'shop.isActive = :isActive',
+            'similarity(shop.shopName, :query) > 0.15'
+        ];
+
+        if (radius) {
+            conditions.push('ST_DWithin(shop.location, ST_SetSRID(ST_Point(:lon, :lat), 4326)::geography, :radius)');
+            params.radius = radius;
+        }
+
+        queryBuilder.where(conditions.join(' AND '), params);
+
+        queryBuilder
+            .orderBy('similarity_score', 'DESC')
+            .addOrderBy('vendorProfile.isVerified', 'DESC')
             .addOrderBy('distance', 'ASC');
 
         const paginatedShops = await paginate<Shops>(queryBuilder, { page, limit });
@@ -269,7 +351,6 @@ export class ShopService {
             paginatedShops.links
         );
     }
-
     async updateShopActivity(shopId: string): Promise<void> {
         await this.repository.update(shopId, {
             lastInventoryUpdate: new Date()

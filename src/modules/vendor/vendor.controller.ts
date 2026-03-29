@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, Put, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Param, Patch, Post, Put, Req, UseGuards, Query } from "@nestjs/common";
 import { VendorService } from "./vendor.service";
 import { CreateVendorDto, UpdateVendorDto } from "./dto/vendor.dto";
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
@@ -69,4 +69,28 @@ export class VendorController {
         return await this.vendorService.getMeVendorProfile(req.user.id);
     }
 
+    @Get('portfolio/search')
+    @ApiOperation({ summary: 'Search within vendor portfolio (shops and items)' })
+    @ApiResponse({ status: 200, description: 'Search results fetched successfully' })
+    async searchPortfolio(
+        @Req() req: any, 
+        @Query('query') query: string,
+        @Query('page') page: string,
+        @Query('limit') limit: string
+    ) {
+        return await this.vendorService.searchPortfolio(
+            req.user.id, 
+            query, 
+            page ? parseInt(page) : 1, 
+            limit ? parseInt(limit) : 10
+        );
+    }
+
+    @Get('portfolio/performance')
+    @ApiOperation({ summary: 'Get portfolio performance analytics (best/worst items)' })
+    @ApiResponse({ status: 200, description: 'Performance data fetched successfully' })
+    async getPortfolioPerformance(@Req() req: any, @Query('days') daysString: string) {
+        const days = daysString ? parseInt(daysString) : 30;
+        return await this.vendorService.getPortfolioPerformance(req.user.id, days);
+    }
 }

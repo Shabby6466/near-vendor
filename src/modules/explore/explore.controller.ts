@@ -1,7 +1,7 @@
 import { Controller, Get, Param, Query, UseGuards } from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { ExploreService } from "./explore.service";
-import { NearbyShopsQueryDto, SearchItemsQueryDto } from "./dto/explore.dto";
+import { NearbyShopsQueryDto, SearchItemsQueryDto, SearchShopsQueryDto } from "./dto/explore.dto";
 import { OptionalAuthGuard } from "@modules/auth/auth-utils/optional-guard";
 import { CurrentUser } from "@modules/common/decorator/current-user.decorator";
 import { User } from "models/entities/users.entity";
@@ -16,7 +16,22 @@ export class ExploreController {
     @ApiOperation({ summary: 'Find shops based on GPS coordinates' })
     @ApiResponse({ status: 200, description: 'Nearby shops retrieved successfully' })
     async findNearbyShops(@Query() query: NearbyShopsQueryDto) {
-        return await this.exploreService.findNearbyShops(query.lat, query.lon, query.radius, query.page, query.limit);
+        return await this.exploreService.findNearbyShops(query.lat, query.lon, query.radius, query.page, query.limit, query.categoryId);
+    }
+
+    @Get('shops/map')
+    @ApiOperation({ summary: 'Get lightweight shop data for map (Unguarded)' })
+    @ApiResponse({ status: 200, description: 'Map data retrieved successfully' })
+    async getShopsForMap(@Query() query: NearbyShopsQueryDto) {
+        return await this.exploreService.getShopsForMap(query.lat, query.lon, query.radius, query.categoryId);
+    }
+
+    @Get('shops/search')
+    @UseGuards(OptionalAuthGuard)
+    @ApiOperation({ summary: 'Fuzzy search for shops by name' })
+    @ApiResponse({ status: 200, description: 'Shops found successfully' })
+    async searchShops(@Query() query: SearchShopsQueryDto, @CurrentUser() user?: User) {
+        return await this.exploreService.searchShops(query.query, query.lat, query.lon, query.radius, query.page, query.limit, user?.id);
     }
 
     @Get('shop/:id')

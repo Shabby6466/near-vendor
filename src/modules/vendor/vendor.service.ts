@@ -1,17 +1,26 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Inject, forwardRef } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Vendors } from "../../models/entities/vendors.entity";
-import { Repository } from "typeorm";
+import { Repository, ILike } from "typeorm";
 import { CreateVendorDto, UpdateVendorDto } from "./dto/vendor.dto";
 import { ResponseCode, UserRoles } from "@utils/enum";
 import { UserService } from "@modules/users/users.service";
+import { Shops } from "models/entities/shops.entity";
+import { Item } from "models/entities/items.entity";
+import { AnalyticsService } from "@modules/analytics/analytics.service";
 
 @Injectable()
 export class VendorService {
     constructor(
         @InjectRepository(Vendors)
         private readonly vendorRepository: Repository<Vendors>,
+        @InjectRepository(Shops)
+        private readonly shopRepository: Repository<Shops>,
+        @InjectRepository(Item)
+        private readonly itemRepository: Repository<Item>,
         private readonly userService: UserService,
+        @Inject(forwardRef(() => AnalyticsService))
+        private readonly analyticsService: AnalyticsService,
     ) { }
 
     async findById(id: string) {
@@ -127,4 +136,120 @@ export class VendorService {
         }
     }
 
+    async searchPortfolio(userId: string, query: string, page: number = 1, limit: number = 10) {
+        const vendor = await this.findByUserId(userId);
+        if (!vendor) return { statusCode: ResponseCode.NOT_FOUND, message: 'Vendor not found' };
+
+        const skip = (page - 1) * limit;
+
+        const [shops, totalShops] = await this.shopRepository.findAndCount({
+            where: {
+                vendorProfile: { id: vendor.id },
+                shopName: ILike(`%${query}%`)
+            },
+            take: limit,
+            skip: skip
+        });
+
+        const [items, totalItems] = await this.itemRepository.findAndCount({
+            where: {
+                shop: { vendorProfile: { id: vendor.id } },
+                name: ILike(`%${query}%`)
+            },
+            relations: ['shop'],
+            select: {
+                id: true,
+                name: true,
+                price: true,
+                imageUrl: true,
+                stockCount: true,
+                shop: {
+                    id: true,
+                    shopName: true
+                }
+            },
+            take: limit,
+            skip: skip
+        });
+
+        return {
+            statusCode: ResponseCode.SUCCESS,
+            data: {
+                shops,
+                items,
+                pagination: {
+                    page,
+                    limit,
+                    totalShops,
+                    totalItems,
+                    totalPageShops: Math.ceil(totalShops / limit),
+                    totalPageItems: Math.ceil(totalItems / limit)
+                }
+            }
+        };
+    }
+
+    async getPortfolioPerformance(userId: string, days: number = 30) {
+        const vendor = await this.findByUserId(userId);
+        if (!vendor) return { statusCode: ResponseCode.NOT_FOUND, message: 'Vendor not found' };
+
+        const shops = await this.shopRepository.find({
+            where: { vendorProfile: { id: vendor.id } },
+            select: ['id']
+        });
+
+        const shopIds = shops.map(s => s.id);
+        const performance = await this.analyticsService.getItemPerformance(shopIds, days);
+
+        // Map results back to item details
+        const topItemDetails = await Promise.all(
+            performance.topItems.map(async (p: any) => {
+                const item = await this.itemRepository.findOne({ 
+                    where: { id: p.itemId },
+                    relations: ['shop'],
+                    select: {
+                        id: true,
+                        name: true,
+                        price: true,
+                        imageUrl: true,
+                        stockCount: true,
+                        shop: {
+                            id: true,
+                            shopName: true
+                        }
+                    }
+                });
+                return item ? { ...item, count: parseInt(p.count) } : null;
+            })
+        );
+
+        const poorItemDetails = await Promise.all(
+            performance.poorItems.map(async (p: any) => {
+                const item = await this.itemRepository.findOne({ 
+                    where: { id: p.itemId },
+                    relations: ['shop'],
+                    select: {
+                        id: true,
+                        name: true,
+                        price: true,
+                        imageUrl: true,
+                        stockCount: true,
+                        shop: {
+                            id: true,
+                            shopName: true
+                        }
+                    }
+                });
+                return item ? { ...item, count: parseInt(p.count) } : null;
+            })
+        );
+
+        return {
+            statusCode: ResponseCode.SUCCESS,
+            data: {
+                bestPerformers: topItemDetails.filter(i => i !== null),
+                poorPerformers: poorItemDetails.filter(i => i !== null)
+            }
+        };
+    }
 }

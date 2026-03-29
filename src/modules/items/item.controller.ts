@@ -48,13 +48,13 @@ export class ItemController {
         return await this.service.deleteItem(id, req.user.id);
     }
 
-    @Get('get-all-by-shop/:shopId')
+    @Get('get-all-by-shop')
     @ApiOperation({
         summary: 'Get all items by shop id',
         description: 'Gets all items in a specific shop',
     })
-    @ApiParam({ name: "shopId", description: "The UUID of the shop", example: "8181903d-b6cb-43ee-889f-b3b2999601ef" })
-    async getAllByShopId(@Param('shopId') shopId: string, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    @ApiQuery({ name: "shopId", description: "The UUID of the shop", example: "8181903d-b6cb-43ee-889f-b3b2999601ef" })
+    async getAllByShopId(@Query('shopId') shopId: string, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
         const options = await Pagination.paginate(req, res);
         return await this.service.getAllItemsByShopId(shopId, options);
     }

@@ -1,5 +1,5 @@
 import { BaseEntity } from "@modules/common/entity/base.entity";
-import { Entity, Column, ManyToOne, OneToOne, Index } from "typeorm";
+import { Entity, Column, ManyToOne, OneToOne, Index, JoinColumn } from "typeorm";
 import { Shops } from "./shops.entity";
 import { Category } from "./categories.entity";
 
@@ -43,6 +43,7 @@ export class Item extends BaseEntity {
     @ManyToOne(() => Shops, (shop) => shop.items, { onDelete: 'CASCADE' })
     shop: Shops;
 
-    @OneToOne(() => Category, (category) => category.item)
+    @ManyToOne(() => Category, (category) => category.items, { nullable: true })
+    @JoinColumn({ name: 'category_id' })
     category: Category;
 }

@@ -10,11 +10,21 @@ export class CategoriesService {
         private readonly categoryRepo: Repository<Category>,
     ) { }
 
-    async getAllCategoryNames(): Promise<string[]> {
+    async getAllCategories(): Promise<{id: string, name: string}[]> {
         const categories = await this.categoryRepo.find({
-            select: ["categoryName"],
+            select: ["id", "categoryName"],
             order: { categoryName: "ASC" },
         });
-        return categories.map((c) => c.categoryName);
+        return categories.map((c) => ({
+            id: c.id,
+            name: c.categoryName
+        }));
+    }
+
+    async getSuggestedCategories(query: string, limit: number = 5): Promise<Category[]> {
+        return this.categoryRepo.createQueryBuilder('category')
+            .where('category.categoryName % :query', { query })
+            .take(limit)
+            .getMany();
     }
 }

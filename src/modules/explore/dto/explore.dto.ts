@@ -30,10 +30,22 @@ export class NearbyShopsQueryDto {
     @IsNumber()
     @Type(() => Number)
     limit?: number;
+
+    @ApiProperty({ example: 'uuid-of-category', required: false })
+    @IsOptional()
+    @IsString()
+    categoryId?: string;
 }
 
 export class SearchItemsQueryDto extends NearbyShopsQueryDto {
     @ApiProperty({ example: 'Fresh Milk', description: 'The search term for items' })
+    @IsString()
+    @IsNotEmpty()
+    query: string;
+}
+
+export class SearchShopsQueryDto extends NearbyShopsQueryDto {
+    @ApiProperty({ example: 'Bake Studio', description: 'The search term for shops' })
     @IsString()
     @IsNotEmpty()
     query: string;

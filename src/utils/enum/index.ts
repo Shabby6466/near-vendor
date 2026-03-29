@@ -60,6 +60,7 @@ export enum ResponseCode {
   EMAIL_ALREADY_EXISTS = 406,
   INVALID_ROLE = 402,
   INVALID_OTP = 403,
+  NO_NEARBY_SHOPS = 410,
 }
 
 export enum UserStatus {

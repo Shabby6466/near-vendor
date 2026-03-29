@@ -7,14 +7,14 @@ import { CreateShopDto, DeleteShopDto, UpdateShopDto } from "./dto/shop.dto";
 
 @Controller('shops')
 @ApiTags('shops')
-@ApiBearerAuth()
-@UseGuards(JwtAuthGuard, VerifiedVendorGuard)
 export class ShopController {
     constructor(private readonly shopService: ShopService) { }
 
     @Post('create')
     @ApiOperation({ summary: 'Create a new shop' })
     @ApiResponse({ status: 201, description: 'Shop created successfully' })
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard, VerifiedVendorGuard)
     async createShop(@Req() req: any, @Body() shopDto: CreateShopDto) {
         return await this.shopService.createShop(req.user.id, shopDto);
     }
@@ -22,6 +22,8 @@ export class ShopController {
     @Patch('update/:id')
     @ApiOperation({ summary: 'Update shop profile' })
     @ApiResponse({ status: 200, description: 'Shop profile updated successfully' })
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard, VerifiedVendorGuard)
     async updateShop(@Param('id') id: string, @Req() req: any, @Body() shopDto: UpdateShopDto) {
         return await this.shopService.updateShop(req.user.id, id, shopDto);
     }
@@ -29,6 +31,8 @@ export class ShopController {
     @Delete('delete')
     @ApiOperation({ summary: 'Delete shop' })
     @ApiResponse({ status: 200, description: 'Shop deleted successfully' })
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard, VerifiedVendorGuard)
     async deleteShop(@Req() req: any, @Body() shopId: DeleteShopDto) {
         return await this.shopService.deleteShop(req.user.id, shopId.shopId);
     }
@@ -36,6 +40,8 @@ export class ShopController {
     @Get('me/shops')
     @ApiOperation({ summary: 'Find my all shops' })
     @ApiResponse({ status: 200, description: 'Shop found successfully' })
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard, VerifiedVendorGuard)
     async findShopByVendorId(@Req() req: any,) {
         return await this.shopService.findByVendor(req.user.id,);
     }
@@ -43,6 +49,8 @@ export class ShopController {
     @Get('completion-status/:id')
     @ApiOperation({ summary: 'Get shop completion checklist' })
     @ApiResponse({ status: 200, description: 'Shop completion status retrieved successfully' })
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard, VerifiedVendorGuard)
     async getCompletionStatus(@Param('id') id: string, @Req() req: any) {
         return await this.shopService.getShopCompletionStatus(req.user.id, id);
     }
@@ -50,7 +58,6 @@ export class ShopController {
     @Get(':id')
     @ApiOperation({ summary: 'Get shop by ID' })
     @ApiResponse({ status: 200, description: 'Shop found successfully' })
-    @UseGuards(JwtAuthGuard)
     async getShopById(@Param('id') id: string) {
         return await this.shopService.getShopById(id);
     }

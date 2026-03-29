@@ -1,9 +1,11 @@
 import { BaseEntity } from "@modules/common/entity/base.entity";
-import { Entity, Column, ManyToOne, Index, OneToMany } from "typeorm";
+import { Entity, Column, ManyToOne, Index, OneToMany, JoinColumn } from "typeorm";
 import { Vendors } from "./vendors.entity";
 import { Item } from "./items.entity";
+import { Category } from "./categories.entity";
 
 @Entity({ name: "shops" })
+@Index('idx_shops_name_trgm', ['shopName'], { unique: false, where: `"shop_name" IS NOT NULL` }) // Postgres uses snake_case for columns
 export class Shops extends BaseEntity {
     @Column({ type: 'varchar', length: 100 })
     shopName: string;
@@ -38,8 +40,13 @@ export class Shops extends BaseEntity {
     @Column({ type: 'varchar', nullable: true })
     shopLogoUrl: string;
 
-    @Column({ type: 'varchar', length: 100, nullable: true })
-    businessCategory: string;
+    @ManyToOne(() => Category, (category) => category.shops)
+    @JoinColumn({ name: 'category_id' })
+    category: Category;
+
+    @Column({ type: 'uuid', name: 'category_id', nullable: true })
+    categoryId: string;
+
 
     @Column({ type: 'varchar', length: 100, nullable: true })
     registrationNumber: string;
@@ -52,7 +59,7 @@ export class Shops extends BaseEntity {
 
     @Column({ type: 'jsonb', nullable: true })
     operatingHours: any;
-  
+
     @Column({ type: 'timestamptz', nullable: true })
     lastInventoryUpdate: Date;
 

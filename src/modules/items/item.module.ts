@@ -7,13 +7,19 @@ import { Item } from "models/entities/items.entity";
 import { VendorModule } from "../vendor/vendor.module";
 import { AuthModule } from "../auth/auth.module";
 import { AnalyticsModule } from "@modules/analytics/analytics.module";
-
-import { Category } from "models/entities/categories.entity";
-import { SearchHistory } from "models/entities/search-history.entity";
-import { RecentItem } from "models/entities/recent-item.entity";
+import { HistoryModule } from "../history/history.module";
+import { CategoriesModule } from "../categories/categories.module";
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Item, Category, SearchHistory, RecentItem]), ShopModule, VendorModule, AuthModule, AnalyticsModule],
+    imports: [
+        TypeOrmModule.forFeature([Item]), 
+        ShopModule, 
+        VendorModule, 
+        AuthModule, 
+        AnalyticsModule, 
+        HistoryModule, 
+        CategoriesModule
+    ],
     controllers: [ItemController],
     providers: [ItemService],
     exports: [ItemService],

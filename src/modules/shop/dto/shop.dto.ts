@@ -18,12 +18,11 @@ export class CreateShopDto {
     shopName: string;
 
     @ApiProperty({
-        enum: [''],
-        example: 'food'
+        example: 'uuid-of-category'
     })
     @IsString()
     @IsNotEmpty()
-    businessCategory: string;
+    categoryId: string;
 
     @ApiProperty({
         example: '123456789',
@@ -172,6 +171,15 @@ export class ShopResponseDto {
 
     @ApiProperty({ example: true })
     isActive: boolean;
+
+    @ApiProperty({ example: 'uuid-of-category' })
+    categoryId: string;
+
+    @ApiProperty({ example: 22.343434 })
+    shopLongitude: number;
+
+    @ApiProperty({ example: 22.343434 })
+    shopLatitude: number;
 
     @ApiProperty({ example: 1.5, description: 'Distance in kilometers' })
     distance?: number;

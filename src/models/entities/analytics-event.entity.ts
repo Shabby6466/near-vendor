@@ -24,4 +24,13 @@ export class AnalyticsEvent extends BaseEntity {
 
     @Column({ type: 'jsonb', nullable: true })
     metadata: any;
+
+    @Index({ spatial: true })
+    @Column({
+        type: 'geography',
+        spatialFeatureType: 'Point',
+        srid: 4326,
+        nullable: true,
+    })
+    location: any;
 }

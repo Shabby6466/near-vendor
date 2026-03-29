@@ -9,15 +9,14 @@ export class CategoriesController {
 
     @Get("get-all-names")
     @ApiOperation({
-        summary: "Get all category names",
-        description: "Returns a list of all category names available in the system.",
+        summary: "Get all categories",
+        description: "Returns a list of all category IDs and names available in the system.",
     })
     @ApiResponse({
         status: 200,
-        description: "List of category names retrieved successfully.",
-        type: [String],
+        description: "List of categories retrieved successfully.",
     })
-    async getAllCategoryNames(): Promise<string[]> {
-        return await this.categoriesService.getAllCategoryNames();
+    async getAllCategories(): Promise<{ id: string, name: string }[]> {
+        return await this.categoriesService.getAllCategories();
     }
 }

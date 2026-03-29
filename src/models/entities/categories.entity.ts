@@ -1,6 +1,7 @@
 import { BaseEntity } from "@modules/common/entity/base.entity";
-import { Entity, Column, OneToOne } from "typeorm";
+import { Entity, Column, OneToOne, OneToMany, ManyToMany } from "typeorm";
 import { Item } from "./items.entity";
+import { Shops } from "./shops.entity";
 
 
 
@@ -12,6 +13,9 @@ export class Category extends BaseEntity {
     @Column({ type: 'varchar', nullable: true })
     iconUrl: string;
 
-    @OneToOne(() => Item, (item) => item.category)
-    item: Item;
+    @OneToMany(() => Item, (item) => item.category)
+    items: Item[];
+
+    @OneToMany(() => Shops, (shop) => shop.category)
+    shops: Shops[];
 }

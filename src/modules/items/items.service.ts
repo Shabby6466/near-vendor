@@ -3,6 +3,8 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { ILike, Repository } from "typeorm";
 import { Item } from "models/entities/items.entity";
 import { CreateItemDto, ItemByIdResponseDto, ItemResponseDto, UpdateItemDto } from "./dto/item.dto";
+import { VerifiedVendorGuard } from '@modules/vendor/guards/verified-vendor.guard';
+import { OptionalAuthGuard } from '@modules/auth/auth-utils/optional-guard';
 import { ShopService } from "@modules/shop/shop.service";
 import { AIService } from "@modules/ai/ai.service";
 import { ShopNotFoundException } from "@modules/shop/shop.exception";
@@ -11,9 +13,8 @@ import { paginate, IPaginationOptions, Pagination } from "nestjs-typeorm-paginat
 import { ResponseCode } from "@utils/enum";
 import { AnalyticsService } from "@modules/analytics/analytics.service";
 import { AnalyticsEventType } from "models/entities/analytics-event.entity";
-import { Category } from "models/entities/categories.entity";
-import { SearchHistory } from "models/entities/search-history.entity";
-import { RecentItem } from "models/entities/recent-item.entity";
+import { CategoriesService } from "../categories/categories.service";
+import { HistoryService } from "../history/history.service";
 
 
 @Injectable()
@@ -21,12 +22,8 @@ export class ItemService {
     constructor(
         @InjectRepository(Item)
         private readonly itemRepo: Repository<Item>,
-        @InjectRepository(Category)
-        private readonly categoryRepo: Repository<Category>,
-        @InjectRepository(SearchHistory)
-        private readonly searchHistoryRepo: Repository<SearchHistory>,
-        @InjectRepository(RecentItem)
-        private readonly recentItemRepo: Repository<RecentItem>,
+        private readonly categoriesService: CategoriesService,
+        private readonly historyService: HistoryService,
         private readonly shopService: ShopService,
         private readonly analyticsService: AnalyticsService,
         private readonly aiService: AIService,
@@ -231,30 +228,12 @@ export class ItemService {
         }
 
         if (userId && searchTerm) {
-            await this.searchHistoryRepo.createQueryBuilder()
-                .insert()
-                .into(SearchHistory)
-                .values({ userId, query: searchTerm })
-                .orUpdate(['updated_at'], ['user_id', 'query'])
-                .execute();
-
-            const historyCount = await this.searchHistoryRepo.countBy({ userId });
-            if (historyCount > 10) {
-                const oldestSearches = await this.searchHistoryRepo.find({
-                    where: { userId },
-                    order: { updatedAt: 'ASC' },
-                    take: historyCount - 10
-                });
-                await this.searchHistoryRepo.remove(oldestSearches);
-            }
+            void this.historyService.saveSearchHistory(userId, searchTerm);
         }
 
         let suggestedCategories = [];
         if (items.length === 0) {
-            suggestedCategories = await this.categoryRepo.createQueryBuilder('category')
-                .where('category.categoryName % :query', { query: searchTerm })
-                .take(5)
-                .getMany();
+            suggestedCategories = await this.categoriesService.getSuggestedCategories(searchTerm);
         }
         const responseItems = items.map(item => ItemResponseDto.fromEntity(item));
         return {
@@ -287,23 +266,7 @@ export class ItemService {
 
         // Only store as "Recently Viewed" if the current user is NOT the owner of the item
         if (userId && item.shop?.vendorProfile?.user?.id !== userId) {
-            await this.recentItemRepo.createQueryBuilder()
-                .insert()
-                .into(RecentItem)
-                .values({ userId, itemId: id })
-                .orUpdate(['updated_at'], ['user_id', 'item_id'])
-                .execute();
-
-            // Cleanup: keep only top 10
-            const historyCount = await this.recentItemRepo.countBy({ userId });
-            if (historyCount > 10) {
-                const oldestItems = await this.recentItemRepo.find({
-                    where: { userId },
-                    order: { updatedAt: 'ASC' },
-                    take: historyCount - 10
-                });
-                await this.recentItemRepo.remove(oldestItems);
-            }
+            void this.historyService.saveRecentItem(userId, id, item.shop?.vendorProfile?.user?.id);
         }
 
         return {
@@ -399,14 +362,16 @@ export class ItemService {
 
         if (items.length > 0) {
             void this.analyticsService.trackSearch(searchTerm, lat, lon, entities.map(i => i.id), userId);
+            
+            // Save search history for authenticated users
+            if (userId && searchTerm && searchTerm.trim()) {
+                void this.historyService.saveSearchHistory(userId, searchTerm);
+            }
         }
 
         let suggestedCategories = [];
         if (items.length === 0 && searchTerm) {
-            suggestedCategories = await this.categoryRepo.createQueryBuilder('category')
-                .where('category.categoryName % :query', { query: searchTerm })
-                .take(5)
-                .getMany();
+            suggestedCategories = await this.categoriesService.getSuggestedCategories(searchTerm);
         }
 
         return {
