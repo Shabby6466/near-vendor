@@ -91,7 +91,7 @@ export class AdminService {
     if (res?.user?.role !== UserRoles.SUPERADMIN) {
       throw new BadRequestException("Invalid portal role");
     }
-    return { success: true, statusCode: 200, data: res };
+    return res;
   }
 }
 
