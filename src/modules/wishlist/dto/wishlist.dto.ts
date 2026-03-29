@@ -12,6 +12,11 @@ export class CreateWishlistDto {
     @IsString()
     description?: string;
     
+    @ApiProperty({ description: 'Optional category ID for the requested item', required: false })
+    @IsOptional()
+    @IsString()
+    categoryId?: string;
+    
     @ApiProperty({ description: 'User latitude (for spatial demand tracking)' })
     @IsNotEmpty()
     lat: number;

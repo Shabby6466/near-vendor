@@ -20,6 +20,9 @@ export class Wishlist extends BaseEntity {
     @Column({ type: 'text', nullable: true })
     description: string;
 
+    @Column({ type: 'uuid', nullable: true })
+    categoryId: string;
+
     @Column({
         type: 'enum',
         enum: WishlistStatus,
