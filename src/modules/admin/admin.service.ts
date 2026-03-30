@@ -6,6 +6,9 @@ import { UserService } from "@modules/users/users.service";
 import { VendorService } from "@modules/vendor/vendor.service";
 import { AuthService } from "@modules/auth/auth.service";
 import { UserRoles } from "@utils/enum";
+import { WishlistService } from "@modules/wishlist/wishlist.service";
+import { HistoryService } from "@modules/history/history.service";
+import { AnalyticsService } from "@modules/analytics/analytics.service";
 
 @Injectable()
 export class AdminService {
@@ -14,20 +17,11 @@ export class AdminService {
     private readonly userService: UserService,
     private readonly vendorService: VendorService,
     private readonly authService: AuthService,
+    private readonly wishlistService: WishlistService,
+    private readonly historyService: HistoryService,
+    private readonly analyticsService: AnalyticsService,
   ) { }
 
-  async listVendorApps(status?: string) {
-    const where: any = {};
-    if (status) where.status = status;
-    const data = await this.apps.find({ where, order: { createdAt: "DESC" } as any });
-    return { success: true, statusCode: 200, data };
-  }
-
-  async getVendorApp(id: string) {
-    const app = await this.apps.findOne({ where: { id } });
-    if (!app) throw new NotFoundException("Application not found");
-    return { success: true, statusCode: 200, data: app };
-  }
 
   async getAllUsers(page: number = 1, limit: number = 20) {
     const { users, total } = await this.userService.findAllUsers(page, limit);
@@ -92,6 +86,70 @@ export class AdminService {
       throw new BadRequestException("Invalid portal role");
     }
     return res;
+  }
+
+  async getBuyerDetail(userId: string, page: number = 1, limit: number = 20) {
+    const user = await this.userService.getUser(userId);
+    if (!user) {
+      throw new NotFoundException("User not found");
+    }
+
+    if (user.role !== UserRoles.BUYER) {
+      throw new BadRequestException("User is not a buyer");
+    }
+
+    // Fetch related paginated data using services
+    const wishlistRes = await this.wishlistService.getUserWishes(userId, page, limit);
+    const wishlist = wishlistRes.data.items;
+    const wishlistTotal = wishlistRes.data.meta.totalItems;
+
+    const { items: searchHistory, total: searchHistoryTotal } = await this.historyService.getUserSearchHistory(userId, page, limit);
+    const { items: recentItems, total: recentItemsTotal } = await this.historyService.getUserRecentItems(userId, page, limit);
+    const { items: analyticsEvents, total: analyticsEventsTotal } = await this.analyticsService.getUserEvents(userId, page, limit);
+
+    return {
+      success: true,
+      statusCode: 200,
+      data: {
+        user,
+        wishlist: {
+          items: wishlist,
+          pagination: {
+            page,
+            limit,
+            total: wishlistTotal,
+            totalPages: Math.ceil(wishlistTotal / limit)
+          }
+        },
+        searchHistory: {
+          items: searchHistory,
+          pagination: {
+            page,
+            limit,
+            total: searchHistoryTotal,
+            totalPages: Math.ceil(searchHistoryTotal / limit)
+          }
+        },
+        recentItems: {
+          items: recentItems,
+          pagination: {
+            page,
+            limit,
+            total: recentItemsTotal,
+            totalPages: Math.ceil(recentItemsTotal / limit)
+          }
+        },
+        analyticsEvents: {
+          items: analyticsEvents,
+          pagination: {
+            page,
+            limit,
+            total: analyticsEventsTotal,
+            totalPages: Math.ceil(analyticsEventsTotal / limit)
+          }
+        }
+      }
+    };
   }
 }
 

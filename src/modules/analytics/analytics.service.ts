@@ -250,4 +250,15 @@ export class AnalyticsService {
       poorItems
     };
   }
+
+  async getUserEvents(userId: string, page: number = 1, limit: number = 20) {
+    const skip = (page - 1) * limit;
+    const [items, total] = await this.eventRepo.findAndCount({
+      where: { userId },
+      order: { createdAt: 'DESC' },
+      skip,
+      take: limit
+    });
+    return { items, total };
+  }
 }

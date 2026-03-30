@@ -13,6 +13,9 @@ import { VendorModule } from "@modules/vendor/vendor.module";
 import { AuthModule } from "@modules/auth/auth.module";
 import { UsersModule } from "@modules/users/users.module";
 import { ItemModule } from "@modules/items/item.module";
+import { WishlistModule } from "@modules/wishlist/wishlist.module";
+import { HistoryModule } from "@modules/history/history.module";
+import { AnalyticsModule } from "@modules/analytics/analytics.module";
 
 @Module({
   imports: [
@@ -28,6 +31,9 @@ import { ItemModule } from "@modules/items/item.module";
     AuthModule,
     UsersModule,
     ItemModule,
+    WishlistModule,
+    HistoryModule,
+    AnalyticsModule,
   ],
   providers: [AdminService],
   controllers: [AdminSyncController, AdminController],

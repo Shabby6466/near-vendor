@@ -82,4 +82,27 @@ export class HistoryService {
             take: limit
         });
     }
+
+    async getUserSearchHistory(userId: string, page: number = 1, limit: number = 20) {
+        const skip = (page - 1) * limit;
+        const [items, total] = await this.searchHistoryRepo.findAndCount({
+            where: { userId },
+            order: { updatedAt: 'DESC' },
+            skip,
+            take: limit
+        });
+        return { items, total };
+    }
+
+    async getUserRecentItems(userId: string, page: number = 1, limit: number = 20) {
+        const skip = (page - 1) * limit;
+        const [items, total] = await this.recentItemRepo.findAndCount({
+            where: { userId },
+            relations: ['item'],
+            order: { updatedAt: 'DESC' },
+            skip,
+            take: limit
+        });
+        return { items, total };
+    }
 }

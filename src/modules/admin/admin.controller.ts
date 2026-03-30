@@ -81,4 +81,21 @@ export class AdminController {
     async getVendorById(@Param("id") id: string) {
         return await this.adminService.getVendorById(id);
     }
+
+    @Get("user/:id")
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(UserRoles.SUPERADMIN)
+    @ApiOperation({ summary: "Get a specific buyer profile and related paginated data (SUPERADMIN only)" })
+    @ApiResponse({ status: 200, description: "Buyer profile and related data fetched successfully" })
+    @ApiQuery({ name: "page", required: false, type: Number })
+    @ApiQuery({ name: "limit", required: false, type: Number })
+    async getBuyerDetail(
+        @Param("id") id: string,
+        @Query("page") pageString: string,
+        @Query("limit") limitString: string
+    ) {
+        const page = pageString ? parseInt(pageString) : 1;
+        const limit = limitString ? parseInt(limitString) : 20;
+        return await this.adminService.getBuyerDetail(id, page, limit);
+    }
 }
