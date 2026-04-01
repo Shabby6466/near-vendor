@@ -1,27 +1,22 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { MailerSend, EmailParams, Sender, Recipient } from "mailersend";
+import sgMail from '@sendgrid/mail';
 import { email_auth } from './templates/email_auth';
 
 
 @Injectable()
 export class MailService {
-  private mailerSend: MailerSend;
 
-  constructor(private configService: ConfigService) { }
-
-  private getClient() {
-    if (!this.mailerSend) {
-      this.mailerSend = new MailerSend({
-        apiKey: this.configService.get<string>('MAILER_API_KEY'),
-      });
+  constructor(private configService: ConfigService) {
+    const apiKey = this.configService.get<string>('SENDGRID_API');
+    if (apiKey) {
+      sgMail.setApiKey(apiKey);
     }
-    return this.mailerSend;
   }
 
   /**
    * Send verification code email to user on signup
-   * @param email - User's email address
+   * @param recipientEmail - User's email address
    * @param verificationCode - The verification code to send
    */
   public async sendEmailVerificationCode(recipientEmail: string, verificationCode: string): Promise<void> {
@@ -29,26 +24,24 @@ export class MailService {
     const senderName = this.configService.get<string>('MAILER_SENDER_NAME') || "NearVendor";
 
 
-    const sentFrom = new Sender(senderEmail, senderName);
-    const recipients = [
-      new Recipient(recipientEmail, "User")
-    ];
-    const emailParams = new EmailParams()
-      .setFrom(sentFrom)
-      .setTo(recipients)
-      .setReplyTo(sentFrom)
-      .setSubject("Email Authentication")
-      .setHtml(email_auth(verificationCode))
-      .setText(`Your verification code is: ${verificationCode}`);
+    const msg = {
+      to: recipientEmail,
+      from: {
+        email: senderEmail,
+        name: senderName,
+      },
+      subject: 'Email Authentication',
+      text: `Your verification code is: ${verificationCode}`,
+      html: email_auth(verificationCode),
+    };
 
     try {
-      const response = await this.getClient().email.send(emailParams);
-      console.log("Mailersend response:", response);
+      const response = await sgMail.send(msg);
+      console.log("SendGrid response code:", response[0].statusCode);
     } catch (err) {
-      console.error("Mailersend full error:", JSON.stringify(err, null, 2));
-      // Re-throw with more details if possible
-      const errorMsg = err.message || (err.body ? JSON.stringify(err.body) : JSON.stringify(err));
-      throw new Error(`Failed to send verification email: ${errorMsg}`);
+      console.error("SendGrid error details:", JSON.stringify(err, null, 2));
+      const errorMsg = err.response?.body?.errors?.[0]?.message || err.message || JSON.stringify(err);
+      throw new Error(`Failed to send verification email via SendGrid: ${errorMsg}`);
     }
   }
 
