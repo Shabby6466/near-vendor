@@ -164,7 +164,13 @@ export class AnalyticsService {
     });
 
     const shopIds = shops.map(s => s.id);
-    if (shopIds.length === 0) return [];
+    if (shopIds.length === 0) return [
+      {
+        success: true,
+        statusCode: ResponseCode.SUCCESS,
+        data: []
+      }
+    ];
 
     const portfolioStats = await this.getPortfolioStats(shopIds, days);
 

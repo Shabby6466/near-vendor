@@ -39,4 +39,28 @@ export class Wishlist extends BaseEntity {
         nullable: true,
     })
     location: any;
+
+    @Column({
+        type: "text",
+        nullable: true,
+        select: false,
+        name: 'embedding',
+        transformer: {
+            to: (value: number[]) => (value && Array.isArray(value)) ? `[${value.join(",")}]` : value,
+            from: (value: string) => (typeof value === "string") ? value.replace(/[\[\]]/g, "").split(",").map(Number) : value
+        }
+    })
+    embedding?: number[];
+
+    @Column({
+        type: "text",
+        nullable: true,
+        select: false,
+        name: 'text_embedding',
+        transformer: {
+            to: (value: number[]) => (value && Array.isArray(value)) ? `[${value.join(",")}]` : value,
+            from: (value: string) => (typeof value === "string") ? value.replace(/[\[\]]/g, "").split(",").map(Number) : value
+        }
+    })
+    textEmbedding?: number[];
 }

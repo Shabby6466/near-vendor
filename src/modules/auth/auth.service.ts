@@ -24,16 +24,27 @@ export class AuthService {
         expiryTime?: number | string | null,
         subject?: string,
     ) {
+        const accessToken = this.jwtService.sign(
+            { uuid: user?.id, role: user?.role },
+            {
+                secret: process.env.JWT_SECRET,
+                subject: subject ? subject : '',
+                expiresIn: expiryTime ? expiryTime : process.env.JWT_EXPIRES_IN,
+            },
+        );
+
+        const refreshToken = this.jwtService.sign(
+            { uuid: user?.id, role: user?.role },
+            {
+                secret: process.env.JWT_REFRESH_SECRET,
+                expiresIn: process.env.JWT_REFRESH_EXPIRES_IN,
+            },
+        );
+
         return {
             expiresIn: expiryTime ? expiryTime : process.env.JWT_EXPIRES_IN,
-            accessToken: this.jwtService.sign(
-                { uuid: user?.id, role: user?.role },
-                {
-                    secret: process.env.JWT_SECRET,
-                    subject: subject ? subject : '',
-                    expiresIn: expiryTime ? expiryTime : process.env.JWT_EXPIRES_IN,
-                },
-            ),
+            accessToken,
+            refreshToken,
             user,
         };
     }
@@ -49,14 +60,15 @@ export class AuthService {
         if (dto.role != UserRoles.BUYER && dto.role != UserRoles.VENDOR) {
             throw new InvalidRoleException();
         }
-        // const otp = await this.otpService.generateOtp(dto.email, dto);
+        const otp = await this.otpService.generateOtp(dto.email, dto);
         // // Generate and send OTP, caching the DTO
-        await this.otpService.sendOtp(dto.email, dto);
+        // await this.otpService.sendOtp(dto.email, dto);
 
         return {
             success: true,
             statusCode: ResponseCode.SUCCESS,
             message: "OTP sent to email. Please verify to complete registration.",
+            otp,
         };
     }
     async verifyAndCreateUser(email: string, otp: string) {
@@ -101,6 +113,7 @@ export class AuthService {
             message: ResponseMessage.SUCCESS,
             user,
             token: tokenData.accessToken,
+            refreshToken: tokenData.refreshToken,
         };
     }
     async login(dto: LoginDto) {
@@ -127,7 +140,36 @@ export class AuthService {
             message: ResponseMessage.SUCCESS,
             user,
             token: tokenData.accessToken,
+            refreshToken: tokenData.refreshToken,
         };
+    }
+
+    async refreshToken(token: string) {
+        try {
+            const payload = this.jwtService.verify(token, {
+                secret: process.env.JWT_REFRESH_SECRET,
+            });
+
+            const user = await this.userService.getUser(payload.uuid);
+            if (!user) {
+                throw new UserNotFoundException();
+            }
+
+            if ((user as any).isActive === false) {
+                throw new InvalidCredentialsException();
+            }
+
+            const tokenData = await this.createToken(user);
+            return {
+                success: true,
+                statusCode: ResponseCode.SUCCESS,
+                message: ResponseMessage.SUCCESS,
+                token: tokenData.accessToken,
+                refreshToken: tokenData.refreshToken,
+            };
+        } catch (e) {
+            throw new InvalidCredentialsException();
+        }
     }
 
 }

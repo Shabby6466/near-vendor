@@ -204,7 +204,7 @@ export class VendorService {
         // Map results back to item details
         const topItemDetails = await Promise.all(
             performance.topItems.map(async (p: any) => {
-                const item = await this.itemRepository.findOne({ 
+                const item = await this.itemRepository.findOne({
                     where: { id: p.itemId },
                     relations: ['shop'],
                     select: {
@@ -225,7 +225,7 @@ export class VendorService {
 
         const poorItemDetails = await Promise.all(
             performance.poorItems.map(async (p: any) => {
-                const item = await this.itemRepository.findOne({ 
+                const item = await this.itemRepository.findOne({
                     where: { id: p.itemId },
                     relations: ['shop'],
                     select: {
@@ -257,7 +257,7 @@ export class VendorService {
         const skip = (page - 1) * limit;
         const where: any = {};
         if (status) where.status = status;
-        
+
         const [vendors, total] = await this.vendorRepository.findAndCount({
             where,
             relations: ['user'],
@@ -269,7 +269,7 @@ export class VendorService {
     }
 
     async getVendorById(id: string) {
-        return await this.vendorRepository.findOne({ 
+        return await this.vendorRepository.findOne({
             where: { id },
             relations: ['user', 'shops']
         });

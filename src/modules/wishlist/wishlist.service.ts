@@ -7,6 +7,8 @@ import { ShopService } from '../shop/shop.service';
 import { CreateWishlistDto } from './dto/wishlist.dto';
 import { ResponseCode } from '@utils/enum';
 
+import { AIService } from '../ai/ai.service';
+
 @Injectable()
 export class WishlistService {
     private readonly logger = new Logger(WishlistService.name);
@@ -16,6 +18,7 @@ export class WishlistService {
         private readonly wishlistRepository: Repository<Wishlist>,
         private readonly itemService: ItemService,
         private readonly shopService: ShopService,
+        private readonly aiService: AIService,
     ) { }
 
     async createWish(userId: string, dto: CreateWishlistDto) {
@@ -32,6 +35,20 @@ export class WishlistService {
             });
 
             await this.wishlistRepository.save(wish);
+
+            // Generate and update text embedding
+            try {
+                const embeddingText = `${wish.itemName} ${wish.description || ''}`;
+                const embedding = await this.aiService.generateEmbedding(embeddingText);
+                
+                await this.wishlistRepository.query(
+                    `UPDATE wishlists SET embedding = $1::vector, text_embedding = $1::vector WHERE id = $2`,
+                    [`[${embedding.join(",")}]`, wish.id]
+                );
+            } catch (error) {
+                this.logger.error(`Failed to generate embedding for wish ${wish.id}: ${error.message}`);
+            }
+
             return {
                 success: true,
                 statusCode: ResponseCode.SUCCESS,
@@ -51,11 +68,17 @@ export class WishlistService {
     async getUserWishes(userId: string, page: number = 1, limit: number = 10) {
         const skip = (page - 1) * limit;
         
-        const [wishes, total] = await this.wishlistRepository.findAndCount({
-            where: { user: { id: userId } },
-            order: { createdAt: 'DESC' },
-            skip,
-            take: limit
+        // Use QueryBuilder to explicitly select text_embedding which is hidden by default
+        const wishes = await this.wishlistRepository.createQueryBuilder('wish')
+            .addSelect('wish.text_embedding')
+            .where('wish.user_id = :userId', { userId })
+            .orderBy('wish.created_at', 'DESC')
+            .skip(skip)
+            .take(limit)
+            .getMany();
+            
+        const total = await this.wishlistRepository.count({
+            where: { user: { id: userId } }
         });
 
         const wishesWithMatches = await Promise.all(
@@ -70,7 +93,9 @@ export class WishlistService {
                             lon,
                             10000,
                             1,
-                            5
+                            5,
+                            undefined,
+                            wish.textEmbedding
                         );
                         matchedItems = searchResult.data || [];
                     } catch (err) {

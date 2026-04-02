@@ -313,10 +313,11 @@ export class ItemService {
         radius: number = 5000,
         page: number = 1,
         limit: number = 10,
-        userId?: string
+        userId?: string,
+        queryVectorInput?: number[]
     ) {
-        let queryVector: number[] | null = null;
-        if (searchTerm && searchTerm.trim()) {
+        let queryVector = queryVectorInput;
+        if (!queryVector && searchTerm && searchTerm.trim()) {
             queryVector = await this.aiService.generateEmbedding(searchTerm).catch((err) => {
                 console.error("Embedding generation failed:", err);
                 return null;

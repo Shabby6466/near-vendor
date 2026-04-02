@@ -1,10 +1,8 @@
 import { Body, Controller, Post } from "@nestjs/common";
 import { ApiOkResponse, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { CreateUserDto, LoginDto, VerifyOtpDto } from "@modules/users/dto/users.dto";
-import { UserService } from "@modules/users/users.service";
-import { UserRoles } from "@utils/enum";
-import { InvalidPortalRoleException } from "./auth-utils/role-login.exception";
 import { AuthService } from "./auth.service";
+import { RefreshTokenDto } from "./dto/refresh-token.dto";
 
 @ApiTags("Auth")
 @Controller("auth")
@@ -31,5 +29,11 @@ export class AuthController {
   @ApiOperation({ summary: "Login" })
   async login(@Body() dto: LoginDto) {
     return await this.authService.login(dto);
+  }
+
+  @Post("/refresh-token")
+  @ApiOperation({ summary: "Refresh access token" })
+  async refreshToken(@Body() dto: RefreshTokenDto) {
+    return await this.authService.refreshToken(dto.refreshToken);
   }
 }
