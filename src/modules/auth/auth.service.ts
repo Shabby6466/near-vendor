@@ -60,15 +60,15 @@ export class AuthService {
         if (dto.role != UserRoles.BUYER && dto.role != UserRoles.VENDOR) {
             throw new InvalidRoleException();
         }
-        const otp = await this.otpService.generateOtp(dto.email, dto);
+        // const otp = await this.otpService.generateOtp(dto.email, dto);
         // // Generate and send OTP, caching the DTO
-        // await this.otpService.sendOtp(dto.email, dto);
+        await this.otpService.sendOtp(dto.email, dto);
 
         return {
             success: true,
             statusCode: ResponseCode.SUCCESS,
             message: "OTP sent to email. Please verify to complete registration.",
-            otp,
+            // otp,
         };
     }
     async verifyAndCreateUser(email: string, otp: string) {
